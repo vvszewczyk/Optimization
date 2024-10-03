@@ -26,6 +26,7 @@
 *.la
 *.a
 *.lib
+*.json
 
 # Executables
 *.exe
