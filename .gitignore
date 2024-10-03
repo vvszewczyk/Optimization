@@ -10,7 +10,7 @@
 # Precompiled Headers
 *.gch
 *.pch
-*.ipch  # Dodane dla plików prekompilowanych nagłówków
+*.ipch
 
 # Compiled Dynamic libraries
 *.so
@@ -33,6 +33,7 @@
 *.app
 
 # Visual Studio specific
-*.vsdx  # Dodane dla plików sesji Visual Studio
-.vs/  # Ignorowanie całego katalogu .vs, który zawiera pliki tymczasowe projektu
-Browse.VC.db*  # Ignorowanie wszystkich plików związanych z bazą danych przeglądarki
+*.vsdx
+*.suo
+.vs/
+Browse.VC.db*
