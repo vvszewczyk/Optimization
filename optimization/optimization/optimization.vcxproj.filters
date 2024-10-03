@@ -15,40 +15,40 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\..\..\Downloads\user_funs.cpp">
+    <ClInclude Include="matrix.h">
       <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\Downloads\solution.cpp">
+    </ClInclude>
+    <ClInclude Include="ode_solver.h">
       <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\Downloads\opt_alg.cpp">
+    </ClInclude>
+    <ClInclude Include="opt_alg.h">
       <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\Downloads\ode_solver.cpp">
+    </ClInclude>
+    <ClInclude Include="solution.h">
       <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\Downloads\main.cpp">
+    </ClInclude>
+    <ClInclude Include="user_funs.h">
       <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\Downloads\matrix.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\..\..\Downloads\user_funs.h">
+    <ClCompile Include="main.cpp">
       <Filter>Source Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\Downloads\solution.h">
+    </ClCompile>
+    <ClCompile Include="matrix.cpp">
       <Filter>Source Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\Downloads\opt_alg.h">
+    </ClCompile>
+    <ClCompile Include="ode_solver.cpp">
       <Filter>Source Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\Downloads\ode_solver.h">
+    </ClCompile>
+    <ClCompile Include="opt_alg.cpp">
       <Filter>Source Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\Downloads\matrix.h">
+    </ClCompile>
+    <ClCompile Include="solution.cpp">
       <Filter>Source Files</Filter>
-    </ClInclude>
+    </ClCompile>
+    <ClCompile Include="user_funs.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

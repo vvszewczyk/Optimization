@@ -18,6 +18,21 @@
       <Platform>x64</Platform>
     </ProjectConfiguration>
   </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="matrix.h" />
+    <ClInclude Include="ode_solver.h" />
+    <ClInclude Include="opt_alg.h" />
+    <ClInclude Include="solution.h" />
+    <ClInclude Include="user_funs.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="main.cpp" />
+    <ClCompile Include="matrix.cpp" />
+    <ClCompile Include="ode_solver.cpp" />
+    <ClCompile Include="opt_alg.cpp" />
+    <ClCompile Include="solution.cpp" />
+    <ClCompile Include="user_funs.cpp" />
+  </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>17.0</VCProjectVersion>
     <Keyword>Win32Proj</Keyword>
@@ -126,21 +141,6 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
   </ItemDefinitionGroup>
-  <ItemGroup>
-    <ClCompile Include="..\..\..\..\Downloads\main.cpp" />
-    <ClCompile Include="..\..\..\..\Downloads\matrix.cpp" />
-    <ClCompile Include="..\..\..\..\Downloads\ode_solver.cpp" />
-    <ClCompile Include="..\..\..\..\Downloads\opt_alg.cpp" />
-    <ClCompile Include="..\..\..\..\Downloads\solution.cpp" />
-    <ClCompile Include="..\..\..\..\Downloads\user_funs.cpp" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="..\..\..\..\Downloads\matrix.h" />
-    <ClInclude Include="..\..\..\..\Downloads\ode_solver.h" />
-    <ClInclude Include="..\..\..\..\Downloads\opt_alg.h" />
-    <ClInclude Include="..\..\..\..\Downloads\solution.h" />
-    <ClInclude Include="..\..\..\..\Downloads\user_funs.h" />
-  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
