@@ -22,7 +22,7 @@ int main()
 {
 	try
 	{
-		lab0();
+		lab1();
 	}
 	catch (string EX_INFO)
 	{
@@ -68,7 +68,18 @@ void lab0()
 
 void lab1()
 {
+	double epsilon = 1e-2;
+	int Nmax = 10000;
+	//matrix lb(2, 1, -5), ub(2, 1, 5), a(2, 1);
+	solution X0, X1, X2;
+	X0.x = 0; //x0
+	//X0.fit_fun(function);
+	//X1.x=x0+di
+	//X1.fin_fun(function);
+	//if(X1.y>X0.y)
+	//...
 
+	std::cout << m2d(df1(62.7)) <<"\n";
 }
 
 void lab2()

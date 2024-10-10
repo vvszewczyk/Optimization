@@ -32,3 +32,10 @@ matrix df0(double t, matrix Y, matrix ud1, matrix ud2)
 	dY(1) = ((t <= ud2(1))*ud2(0) - m*g*l*sin(Y(0)) - b*Y(1)) / I;
 	return dY;
 }
+
+matrix df1(matrix x, matrix ud1, matrix ud2)
+{
+	matrix y;
+	y = -cos(0.1 * x(0)) * exp(-pow(0.1 * x(0) - (2 * 3.14), 2)) + 0.002 * pow(0.1 * x(0), 2);
+	return y;
+}

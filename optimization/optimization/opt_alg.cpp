@@ -66,7 +66,56 @@ solution lag(matrix(*ff)(matrix, matrix, matrix), double a, double b, double eps
 	try
 	{
 		solution Xopt;
-		//Tu wpisz kod funkcji
+		//int i = 0;
+//double ai = a, bi = b, ci = c;
+//double di = 0.0, diMinus1 = 0.0;
+
+//do {
+//	double l = (ff(ai) * (pow(bi, 2) - pow(ci, 2))) + (f(bi) * (pow(ci, 2) - pow(ai, 2))) + (f(ci) * (pow(ai, 2) - pow(bi, 2));
+//	double m = (ff(ai) * (bi - ci)) + (f(bi) * (ci - ai)) + (f(ci) * (ai - bi));
+
+//	if (m <= 0) {
+//		return -1; // error
+//	}
+
+//	di = 0.5 * l / m;
+
+//	if (ai < di && di < ci) {
+//		if (f(di) < f(ci)) {
+//			ai = ai;
+//			ci = di;
+//			bi = ci;
+//		}
+//		else {
+//			ai = di;
+//			ci = ci;
+//			bi = bi;
+//		}
+//	}
+//	else if (ci < di && di < bi) {
+//		if (f(di) < f(ci)) {
+//			ai = ci;
+//			ci = di;
+//			bi = bi;
+//		}
+//		else {
+//			ai = ai;
+//			ci = ci;
+//			bi = di;
+//		}
+//	}
+//	else {
+//		return -1; // error
+//	}
+
+//	i++;
+
+//	if (fcalls > Nmax) {
+//		return -1; // error
+//	}
+//} while ((bi - ai) < epsilon || std::abs(di - diMinus1) < gamma);
+
+//return di;
 
 		return Xopt;
 	}
