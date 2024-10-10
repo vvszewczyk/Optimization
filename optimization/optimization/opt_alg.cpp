@@ -50,7 +50,41 @@ solution fib(matrix(*ff)(matrix, matrix, matrix), double a, double b, double eps
 	try
 	{
 		solution Xopt;
-		//Tu wpisz kod funkcji
+		// Tu wpisz kod funkcji
+		int k = 0;
+		double phi_prev, phi_curr;
+
+		std::vector<double> fibonacci = { 1, 1 };
+
+		while (fibonacci.back() <= (b - a) / epsilon)
+		{
+			fibonacci.push_back(fibonacci[fibonacci.size() - 1] + fibonacci[fibonacci.size() - 2]);
+		}
+
+		k = fibonacci.size() - 1;
+
+		double ai = a, bi = b;
+		double ci = bi - (fibonacci[k - 1] / fibonacci[k]) * (bi - ai);
+		double di = ai + (bi - ci);
+
+		for (int i = 0; i < k - 2; i++)
+		{
+			if (ff(ci, ud1, ud2) < ff(di, ud1, ud2))
+			{
+				ai = ai;
+				bi = di;
+			}
+			else
+			{
+				bi = bi;
+				ai = ci;
+			}
+
+			ci = bi - (fibonacci[k - i - 2] / fibonacci[k - i - 1]) * (bi - ai);
+			di = ai + (bi - ci);
+		}
+
+		Xopt.x = ci;
 
 		return Xopt;
 	}
@@ -58,7 +92,6 @@ solution fib(matrix(*ff)(matrix, matrix, matrix), double a, double b, double eps
 	{
 		throw ("solution fib(...):\n" + ex_info);
 	}
-
 }
 
 solution lag(matrix(*ff)(matrix, matrix, matrix), double a, double b, double epsilon, double gamma, int Nmax, matrix ud1, matrix ud2)
