@@ -78,8 +78,13 @@ void lab1()
 	//X1.fin_fun(function);
 	//if(X1.y>X0.y)
 	//...
+	std::cout << m2d(df1(62.7)) << "\n";
 
-	std::cout << m2d(df1(62.7)) <<"\n";
+	// Testowanie algorytmu fib()
+	epsilon = 0.00000000001;
+	solution xopt = fib(df1, 50, 100, epsilon);
+	cout << m2d(xopt.x)<< "\n";
+
 }
 
 void lab2()

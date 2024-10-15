@@ -1,9 +1,2 @@
-﻿  main.cpp
-  matrix.cpp
-D:\Github\Optimization-s\optimization\optimization\matrix.cpp(393,17): warning C4101: 'rd': unreferenced local variable
-  ode_solver.cpp
-  opt_alg.cpp
-  solution.cpp
-  user_funs.cpp
-  Generating Code...
+﻿  opt_alg.cpp
   optimization.vcxproj -> D:\Github\Optimization-s\optimization\x64\Debug\optimization.exe

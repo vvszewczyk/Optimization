@@ -1,4 +1,4 @@
-#include"opt_alg.h"
+﻿#include"opt_alg.h"
 
 solution MC(matrix(*ff)(matrix, matrix, matrix), int N, matrix lb, matrix ub, double epsilon, int Nmax, matrix ud1, matrix ud2)
 {
@@ -45,54 +45,85 @@ double* expansion(matrix(*ff)(matrix, matrix, matrix), double x0, double d, doub
 	}
 }
 
-solution fib(matrix(*ff)(matrix, matrix, matrix), double a, double b, double epsilon, matrix ud1, matrix ud2)
+solution fib(matrix(*ff)(matrix, matrix, matrix), double a, double b, double epsilon, matrix ud1, matrix ud2) 
 {
-	try
+    try 
 	{
-		solution Xopt;
-		// Tu wpisz kod funkcji
-		int k = 0;
-		double phi_prev, phi_curr;
+        int k = 1;
+        double fik_prev = 1, fik = 1, bufor;
 
-		std::vector<double> fibonacci = { 1, 1 };
-
-		while (fibonacci.back() <= (b - a) / epsilon)
+		// Znalezienie najmniejszej liczby spełniającej poniższy warunek
+        while (fik <= (b - a) / epsilon)
 		{
-			fibonacci.push_back(fibonacci[fibonacci.size() - 1] + fibonacci[fibonacci.size() - 2]);
-		}
+            k++;
+			bufor = fik;
+			fik = fik + fik_prev;
+			fik_prev = bufor;
+        }
 
-		k = fibonacci.size() - 1;
+        // a(0) = a
+		double ai = a;
 
-		double ai = a, bi = b;
-		double ci = bi - (fibonacci[k - 1] / fibonacci[k]) * (bi - ai);
-		double di = ai + (bi - ci);
+		// b(0) = b
+		double	bi = b;
 
-		for (int i = 0; i < k - 2; i++)
+        // c(0) = b(0) - (fi(k-1) / fi(k)) * (b(0) * a(0))
+        double ci = bi - (fik_prev / fik) * (bi - ai);
+
+		// d(0) = a(0) + b(0) - c(0)
+        double di = ai + bi - ci;
+
+        solution Xopt;
+
+        for (int i = 0; i <= k - 3; i++) 
 		{
-			if (ff(ci, ud1, ud2) < ff(di, ud1, ud2))
+            matrix x_c(1, 1, ci);
+            matrix x_d(1, 1, di);
+            double fc = m2d(ff(x_c, ud1, ud2));
+            double fd = m2d(ff(x_d, ud1, ud2));
+
+            if (fc < fd) 
 			{
-				ai = ai;
-				bi = di;
-			}
-			else
+				// a(i+1) = a(i)
+                ai = ai;
+				// b(i+1) = d(i)
+                bi = di;
+            } 
+			else 
 			{
-				bi = bi;
-				ai = ci;
-			}
+				// a(i+1) = c(i)
+                ai = ci;
+				// b(i+1) = b(i)
+                bi = bi;
+            }
 
-			ci = bi - (fibonacci[k - i - 2] / fibonacci[k - i - 1]) * (bi - ai);
-			di = ai + (bi - ci);
-		}
+            // Aktualizacja dla następnej iteracji
+			bufor = fik_prev;
+			fik_prev = fik - fik_prev;    // fi(k-1) -> fi(k-2)
+			fik = bufor;                   // fi(k) -> fi(k-1)
 
-		Xopt.x = ci;
+			// c(i+1) = b(i+1) - (fi(k-i-2) / fi(k-i-1)) * (b(i+1) - a(i+1))
+            ci = bi - (fik_prev / fik) * (bi - ai);
 
-		return Xopt;
-	}
-	catch (string ex_info)
+            // d(i+1) = a(i+1) + b(i+1) - c(i+1)
+            di = ai + bi - ci;
+        }
+
+        // x* = c(i+1)
+        Xopt.x = matrix(1, 1, ci);
+
+        Xopt.fit_fun(ff, ud1, ud2);
+
+        return Xopt;
+    } 
+	catch (string ex_info) 
 	{
-		throw ("solution fib(...):\n" + ex_info);
-	}
+        throw ("solution fib(...):\n" + ex_info);
+    }
 }
+
+
+
 
 solution lag(matrix(*ff)(matrix, matrix, matrix), double a, double b, double epsilon, double gamma, int Nmax, matrix ud1, matrix ud2)
 {
