@@ -34,10 +34,46 @@ double* expansion(matrix(*ff)(matrix, matrix, matrix), double x0, double d, doub
 {
 	try
 	{
-		double* p = new double[2]{ 0,0 };
-		//Tu wpisz kod funkcji
+		auto* p = new double[2] { 0, 0 };
+		auto i = 0;
+		auto x1 = x0 + d;
+		matrix fx0 = ff(matrix(1, &x0), ud1, ud2);
+		matrix fx1 = ff(matrix(1, &x1), ud1, ud2);
+		if (m2d(fx1) == m2d(fx0)) {
+			p[0] = x0;
+			p[1] = x1;
+			return p;
+		}
+		if (m2d(fx1) > m2d(fx0)) {
+			d = -d;
+			x1 = x0 + d;
+			fx1 = ff(matrix(1, &x1), ud1, ud2);
 
-		return p;
+			if (m2d(fx1) >= m2d(fx0)) {
+				p[0] = x1;
+				p[1] = x0 - d;
+				return p;
+			}
+		}
+		while (solution::f_calls < Nmax) {
+			++i;
+			double xi_next = x0 + pow(alpha, i) * d;
+			matrix fxi_next = ff(matrix(1, &xi_next), ud1, ud2);
+			if (m2d(fxi_next) >= m2d(fx1)) {
+				if (d > 0) {
+					p[0] = x0 + pow(alpha, i - 1) * d;
+					p[1] = xi_next;
+				}
+				else {
+					p[0] = xi_next;
+					p[1] = x0 + pow(alpha, i - 1) * d;
+				}
+				return p;
+			}
+			x1 = xi_next;
+			fx1 = fxi_next;
+		}
+		throw string("Metoda ekspansji osiagnela maksymalna liczbe iteracji");
 	}
 	catch (string ex_info)
 	{
