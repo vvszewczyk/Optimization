@@ -63,3 +63,22 @@ matrix f1(double t, matrix Y, matrix ud1, matrix ud2)
 
 	return dY;
 }
+
+matrix f2(matrix x, matrix ud1, matrix ud2)
+{
+	matrix y;
+	matrix Y0 = matrix(3, new double[3] {5, 1, 20});
+	matrix* Y = solve_ode(f1, 0, 1, 2000, Y0, ud1, x);
+	int n = get_len(Y[0]);
+	double max = Y[1](0, 2);
+	for (size_t i = 0; i < n; i++)
+	{
+		if (max < Y[1](i, 2))
+		{
+			max = Y[1](i, 2);
+		}
+		y = abs(max - 50);
+	}
+	
+	return y;
+}
