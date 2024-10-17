@@ -86,8 +86,8 @@ void lab1()
 	for (int i = 0; i < 100; i++)
 	{
 		int x0 = dis(gen);
-		expansionResults = expansion(df1, x0, d, alpha, Nmax);
-		//std::cout << "expansionResults[0] = " << expansionResults[0] << "  expansionResults[1] = " << expansionResults[1] << "\n";
+		expansionResults = expansion(df1, x0, d, alpha, Nmax, 0);
+		std::cout << "expansionResults[0] = " << expansionResults[0] << "  expansionResults[1] = " << expansionResults[1] << "\n";
 		solution::clear_calls();
 
 		solution fibonacci = fib(df1, expansionResults[0], expansionResults[1], epsilon);
@@ -98,7 +98,6 @@ void lab1()
 		//cout << "\nSolution result flag = " << lagrange.flag << "\n";
 		cout <<"x0 = " << x0 << ": m2d(lagrange.x) = " << m2d(lagrange.x) << ", m2d(lagrange.y) = " << m2d(lagrange.y) << ", solution::f_calls = " << solution::f_calls << "\n";
 		solution::clear_calls();
-		x0++;
 	}
 
 	delete [] expansionResults;
