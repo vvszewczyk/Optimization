@@ -72,37 +72,36 @@ void lab1()
 	std::cout << "Global minumum x = 62.7, y =  " << m2d(df1(62.7)) << "\n\n";
 
 	// Random starting point
-	//std::random_device rd;  // Ziarno losowe
-	//std::mt19937 gen(rd()); // Generator Mersenne Twister
-	//std::uniform_int_distribution<> dis(-100, 100); // Definiujemy zakres od -100 do 100
-	//int x0 = dis(gen); // Losowanie liczby z podanego przedziału
-	int x0 = 0;
+	std::random_device rd;  // Ziarno losowe
+	std::mt19937 gen(rd()); // Generator Mersenne Twister
+	std::uniform_int_distribution<> dis(-100, 100); // Definiujemy zakres od -100 do 100
+
 	double* expansionResults = new double[2];
 	double d = 1.0;
 	double alpha = 2.0;
-	//int liczba = 0;
 	int Nmax = 10000;
 	double epsilon = 1e-2;
 	double gamma = 1e-200;
 
 	for (int i = 0; i < 100; i++)
 	{
-		expansionResults = expansion(df1, x0, d, alpha, Nmax);//... , liczba);
+		int x0 = dis(gen);
+		expansionResults = expansion(df1, x0, d, alpha, Nmax);
+		//std::cout << "expansionResults[0] = " << expansionResults[0] << "  expansionResults[1] = " << expansionResults[1] << "\n";
+		solution::clear_calls();
+
+		solution fibonacci = fib(df1, expansionResults[0], expansionResults[1], epsilon);
+		cout << "\nfib(): " << m2d(fibonacci.x) << "\n";
+		solution::clear_calls();
+
 		solution lagrange = lag(df1, expansionResults[0], expansionResults[1], epsilon, gamma, Nmax);
-		//cout << "Solution result flag = " << lagrange.flag << "\n";
+		//cout << "\nSolution result flag = " << lagrange.flag << "\n";
 		cout <<"x0 = " << x0 << ": m2d(lagrange.x) = " << m2d(lagrange.x) << ", m2d(lagrange.y) = " << m2d(lagrange.y) << ", solution::f_calls = " << solution::f_calls << "\n";
-		//std::cout << "expansionResults[0] = " << expansionResults[0] << "  expansionResults[1] = " << expansionResults[1] << "\n\n";
 		solution::clear_calls();
 		x0++;
 	}
 
-	solution::clear_calls();
-	// Testowanie algorytmu fib()
-	epsilon = 0.00000000001;
-	solution xopt = fib(df1, 50, 100, epsilon);
-	cout <<"fib(): " << m2d(xopt.x) << "\n";
 	delete [] expansionResults;
-
 }
 
 void lab2()
