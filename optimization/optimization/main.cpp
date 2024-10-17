@@ -72,9 +72,9 @@ void lab1()
 	std::cout << "Global minumum x = 62.7, y =  " << m2d(df1(62.7)) << "\n\n";
 
 	// Random starting point
-	std::random_device rd;  // Ziarno losowe
-	std::mt19937 gen(rd()); // Generator Mersenne Twister
-	std::uniform_int_distribution<> dis(-100, 100); // Definiujemy zakres od -100 do 100
+	//std::random_device rd;  // Ziarno losowe
+	//std::mt19937 gen(rd()); // Generator Mersenne Twister
+	//std::uniform_int_distribution<> dis(-100, 100); // Definiujemy zakres od -100 do 100
 	//int x0 = dis(gen); // Losowanie liczby z podanego przedziału
 	int x0 = 0;
 	double* expansionResults = new double[2];
@@ -89,9 +89,9 @@ void lab1()
 	{
 		expansionResults = expansion(df1, x0, d, alpha, Nmax);//... , liczba);
 		solution lagrange = lag(df1, expansionResults[0], expansionResults[1], epsilon, gamma, Nmax);
-		cout << "Solution result flag = " << lagrange.flag << "\n";
+		//cout << "Solution result flag = " << lagrange.flag << "\n";
 		cout <<"x0 = " << x0 << ": m2d(lagrange.x) = " << m2d(lagrange.x) << ", m2d(lagrange.y) = " << m2d(lagrange.y) << ", solution::f_calls = " << solution::f_calls << "\n";
-		std::cout << "expansionResults[0] = " << expansionResults[0] << "  expansionResults[1] = " << expansionResults[1] << "\n\n";
+		//std::cout << "expansionResults[0] = " << expansionResults[0] << "  expansionResults[1] = " << expansionResults[1] << "\n\n";
 		solution::clear_calls();
 		x0++;
 	}

@@ -168,7 +168,7 @@ solution lag(matrix(*ff)(matrix, matrix, matrix), double a, double b, double eps
 		solution A(a), B(b), C; // Krok2: a(0), b(0)
 		C.x = (a + b) / 2;  // Krok2: c(0) = (a + b) / 2
 
-		solution D, D_old(a); // inicjalizacja d i kopia pomocnicza
+		solution D, D_old(a); // d i kopia pomocnicza do zwracania aktualnego rozwiazania
 
 		A.fit_fun(ff, ud1, ud2);  // sledzenie wywolan A
 		B.fit_fun(ff, ud1, ud2);  // sledzenie wywolan B
@@ -176,16 +176,16 @@ solution lag(matrix(*ff)(matrix, matrix, matrix), double a, double b, double eps
 
 		double l, m;
 
-		for (int i = 0; i < Nmax; i++)  // Krok1/krok3: repeat
+		for (int i = 0; i < Nmax; i++)  // Krok 1 & 3 & 35: repeat
 		{
 			l = m2d(A.y * (pow(B.x, 2) - pow(C.x, 2)) + B.y * (pow(C.x, 2) - pow(A.x, 2)) + C.y * (pow(A.x, 2) - pow(B.x, 2))); // Krok 4: oblicz l
 			m = m2d(A.y * (B.x - C.x) + B.y * (C.x - A.x) + C.y * (A.x - B.x)); // Krok 5: oblicz m
 
 			if (m <= 0) // Krok 6: Sprawdzanie, czy m <= 0
 			{
-				Xopt = D_old;  // Zwrócenie poprzedniego rozwiązania, jeśli m jest niepoprawne
+				Xopt = D_old;  // Zwrocenie poprzedniego rozwizania, jeśli m jest niepoprawne
 				Xopt.flag = -1; // krok 7: Flaga bledu (error)
-				return Xopt;   // Zakończenie algorytmu z błędem
+				return Xopt;
 			} // krok 8
 
 			D.x = 0.5 * l / m; // Krok 9: Obliczanie nowego punktu d(i)
@@ -195,56 +195,61 @@ solution lag(matrix(*ff)(matrix, matrix, matrix), double a, double b, double eps
 			{
 				if (D.y < C.y)  // krok 11: f(d(i)) < f(c(i))
 				{
-					B = C;      // Aktualizacja b(i+1) = c(i)
-					C = D;      // Aktualizacja c(i+1) = d(i)
+					// A = A    // krok 12
+					C = D;      // krok 13: c(i+1) = d(i)
+					B = C;      // krok 14: b(i+1) = c(i)
 				}
-				else
+				else // krok 15
 				{
-					A = D;      // Aktualizacja a(i+1) = d(i)
+					A = D;      // krok 16: a(i+1) = d(i)
+					// C = C    // krok 17
+					// D = D    // krok 18
 				}
-			}
-			else if (C.x <= D.x && D.x <= B.x)  // Sprawdzanie, czy d(i) jest pomiędzy c(i) a b(i)
+			}// krok 19 & 20
+			else if (C.x < D.x && D.x < B.x)  // krok 21: c(i) < d(i) < b(i)
 			{
-				if (D.y < C.y)  // Jeśli f(d(i)) < f(c(i))
+				if (D.y < C.y)  // krok 22: f(d(i)) < f(c(i))
 				{
-					A = C;      // Aktualizacja a(i+1) = c(i)
-					C = D;      // Aktualizacja c(i+1) = d(i)
+					A = C;      // krok 23: a(i+1) = c(i)
+					C = D;      // krok 24: c(i+1) = d(i)
+					//B = B     // krok 25
 				}
-				else
+				else // krok 26
 				{
-					B = D;      // Aktualizacja b(i+1) = d(i)
+					// A = A;   // krok 27
+					// C = C;   // krok 28
+					B = D;      // krok 29: b(i+1) = d(i)
 				}
-			}
-			else  // Jeśli d(i) nie mieści się w przedziale [a, b]
+			} // krok 30
+			else  // krok 31: Jesli d(i) nie mieści się w przedziale [a, b]
 			{
-				Xopt = D_old;  // Zwrócenie poprzedniego rozwiązania
-				Xopt.flag = 2; // Flaga błędu
-				return Xopt;   // Zakończenie algorytmu z błędem
-			}
+				Xopt = D_old;  // Zwrocenie poprzedniego rozwiązania
+				Xopt.flag = -1; // krok 32: Flaga bledu (error)
+				return Xopt;
+			} // krok 33 & 34
 
 			// Zapisanie długości przedziału do wyniku
 			Xopt.ud.add_row((B.x - A.x)());
 
-			// Krok 39: Warunki zakończenia
-			if (B.x - A.x < epsilon || abs(D.x() - D_old.x()) < gamma)
+			if (B.x - A.x < epsilon || abs(D.x() - D_old.x()) < gamma) // Krok 39: b(i)– a(i) < ε or |d(i) – d(i - 1) | < γ
 			{
-				Xopt = D;      // Zwrócenie optymalnego punktu d(i)
-				Xopt.flag = 0; // Flaga sukcesu
+				Xopt = D;      // Zwrocenie optymalnego punktu d(i)
+				Xopt.flag = 0; // flaga prawidlowego zakonczenia
 				break;         // Zakończenie algorytmu
 			}
 
-			// Krok 36: Sprawdzanie maksymalnej liczby iteracji
-			if (solution::f_calls > Nmax)
+			if (solution::f_calls > Nmax) // Krok 36: fcalls > Nmax
 			{
-				Xopt = D;      // Zwrócenie optymalnego punktu d(i)
-				Xopt.flag = 1; // Flaga przekroczenia liczby iteracji
+				Xopt = D;      // Zwrocenie optymalnego punktu d(i)
+				Xopt.flag = 1; // krok 37: Flaga przekroczenia liczby iteracji (error)
 				break;         // Zakończenie algorytmu
-			}
+			} // krok: 38
 
 			D_old = D;  // Zapisanie poprzedniego punktu d(i)
 		}
 
-		return Xopt;  // Zwrócenie optymalnego rozwiązania
+		Xopt.flag = 0; // flaga prawidlowego zakonczenia
+		return Xopt;  // krok 40: Zwrocenie optymalnego rozwiazania
 	}
 	catch (string ex_info)
 	{
