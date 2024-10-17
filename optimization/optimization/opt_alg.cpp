@@ -36,44 +36,41 @@ double* expansion(matrix(*ff)(matrix, matrix, matrix), double x0, double d, doub
 	{
 		auto* p = new double[2] { 0, 0 };
 		auto i = 0;
-		auto x1 = x0 + d;
-		matrix fx0 = ff(matrix(1, &x0), ud1, ud2);
-		matrix fx1 = ff(matrix(1, &x1), ud1, ud2);
-		if (m2d(fx1) == m2d(fx0)) {
-			p[0] = x0;
-			p[1] = x1;
+		solution X0(x0);
+		solution X1(x0 + d);
+		X0.fit_fun(ff, ud1, ud2);
+		X1.fit_fun(ff, ud1, ud2);
+		if (X1.y == X0.y) {
+			p[0] = m2d(X0.x);
+			p[1] = m2d(X1.x);
 			return p;
 		}
-		if (m2d(fx1) > m2d(fx0)) {
+		else if (X1.y > X0.y) {
 			d = -d;
-			x1 = x0 + d;
-			fx1 = ff(matrix(1, &x1), ud1, ud2);
-
-			if (m2d(fx1) >= m2d(fx0)) {
-				p[0] = x1;
-				p[1] = x0 - d;
+			X1.x = x0 + d;
+			X1.fit_fun(ff, ud1, ud2);
+			if (X1.y >= X0.y) {
+				p[0] = m2d(X0.x - d);
+				p[1] = m2d(X1.x);
 				return p;
 			}
 		}
+		solution X2;
 		while (solution::f_calls < Nmax) {
 			++i;
-			double xi_next = x0 + pow(alpha, i) * d;
-			matrix fxi_next = ff(matrix(1, &xi_next), ud1, ud2);
-			if (m2d(fxi_next) >= m2d(fx1)) {
-				if (d > 0) {
-					p[0] = x0 + pow(alpha, i - 1) * d;
-					p[1] = xi_next;
-				}
-				else {
-					p[0] = xi_next;
-					p[1] = x0 + pow(alpha, i - 1) * d;
-				}
-				return p;
-			}
-			x1 = xi_next;
-			fx1 = fxi_next;
+			X2.x = x0 + pow(alpha, i) * d;
+			X2.fit_fun(ff, ud1, ud2);
+			X0 = X1;
+			X1 = X2;
 		}
-		throw string("Metoda ekspansji osiagnela maksymalna liczbe iteracji");
+		if (d > 0) {
+			p[0] = m2d(X0.x);
+			p[1] = m2d(X2.x);
+			return p;
+		}
+		p[0] = m2d(X2.x);
+		p[1] = m2d(X0.x);
+		return p;
 	}
 	catch (string ex_info)
 	{

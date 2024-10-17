@@ -1,0 +1,3 @@
+/home/igor/Documents/GitHub/Optimization-s/cmake-build-debug/CMakeFiles/Optimization_s.dir
+/home/igor/Documents/GitHub/Optimization-s/cmake-build-debug/CMakeFiles/edit_cache.dir
+/home/igor/Documents/GitHub/Optimization-s/cmake-build-debug/CMakeFiles/rebuild_cache.dir
