@@ -96,6 +96,7 @@ void lab1()
 		x0++;
 	}
 
+	solution::clear_calls();
 	// Testowanie algorytmu fib()
 	epsilon = 0.00000000001;
 	solution xopt = fib(df1, 50, 100, epsilon);

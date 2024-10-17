@@ -1,3 +1,2 @@
-﻿  main.cpp
-C:\school\optymalizacja\repo\Optimization-s\optimization\optimization\main.cpp(79,9): warning C4244: 'initializing': conversion from 'double' to 'int', possible loss of data
+﻿  opt_alg.cpp
   optimization.vcxproj -> C:\school\optymalizacja\repo\Optimization-s\optimization\x64\Debug\optimization.exe

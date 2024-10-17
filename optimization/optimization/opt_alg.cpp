@@ -163,100 +163,108 @@ solution lag(matrix(*ff)(matrix, matrix, matrix), double a, double b, double eps
 	try
 	{
 		solution Xopt;  // Zmienna przechowująca rozwiązanie
-		Xopt.ud = b - a; // Dodanie długosci przedzialu
-		
-		solution A(a), B(b), C; // Krok2: a(0), b(0)
-		C.x = (a + b) / 2;  // Krok2: c(0) = (a + b) / 2
 
-		solution D, D_old(a); // d i kopia pomocnicza do zwracania aktualnego rozwiazania
+		solution A(a), B(b), C; // Krok 2: a(0), b(0)
+		C.x = (a + b) / 2;  // Krok 2: c(0) = (a + b) / 2
+
+		solution D, D_old(a); // d(i) i kopia pomocnicza
 
 		A.fit_fun(ff, ud1, ud2);  // sledzenie wywolan A
 		B.fit_fun(ff, ud1, ud2);  // sledzenie wywolan B
 		C.fit_fun(ff, ud1, ud2);  // sledzenie wywolan C
 
 		double l, m;
+		int i = 0;  // Krok 1: inicjalizacja licznika petli
 
-		for (int i = 0; i < Nmax; i++)  // Krok 1 & 3 & 35: repeat
+		while (i < Nmax) // Krok 3: repeat
 		{
-			l = m2d(A.y * (pow(B.x, 2) - pow(C.x, 2)) + B.y * (pow(C.x, 2) - pow(A.x, 2)) + C.y * (pow(A.x, 2) - pow(B.x, 2))); // Krok 4: oblicz l
-			m = m2d(A.y * (B.x - C.x) + B.y * (C.x - A.x) + C.y * (A.x - B.x)); // Krok 5: oblicz m
+			// Krok 4: Obliczanie licznika l
+			l = m2d(A.y * (pow(B.x, 2) - pow(C.x, 2)) + B.y * (pow(C.x, 2) - pow(A.x, 2)) + C.y * (pow(A.x, 2) - pow(B.x, 2)));
 
-			if (m <= 0) // Krok 6: Sprawdzanie, czy m <= 0
+			// Krok 5: Obliczanie mianownika m
+			m = m2d(A.y * (B.x - C.x) + B.y * (C.x - A.x) + C.y * (A.x - B.x));
+
+			// Krok 6: Sprawdzenie, czy m <= 0
+			if (m <= 0)
 			{
-				Xopt = D_old;  // Zwrocenie poprzedniego rozwizania, jeśli m jest niepoprawne
-				Xopt.flag = -1; // krok 7: Flaga bledu (error)
-				return Xopt;
-			} // krok 8
+				Xopt = D_old;  // Zwrócenie poprzedniego rozwiązania
+				Xopt.flag = -1; // Krok 7: Flaga błędu (error)
+				return Xopt;    // Zakończenie algorytmu
+			} // Krok 8
 
-			D.x = 0.5 * l / m; // Krok 9: Obliczanie nowego punktu d(i)
-			D.fit_fun(ff, ud1, ud2);  // Osledzenie wywolan D
+			// Krok 9: Obliczanie nowego punktu d(i)
+			D.x = 0.5 * l / m;
+			D.fit_fun(ff, ud1, ud2);  // sledzenie wywolan D
 
-			if (A.x < D.x && D.x < C.x)  //krok 10: a(i) < d(i) < c(i)
+			// Krok 10-19: Aktualizacja przedziału w zależności od pozycji d(i)
+			if (A.x < D.x && D.x < C.x)  // Krok 10: a(i) < d(i) < c(i)
 			{
-				if (D.y < C.y)  // krok 11: f(d(i)) < f(c(i))
+				if (D.y < C.y)  // Krok 11: f(d(i)) < f(c(i))
 				{
-					// A = A    // krok 12
-					C = D;      // krok 13: c(i+1) = d(i)
+					// A = A    // krok 12: a(i+1) = a(i)
 					B = C;      // krok 14: b(i+1) = c(i)
+					C = D;      // krok 13: c(i+1) = d(i) odwrotnie ponieważ nadpisujemy C
 				}
-				else // krok 15
+				else  // Krok 15
 				{
 					A = D;      // krok 16: a(i+1) = d(i)
-					// C = C    // krok 17
-					// D = D    // krok 18
+					// C = C    // krok 17: c(i+1) = c(i)
+					// D = D    // krok 18: d(i+1) = d(i)
 				}
 			}// krok 19 & 20
-			else if (C.x < D.x && D.x < B.x)  // krok 21: c(i) < d(i) < b(i)
+			else if (C.x < D.x && D.x < B.x)  // Krok 21: c(i) < d(i) < b(i)
 			{
-				if (D.y < C.y)  // krok 22: f(d(i)) < f(c(i))
+				if (D.y < C.y)  // Krok 22: f(d(i)) < f(c(i))
 				{
 					A = C;      // krok 23: a(i+1) = c(i)
 					C = D;      // krok 24: c(i+1) = d(i)
-					//B = B     // krok 25
+					//B = B     // krok 25: b(i+1) = b(i)
 				}
-				else // krok 26
+				else  // Krok 26
 				{
-					// A = A;   // krok 27
-					// C = C;   // krok 28
+					// A = A;   // krok 27: a(i+1) = a(i)
+					// C = C;   // krok 28: c(i+1) = c(i)
 					B = D;      // krok 29: b(i+1) = d(i)
 				}
 			} // krok 30
-			else  // krok 31: Jesli d(i) nie mieści się w przedziale [a, b]
+			else  // Krok 31: Jeśli d(i) nie mieści się w przedziale [a, b]
 			{
-				Xopt = D_old;  // Zwrocenie poprzedniego rozwiązania
-				Xopt.flag = -1; // krok 32: Flaga bledu (error)
-				return Xopt;
-			} // krok 33 & 34
+				Xopt = D_old;  // Zwrócenie poprzedniego rozwiązania
+				Xopt.flag = -1; // Krok 32: Flaga błędu (error)
+				return Xopt;    // Zakończenie algorytmu
+			} // Krok 33 & 24
 
-			// Zapisanie długości przedziału do wyniku
-			Xopt.ud.add_row((B.x - A.x)());
-
-			if (B.x - A.x < epsilon || abs(D.x() - D_old.x()) < gamma) // Krok 39: b(i)– a(i) < ε or |d(i) – d(i - 1) | < γ
+			// Krok 39: Sprawdzenie warunku zakończenia
+			if (B.x - A.x < epsilon || abs(D.x() - D_old.x()) < gamma)
 			{
-				Xopt = D;      // Zwrocenie optymalnego punktu d(i)
-				Xopt.flag = 0; // flaga prawidlowego zakonczenia
+				Xopt = D;      // Zwrócenie optymalnego punktu d(i)
+				Xopt.flag = 0; // Flaga sukcesu
 				break;         // Zakończenie algorytmu
 			}
 
-			if (solution::f_calls > Nmax) // Krok 36: fcalls > Nmax
+			// Krok 36: Sprawdzenie, czy liczba wywołań funkcji celu przekroczyła Nmax
+			if (solution::f_calls > Nmax)
 			{
-				Xopt = D;      // Zwrocenie optymalnego punktu d(i)
-				Xopt.flag = 1; // krok 37: Flaga przekroczenia liczby iteracji (error)
+				Xopt = D;      // Zwrócenie optymalnego punktu d(i)
+				Xopt.flag = 1; // Flaga przekroczenia liczby iteracji (error)
 				break;         // Zakończenie algorytmu
-			} // krok: 38
+			}
 
-			D_old = D;  // Zapisanie poprzedniego punktu d(i)
+			// Aktualizacja starego punktu d(i)
+			D_old = D;
+
+			// Krok 35: Inkrementacja iteratora
+			i++;
 		}
 
-		Xopt.flag = 0; // flaga prawidlowego zakonczenia
-		return Xopt;  // krok 40: Zwrocenie optymalnego rozwiazania
+		Xopt.flag = 0; // Flaga sukcesu
+		return Xopt;  // Zwrócenie optymalnego rozwiązania
 	}
 	catch (string ex_info)
 	{
 		throw ("solution lag(...):\n" + ex_info);  // Obsługa błędów
 	}
 }
-
 
 solution HJ(matrix(*ff)(matrix, matrix, matrix), matrix x0, double s, double alpha, double epsilon, int Nmax, matrix ud1, matrix ud2)
 {
