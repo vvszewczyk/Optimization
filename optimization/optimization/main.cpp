@@ -69,9 +69,7 @@ void lab0()
 
 void lab1()
 {
-	std::cout << "Global minumum x = 62.7, y =  " << m2d(df1(62.7)) << "\n\n";
-
-	// Random starting point
+    // Random starting point
 	std::random_device rd;  // Ziarno losowe
 	std::mt19937 gen(rd()); // Generator Mersenne Twister
 	std::uniform_int_distribution<> dis(-100, 100); // Definiujemy zakres od -100 do 100
@@ -83,21 +81,26 @@ void lab1()
 	double epsilon = 1e-2;
 	double gamma = 1e-200;
 
+	ofstream expToFile("./expansion.csv");
+	ofstream fibToFile("./fibonacci.csv");
+	ofstream lagToFile("./lagrange.csv");
+
 	for (int i = 0; i < 100; i++)
 	{
 		int x0 = dis(gen);
+
 		expansionResults = expansion(df1, x0, d, alpha, Nmax, 0);
-		std::cout << "expansionResults[0] = " << expansionResults[0] << "  expansionResults[1] = " << expansionResults[1] << "\n";
+		expToFile << x0 << "," << expansionResults[0] << "," << expansionResults[1] << "," << solution::f_calls << endl;
 		solution::clear_calls();
 
 		solution fibonacci = fib(df1, expansionResults[0], expansionResults[1], epsilon);
-		cout << "\nfib(): " << m2d(fibonacci.x) << "\n";
+		fibToFile << x0 << "," << m2d(fibonacci.x) << "," << m2d(fibonacci.y) << "," << solution::f_calls << "\n";
 		solution::clear_calls();
 
 		solution lagrange = lag(df1, expansionResults[0], expansionResults[1], epsilon, gamma, Nmax);
-		//cout << "\nSolution result flag = " << lagrange.flag << "\n";
-		cout <<"x0 = " << x0 << ": m2d(lagrange.x) = " << m2d(lagrange.x) << ", m2d(lagrange.y) = " << m2d(lagrange.y) << ", solution::f_calls = " << solution::f_calls << "\n";
+		lagToFile << x0 << "," << m2d(lagrange.x) << "," << m2d(lagrange.y) << "," << solution::f_calls << "\n";
 		solution::clear_calls();
+
 	}
 
 	delete [] expansionResults;

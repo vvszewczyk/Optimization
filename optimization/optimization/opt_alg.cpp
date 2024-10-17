@@ -42,7 +42,6 @@ double* expansion(matrix(*ff)(matrix, matrix, matrix), double x0, double d, doub
 		if (X1.y == X0.y) {
 			p[0] = m2d(X0.x);
 			p[1] = m2d(X1.x);
-			cout << "Liczba wywolan algorytmu ekspansji " << solution::f_calls << endl;
 			return p;
 		}
 		else if (X1.y > X0.y) {
@@ -52,7 +51,6 @@ double* expansion(matrix(*ff)(matrix, matrix, matrix), double x0, double d, doub
 			if (X1.y >= X0.y) {
 				p[0] = m2d(X0.x - d);
 				p[1] = m2d(X1.x);
-				cout << "Liczba wywolan algorytmu ekspansji " << solution::f_calls << endl;
 				return p;
 			}
 		}
@@ -69,12 +67,10 @@ double* expansion(matrix(*ff)(matrix, matrix, matrix), double x0, double d, doub
 		if (d > 0) {
 			p[0] = m2d(X0.x);
 			p[1] = m2d(X2.x);
-			cout << "Liczba wywolan algorytmu ekspansji " << solution::f_calls << endl;
 			return p;
 		}
 		p[0] = m2d(X2.x);
 		p[1] = m2d(X0.x);
-		cout << "Liczba wywolan algorytmu ekspansji " << solution::f_calls << endl;
 		return p;
 	}
 	catch (string ex_info)
