@@ -1,26 +1,50 @@
 {
   "Version": 1,
-  "WorkspaceRootPath": "D:\\Github\\Optimization-s\\optimization\\",
+  "WorkspaceRootPath": "C:\\school\\optymalizacja\\repo\\Optimization-s\\optimization\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{9229B27F-0063-4406-A64A-F235E29F6F25}|optimization\\optimization.vcxproj|D:\\Github\\Optimization-s\\optimization\\optimization\\opt_alg.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
+      "AbsoluteMoniker": "D:0:0:{9229B27F-0063-4406-A64A-F235E29F6F25}|optimization\\optimization.vcxproj|C:\\school\\optymalizacja\\repo\\Optimization-s\\optimization\\optimization\\opt_alg.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
       "RelativeMoniker": "D:0:0:{9229B27F-0063-4406-A64A-F235E29F6F25}|optimization\\optimization.vcxproj|solutionrelative:optimization\\opt_alg.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{9229B27F-0063-4406-A64A-F235E29F6F25}|optimization\\optimization.vcxproj|D:\\Github\\Optimization-s\\optimization\\optimization\\main.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
+      "AbsoluteMoniker": "D:0:0:{9229B27F-0063-4406-A64A-F235E29F6F25}|optimization\\optimization.vcxproj|C:\\school\\optymalizacja\\repo\\Optimization-s\\optimization\\optimization\\main.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
       "RelativeMoniker": "D:0:0:{9229B27F-0063-4406-A64A-F235E29F6F25}|optimization\\optimization.vcxproj|solutionrelative:optimization\\main.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{9229B27F-0063-4406-A64A-F235E29F6F25}|optimization\\optimization.vcxproj|D:\\Github\\Optimization-s\\optimization\\optimization\\user_funs.h||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
-      "RelativeMoniker": "D:0:0:{9229B27F-0063-4406-A64A-F235E29F6F25}|optimization\\optimization.vcxproj|solutionrelative:optimization\\user_funs.h||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
+      "AbsoluteMoniker": "D:0:0:{9229B27F-0063-4406-A64A-F235E29F6F25}|optimization\\optimization.vcxproj|C:\\school\\optymalizacja\\repo\\Optimization-s\\optimization\\optimization\\opt_alg.h||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
+      "RelativeMoniker": "D:0:0:{9229B27F-0063-4406-A64A-F235E29F6F25}|optimization\\optimization.vcxproj|solutionrelative:optimization\\opt_alg.h||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{9229B27F-0063-4406-A64A-F235E29F6F25}|optimization\\optimization.vcxproj|D:\\Github\\Optimization-s\\optimization\\optimization\\user_funs.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
+      "AbsoluteMoniker": "D:0:0:{9229B27F-0063-4406-A64A-F235E29F6F25}|optimization\\optimization.vcxproj|C:\\school\\optymalizacja\\repo\\Optimization-s\\optimization\\optimization\\solution.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
+      "RelativeMoniker": "D:0:0:{9229B27F-0063-4406-A64A-F235E29F6F25}|optimization\\optimization.vcxproj|solutionrelative:optimization\\solution.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{9229B27F-0063-4406-A64A-F235E29F6F25}|optimization\\optimization.vcxproj|C:\\school\\optymalizacja\\repo\\Optimization-s\\optimization\\optimization\\solution.h||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
+      "RelativeMoniker": "D:0:0:{9229B27F-0063-4406-A64A-F235E29F6F25}|optimization\\optimization.vcxproj|solutionrelative:optimization\\solution.h||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{9229B27F-0063-4406-A64A-F235E29F6F25}|optimization\\optimization.vcxproj|C:\\school\\optymalizacja\\repo\\Optimization-s\\optimization\\optimization\\matrix.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
+      "RelativeMoniker": "D:0:0:{9229B27F-0063-4406-A64A-F235E29F6F25}|optimization\\optimization.vcxproj|solutionrelative:optimization\\matrix.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{9229B27F-0063-4406-A64A-F235E29F6F25}|optimization\\optimization.vcxproj|C:\\school\\optymalizacja\\repo\\Optimization-s\\optimization\\optimization\\user_funs.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
       "RelativeMoniker": "D:0:0:{9229B27F-0063-4406-A64A-F235E29F6F25}|optimization\\optimization.vcxproj|solutionrelative:optimization\\user_funs.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{9229B27F-0063-4406-A64A-F235E29F6F25}|optimization\\optimization.vcxproj|D:\\Github\\Optimization-s\\optimization\\optimization\\solution.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
-      "RelativeMoniker": "D:0:0:{9229B27F-0063-4406-A64A-F235E29F6F25}|optimization\\optimization.vcxproj|solutionrelative:optimization\\solution.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
+      "AbsoluteMoniker": "D:0:0:{9229B27F-0063-4406-A64A-F235E29F6F25}|optimization\\optimization.vcxproj|C:\\school\\optymalizacja\\repo\\Optimization-s\\optimization\\optimization\\ode_solver.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
+      "RelativeMoniker": "D:0:0:{9229B27F-0063-4406-A64A-F235E29F6F25}|optimization\\optimization.vcxproj|solutionrelative:optimization\\ode_solver.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{9229B27F-0063-4406-A64A-F235E29F6F25}|optimization\\optimization.vcxproj|C:\\school\\optymalizacja\\repo\\Optimization-s\\optimization\\optimization\\ode_solver.h||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
+      "RelativeMoniker": "D:0:0:{9229B27F-0063-4406-A64A-F235E29F6F25}|optimization\\optimization.vcxproj|solutionrelative:optimization\\ode_solver.h||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{9229B27F-0063-4406-A64A-F235E29F6F25}|optimization\\optimization.vcxproj|C:\\school\\optymalizacja\\repo\\Optimization-s\\optimization\\optimization\\matrix.h||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
+      "RelativeMoniker": "D:0:0:{9229B27F-0063-4406-A64A-F235E29F6F25}|optimization\\optimization.vcxproj|solutionrelative:optimization\\matrix.h||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{9229B27F-0063-4406-A64A-F235E29F6F25}|optimization\\optimization.vcxproj|C:\\school\\optymalizacja\\repo\\Optimization-s\\optimization\\optimization\\user_funs.h||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
+      "RelativeMoniker": "D:0:0:{9229B27F-0063-4406-A64A-F235E29F6F25}|optimization\\optimization.vcxproj|solutionrelative:optimization\\user_funs.h||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
     }
   ],
   "DocumentGroupContainers": [
@@ -34,67 +58,145 @@
           "Children": [
             {
               "$type": "Document",
-              "DocumentIndex": 4,
-              "Title": "solution.cpp",
-              "DocumentMoniker": "D:\\Github\\Optimization-s\\optimization\\optimization\\solution.cpp",
-              "RelativeDocumentMoniker": "optimization\\solution.cpp",
-              "ToolTip": "D:\\Github\\Optimization-s\\optimization\\optimization\\solution.cpp",
-              "RelativeToolTip": "optimization\\solution.cpp",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "DocumentIndex": 1,
+              "Title": "main.cpp",
+              "DocumentMoniker": "C:\\school\\optymalizacja\\repo\\Optimization-s\\optimization\\optimization\\main.cpp",
+              "RelativeDocumentMoniker": "optimization\\main.cpp",
+              "ToolTip": "C:\\school\\optymalizacja\\repo\\Optimization-s\\optimization\\optimization\\main.cpp",
+              "RelativeToolTip": "optimization\\main.cpp",
+              "ViewState": "AgIAAEAAAAAAAAAAAAAAAFoAAABfAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000677|",
-              "WhenOpened": "2024-10-15T14:24:57.796Z",
+              "WhenOpened": "2024-10-10T10:49:59.478Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
               "DocumentIndex": 0,
               "Title": "opt_alg.cpp",
-              "DocumentMoniker": "D:\\Github\\Optimization-s\\optimization\\optimization\\opt_alg.cpp",
+              "DocumentMoniker": "C:\\school\\optymalizacja\\repo\\Optimization-s\\optimization\\optimization\\opt_alg.cpp",
               "RelativeDocumentMoniker": "optimization\\opt_alg.cpp",
-              "ToolTip": "D:\\Github\\Optimization-s\\optimization\\optimization\\opt_alg.cpp*",
-              "RelativeToolTip": "optimization\\opt_alg.cpp*",
-              "ViewState": "AgIAAEQAAAAAAAAAAAAiwG0AAAAAAAAAAAAAAA==",
+              "ToolTip": "C:\\school\\optymalizacja\\repo\\Optimization-s\\optimization\\optimization\\opt_alg.cpp",
+              "RelativeToolTip": "optimization\\opt_alg.cpp",
+              "ViewState": "AgIAAKQAAAAAAAAAAAAAAKwAAAAyAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000677|",
-              "WhenOpened": "2024-10-10T10:02:52.83Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 1,
-              "Title": "main.cpp",
-              "DocumentMoniker": "D:\\Github\\Optimization-s\\optimization\\optimization\\main.cpp",
-              "RelativeDocumentMoniker": "optimization\\main.cpp",
-              "ToolTip": "D:\\Github\\Optimization-s\\optimization\\optimization\\main.cpp",
-              "RelativeToolTip": "optimization\\main.cpp",
-              "ViewState": "AgIAAD8AAAAAAAAAAAAAAFIAAAADAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000677|",
-              "WhenOpened": "2024-10-03T11:56:43.518Z",
+              "WhenOpened": "2024-10-10T10:50:31.71Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
               "DocumentIndex": 2,
-              "Title": "user_funs.h",
-              "DocumentMoniker": "D:\\Github\\Optimization-s\\optimization\\optimization\\user_funs.h",
-              "RelativeDocumentMoniker": "optimization\\user_funs.h",
-              "ToolTip": "D:\\Github\\Optimization-s\\optimization\\optimization\\user_funs.h",
-              "RelativeToolTip": "optimization\\user_funs.h",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAcAAAAvAAAAAAAAAA==",
+              "Title": "opt_alg.h",
+              "DocumentMoniker": "C:\\school\\optymalizacja\\repo\\Optimization-s\\optimization\\optimization\\opt_alg.h",
+              "RelativeDocumentMoniker": "optimization\\opt_alg.h",
+              "ToolTip": "C:\\school\\optymalizacja\\repo\\Optimization-s\\optimization\\optimization\\opt_alg.h",
+              "RelativeToolTip": "optimization\\opt_alg.h",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000680|",
-              "WhenOpened": "2024-10-10T10:40:37.848Z",
+              "WhenOpened": "2024-10-10T10:50:32.546Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
               "DocumentIndex": 3,
-              "Title": "user_funs.cpp",
-              "DocumentMoniker": "D:\\Github\\Optimization-s\\optimization\\optimization\\user_funs.cpp",
-              "RelativeDocumentMoniker": "optimization\\user_funs.cpp",
-              "ToolTip": "D:\\Github\\Optimization-s\\optimization\\optimization\\user_funs.cpp",
-              "RelativeToolTip": "optimization\\user_funs.cpp",
-              "ViewState": "AgIAABIAAAAAAAAAAAAAACgAAAABAAAAAAAAAA==",
+              "Title": "solution.cpp",
+              "DocumentMoniker": "C:\\school\\optymalizacja\\repo\\Optimization-s\\optimization\\optimization\\solution.cpp",
+              "RelativeDocumentMoniker": "optimization\\solution.cpp",
+              "ToolTip": "C:\\school\\optymalizacja\\repo\\Optimization-s\\optimization\\optimization\\solution.cpp",
+              "RelativeToolTip": "optimization\\solution.cpp",
+              "ViewState": "AgIAACcAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000677|",
-              "WhenOpened": "2024-10-10T09:36:38.975Z",
+              "WhenOpened": "2024-10-17T05:36:55.733Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 4,
+              "Title": "solution.h",
+              "DocumentMoniker": "C:\\school\\optymalizacja\\repo\\Optimization-s\\optimization\\optimization\\solution.h",
+              "RelativeDocumentMoniker": "optimization\\solution.h",
+              "ToolTip": "C:\\school\\optymalizacja\\repo\\Optimization-s\\optimization\\optimization\\solution.h",
+              "RelativeToolTip": "optimization\\solution.h",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000680|",
+              "WhenOpened": "2024-10-17T05:36:56.893Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 5,
+              "Title": "matrix.cpp",
+              "DocumentMoniker": "C:\\school\\optymalizacja\\repo\\Optimization-s\\optimization\\optimization\\matrix.cpp",
+              "RelativeDocumentMoniker": "optimization\\matrix.cpp",
+              "ToolTip": "C:\\school\\optymalizacja\\repo\\Optimization-s\\optimization\\optimization\\matrix.cpp",
+              "RelativeToolTip": "optimization\\matrix.cpp",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAI4BAAAOAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000677|",
+              "WhenOpened": "2024-10-17T05:36:51.444Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 9,
+              "Title": "matrix.h",
+              "DocumentMoniker": "C:\\school\\optymalizacja\\repo\\Optimization-s\\optimization\\optimization\\matrix.h",
+              "RelativeDocumentMoniker": "optimization\\matrix.h",
+              "ToolTip": "C:\\school\\optymalizacja\\repo\\Optimization-s\\optimization\\optimization\\matrix.h",
+              "RelativeToolTip": "optimization\\matrix.h",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000680|",
+              "WhenOpened": "2024-10-17T05:36:52.05Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 7,
+              "Title": "ode_solver.cpp",
+              "DocumentMoniker": "C:\\school\\optymalizacja\\repo\\Optimization-s\\optimization\\optimization\\ode_solver.cpp",
+              "RelativeDocumentMoniker": "optimization\\ode_solver.cpp",
+              "ToolTip": "C:\\school\\optymalizacja\\repo\\Optimization-s\\optimization\\optimization\\ode_solver.cpp",
+              "RelativeToolTip": "optimization\\ode_solver.cpp",
+              "ViewState": "AgIAAAMAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000677|",
+              "WhenOpened": "2024-10-17T05:36:53.306Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 8,
+              "Title": "ode_solver.h",
+              "DocumentMoniker": "C:\\school\\optymalizacja\\repo\\Optimization-s\\optimization\\optimization\\ode_solver.h",
+              "RelativeDocumentMoniker": "optimization\\ode_solver.h",
+              "ToolTip": "C:\\school\\optymalizacja\\repo\\Optimization-s\\optimization\\optimization\\ode_solver.h",
+              "RelativeToolTip": "optimization\\ode_solver.h",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000680|",
+              "WhenOpened": "2024-10-17T05:36:53.938Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 6,
+              "Title": "user_funs.cpp",
+              "DocumentMoniker": "C:\\school\\optymalizacja\\repo\\Optimization-s\\optimization\\optimization\\user_funs.cpp",
+              "RelativeDocumentMoniker": "optimization\\user_funs.cpp",
+              "ToolTip": "C:\\school\\optymalizacja\\repo\\Optimization-s\\optimization\\optimization\\user_funs.cpp",
+              "RelativeToolTip": "optimization\\user_funs.cpp",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAACMAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000677|",
+              "WhenOpened": "2024-10-10T10:50:29.89Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 10,
+              "Title": "user_funs.h",
+              "DocumentMoniker": "C:\\school\\optymalizacja\\repo\\Optimization-s\\optimization\\optimization\\user_funs.h",
+              "RelativeDocumentMoniker": "optimization\\user_funs.h",
+              "ToolTip": "C:\\school\\optymalizacja\\repo\\Optimization-s\\optimization\\optimization\\user_funs.h",
+              "RelativeToolTip": "optimization\\user_funs.h",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAcAAAAvAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000680|",
+              "WhenOpened": "2024-10-10T10:50:30.691Z",
               "EditorCaption": ""
             }
           ]

@@ -158,72 +158,100 @@ solution fib(matrix(*ff)(matrix, matrix, matrix), double a, double b, double eps
     }
 }
 
-
-
-
 solution lag(matrix(*ff)(matrix, matrix, matrix), double a, double b, double epsilon, double gamma, int Nmax, matrix ud1, matrix ud2)
 {
 	try
 	{
-		solution Xopt;
-		//int i = 0;
-//double ai = a, bi = b, ci = c;
-//double di = 0.0, diMinus1 = 0.0;
+		solution Xopt;  // Zmienna przechowująca rozwiązanie
+		Xopt.ud = b - a; // Dodanie długosci przedzialu
+		
+		solution A(a), B(b), C; // Krok2: a(0), b(0)
+		C.x = (a + b) / 2;  // Krok2: c(0) = (a + b) / 2
 
-//do {
-//	double l = (ff(ai) * (pow(bi, 2) - pow(ci, 2))) + (f(bi) * (pow(ci, 2) - pow(ai, 2))) + (f(ci) * (pow(ai, 2) - pow(bi, 2));
-//	double m = (ff(ai) * (bi - ci)) + (f(bi) * (ci - ai)) + (f(ci) * (ai - bi));
+		solution D, D_old(a); // inicjalizacja d i kopia pomocnicza
 
-//	if (m <= 0) {
-//		return -1; // error
-//	}
+		A.fit_fun(ff, ud1, ud2);  // sledzenie wywolan A
+		B.fit_fun(ff, ud1, ud2);  // sledzenie wywolan B
+		C.fit_fun(ff, ud1, ud2);  // sledzenie wywolan C
 
-//	di = 0.5 * l / m;
+		double l, m;
 
-//	if (ai < di && di < ci) {
-//		if (f(di) < f(ci)) {
-//			ai = ai;
-//			ci = di;
-//			bi = ci;
-//		}
-//		else {
-//			ai = di;
-//			ci = ci;
-//			bi = bi;
-//		}
-//	}
-//	else if (ci < di && di < bi) {
-//		if (f(di) < f(ci)) {
-//			ai = ci;
-//			ci = di;
-//			bi = bi;
-//		}
-//		else {
-//			ai = ai;
-//			ci = ci;
-//			bi = di;
-//		}
-//	}
-//	else {
-//		return -1; // error
-//	}
+		for (int i = 0; i < Nmax; i++)  // Krok1/krok3: repeat
+		{
+			l = m2d(A.y * (pow(B.x, 2) - pow(C.x, 2)) + B.y * (pow(C.x, 2) - pow(A.x, 2)) + C.y * (pow(A.x, 2) - pow(B.x, 2))); // Krok 4: oblicz l
+			m = m2d(A.y * (B.x - C.x) + B.y * (C.x - A.x) + C.y * (A.x - B.x)); // Krok 5: oblicz m
 
-//	i++;
+			if (m <= 0) // Krok 6: Sprawdzanie, czy m <= 0
+			{
+				Xopt = D_old;  // Zwrócenie poprzedniego rozwiązania, jeśli m jest niepoprawne
+				Xopt.flag = -1; // krok 7: Flaga bledu (error)
+				return Xopt;   // Zakończenie algorytmu z błędem
+			} // krok 8
 
-//	if (fcalls > Nmax) {
-//		return -1; // error
-//	}
-//} while ((bi - ai) < epsilon || std::abs(di - diMinus1) < gamma);
+			D.x = 0.5 * l / m; // Krok 9: Obliczanie nowego punktu d(i)
+			D.fit_fun(ff, ud1, ud2);  // Osledzenie wywolan D
 
-//return di;
+			if (A.x < D.x && D.x < C.x)  //krok 10: a(i) < d(i) < c(i)
+			{
+				if (D.y < C.y)  // krok 11: f(d(i)) < f(c(i))
+				{
+					B = C;      // Aktualizacja b(i+1) = c(i)
+					C = D;      // Aktualizacja c(i+1) = d(i)
+				}
+				else
+				{
+					A = D;      // Aktualizacja a(i+1) = d(i)
+				}
+			}
+			else if (C.x <= D.x && D.x <= B.x)  // Sprawdzanie, czy d(i) jest pomiędzy c(i) a b(i)
+			{
+				if (D.y < C.y)  // Jeśli f(d(i)) < f(c(i))
+				{
+					A = C;      // Aktualizacja a(i+1) = c(i)
+					C = D;      // Aktualizacja c(i+1) = d(i)
+				}
+				else
+				{
+					B = D;      // Aktualizacja b(i+1) = d(i)
+				}
+			}
+			else  // Jeśli d(i) nie mieści się w przedziale [a, b]
+			{
+				Xopt = D_old;  // Zwrócenie poprzedniego rozwiązania
+				Xopt.flag = 2; // Flaga błędu
+				return Xopt;   // Zakończenie algorytmu z błędem
+			}
 
-		return Xopt;
+			// Zapisanie długości przedziału do wyniku
+			Xopt.ud.add_row((B.x - A.x)());
+
+			// Krok 39: Warunki zakończenia
+			if (B.x - A.x < epsilon || abs(D.x() - D_old.x()) < gamma)
+			{
+				Xopt = D;      // Zwrócenie optymalnego punktu d(i)
+				Xopt.flag = 0; // Flaga sukcesu
+				break;         // Zakończenie algorytmu
+			}
+
+			// Krok 36: Sprawdzanie maksymalnej liczby iteracji
+			if (solution::f_calls > Nmax)
+			{
+				Xopt = D;      // Zwrócenie optymalnego punktu d(i)
+				Xopt.flag = 1; // Flaga przekroczenia liczby iteracji
+				break;         // Zakończenie algorytmu
+			}
+
+			D_old = D;  // Zapisanie poprzedniego punktu d(i)
+		}
+
+		return Xopt;  // Zwrócenie optymalnego rozwiązania
 	}
 	catch (string ex_info)
 	{
-		throw ("solution lag(...):\n" + ex_info);
+		throw ("solution lag(...):\n" + ex_info);  // Obsługa błędów
 	}
 }
+
 
 solution HJ(matrix(*ff)(matrix, matrix, matrix), matrix x0, double s, double alpha, double epsilon, int Nmax, matrix ud1, matrix ud2)
 {

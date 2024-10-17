@@ -1,14 +1,15 @@
-/*********************************************
-Kod stanowi uzupe³nienie materia³ów do æwiczeñ
+ï»¿/*********************************************
+Kod stanowi uzupeÂ³nienie materiaÂ³Ã³w do Ã¦wiczeÃ±
 w ramach przedmiotu metody optymalizacji.
-Kod udostêpniony na licencji CC BY-SA 3.0
-Autor: dr in¿. £ukasz Sztangret
+Kod udostÃªpniony na licencji CC BY-SA 3.0
+Autor: dr inÂ¿. Â£ukasz Sztangret
 Katedra Informatyki Stosowanej i Modelowania
-Akademia Górniczo-Hutnicza
+Akademia GÃ³rniczo-Hutnicza
 Data ostatniej modyfikacji: 19.09.2023
 *********************************************/
 
 #include"opt_alg.h"
+#include <random>
 
 void lab0();
 void lab1();
@@ -68,22 +69,38 @@ void lab0()
 
 void lab1()
 {
-	double epsilon = 1e-2;
+	std::cout << "Global minumum x = 62.7, y =  " << m2d(df1(62.7)) << "\n\n";
+
+	// Random starting point
+	std::random_device rd;  // Ziarno losowe
+	std::mt19937 gen(rd()); // Generator Mersenne Twister
+	std::uniform_int_distribution<> dis(-100, 100); // Definiujemy zakres od -100 do 100
+	//int x0 = dis(gen); // Losowanie liczby z podanego przedziaÅ‚u
+	int x0 = 0;
+	double* expansionResults = new double[2];
+	double d = 1.0;
+	double alpha = 2.0;
+	//int liczba = 0;
 	int Nmax = 10000;
-	//matrix lb(2, 1, -5), ub(2, 1, 5), a(2, 1);
-	solution X0, X1, X2;
-	X0.x = 0; //x0
-	//X0.fit_fun(function);
-	//X1.x=x0+di
-	//X1.fin_fun(function);
-	//if(X1.y>X0.y)
-	//...
-	std::cout << m2d(df1(62.7)) << "\n";
+	double epsilon = 1e-2;
+	double gamma = 1e-200;
+
+	for (int i = 0; i < 100; i++)
+	{
+		expansionResults = expansion(df1, x0, d, alpha, Nmax);//... , liczba);
+		solution lagrange = lag(df1, expansionResults[0], expansionResults[1], epsilon, gamma, Nmax);
+		cout << "Solution result flag = " << lagrange.flag << "\n";
+		cout <<"x0 = " << x0 << ": m2d(lagrange.x) = " << m2d(lagrange.x) << ", m2d(lagrange.y) = " << m2d(lagrange.y) << ", solution::f_calls = " << solution::f_calls << "\n";
+		std::cout << "expansionResults[0] = " << expansionResults[0] << "  expansionResults[1] = " << expansionResults[1] << "\n\n";
+		solution::clear_calls();
+		x0++;
+	}
 
 	// Testowanie algorytmu fib()
 	epsilon = 0.00000000001;
 	solution xopt = fib(df1, 50, 100, epsilon);
-	cout << m2d(xopt.x)<< "\n";
+	cout <<"fib(): " << m2d(xopt.x) << "\n";
+	delete [] expansionResults;
 
 }
 
