@@ -1,3 +1,7 @@
+optimization/optimization/x64/
+optimization/x64/
+optimization/.vs/
+
 # Prerequisites
 *.d
 

@@ -177,6 +177,7 @@ solution lag(matrix(*ff)(matrix, matrix, matrix), double a, double b, double eps
 
         double l, m;
         int i = 0;  // Inicjalizacja licznika iteracji
+		std::cout << "i = " << i << ": Range = " << m2d(B.x) - m2d(A.x) << std::endl;
 
         // Pętla główna optymalizacji Lagrange'a
         while (i < Nmax) // repeat
@@ -199,41 +200,43 @@ solution lag(matrix(*ff)(matrix, matrix, matrix), double a, double b, double eps
             D.x = 0.5 * l / m;
             D.fit_fun(ff, ud1, ud2);  // Wywołanie funkcji dla D
 
-            // Aktualizacja przedziału w zależności od pozycji d(i)
-            if (m2d(A.x) < m2d(D.x) && m2d(D.x) < m2d(C.x))  // a(i) < d(i) < c(i)
-            {
-                if (D.y < C.y)  // f(d(i)) < f(c(i))
-                {
-                    B = C;      // b(i+1) = c(i)
-                    B.x = C.x;  // Aktualizacja przedziału
-                    C = D;      // c(i+1) = d(i)
-                }
-                else 
-                {
-                    A = D;      // a(i+1) = d(i)
-                    A.x = D.x;  // Aktualizacja przedziału
-                }
-            }
-            else if (m2d(C.x) < m2d(D.x) && m2d(D.x) < m2d(B.x))  // c(i) < d(i) < b(i)
-            {
-                if (D.y < C.y)  // f(d(i)) < f(c(i))
-                {
-                    A = C;      // a(i+1) = c(i)
-                    A.x = C.x;  // Aktualizacja przedziału
-                    C = D;      // c(i+1) = d(i)
-                }
-                else 
-                {
-                    B = D;      // b(i+1) = d(i)
-                    B.x = D.x;  // Aktualizacja przedziału
-                }
-            }
-            else  
-            {
-                Xopt = D_old;  // Zwrócenie poprzedniego rozwiązania
-                Xopt.flag = -1; // Flaga błędu
-                return Xopt;    // Zakończenie algorytmu
-            }
+			// Krok 10-19: Aktualizacja przedziału w zależności od pozycji d(i)
+			if (A.x < D.x && D.x < C.x)  // Krok 10: a(i) < d(i) < c(i)
+			{
+				if (D.y < C.y)  // Krok 11: f(d(i)) < f(c(i))
+				{
+					// A = A    // krok 12: a(i+1) = a(i)
+					B = C;      // krok 14: b(i+1) = c(i)
+					C = D;      // krok 13: c(i+1) = d(i) odwrotnie ponieważ nadpisujemy C
+				}
+				else  // Krok 15
+				{
+					A = D;      // krok 16: a(i+1) = d(i)
+					// C = C    // krok 17: c(i+1) = c(i)
+					// D = D    // krok 18: d(i+1) = d(i)
+				}
+			}// krok 19 & 20
+			else if (C.x < D.x && D.x < B.x)  // Krok 21: c(i) < d(i) < b(i)
+			{
+				if (D.y < C.y)  // Krok 22: f(d(i)) < f(c(i))
+				{
+					A = C;      // krok 23: a(i+1) = c(i)
+					C = D;      // krok 24: c(i+1) = d(i)
+					//B = B     // krok 25: b(i+1) = b(i)
+				}
+				else  // Krok 26
+				{
+					// A = A;   // krok 27: a(i+1) = a(i)
+					// C = C;   // krok 28: c(i+1) = c(i)
+					B = D;      // krok 29: b(i+1) = d(i)
+				}
+			} // krok 30
+			else  // Krok 31: Jeśli d(i) nie mieści się w przedziale [a, b]
+			{
+				Xopt = D_old;  // Zwrócenie poprzedniego rozwiązania
+				Xopt.flag = -1; // Krok 32: Flaga błędu (error)
+				return Xopt;    // Zakończenie algorytmu
+			} // Krok 33 & 24
 
             // Wypisywanie długości przedziału
             std::cout << "i = " << i + 1 << ": Range = " << m2d(B.x) - m2d(A.x) << std::endl;
