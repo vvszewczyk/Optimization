@@ -109,6 +109,8 @@ solution fib(matrix(*ff)(matrix, matrix, matrix), double a, double b, double eps
 
 		solution Xopt;
 
+		std::cout << "i = 0: Range = " << bi - ai << std::endl;
+
 		for (int i = 0; i <= k - 3; i++)
 		{
 			matrix x_c(1, 1, ci);
