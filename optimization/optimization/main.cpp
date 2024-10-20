@@ -77,9 +77,9 @@ void lab1()
 	double* expansionResults = new double[2];
 	double d = 1.0;
 
-	double alpha1 = 25.0; // współczynnik ekspansji
-	double alpha2 = 1.5; // współczynnik ekspansji
-	double alpha3 = 2.5; // współczynnik ekspansji
+	double alpha1 = 1.01; // współczynnik ekspansji
+	double alpha2 = 1.2; // współczynnik ekspansji
+	double alpha3 = 1.3; // współczynnik ekspansji
 
 	int Nmax = 10000;
 	double epsilon = 1e-2;
@@ -93,7 +93,7 @@ void lab1()
 	{
 		int x0 = dis(gen);
 
-		expansionResults = expansion(df1, x0, d, alpha2, Nmax, 0);
+		expansionResults = expansion(df1, x0, d, alpha3, Nmax, 0);
 		expToFile << x0 << "," << expansionResults[0] << "," << expansionResults[1] << "," << solution::f_calls << endl;
 		solution::clear_calls();
 
@@ -113,6 +113,21 @@ void lab1()
 		solution::clear_calls();
 
 	}
+
+	solution fibonacci2 = fib(df1, -100, 100, epsilon);
+	double x_fib = m2d(fibonacci2.x);
+	double y_fib = m2d(fibonacci2.y);
+	std::string minimum_type_fib2 = (x_fib >= 62.72 && x_fib <= 62.73) ? "GLOBALNE" : "LOKALNE"; // 2 dla globalnego, 1 dla lokalnego
+	std::cout << x_fib << "," << y_fib << "," << solution::f_calls << "," << minimum_type_fib2 << "\n";
+	solution::clear_calls();
+
+	solution lagrange2 = lag(df1, -100, 100, epsilon, gamma, Nmax);
+	double x_lag = m2d(lagrange2.x);
+	double y_lag = m2d(lagrange2.y);
+	std::string minimum_type_lag2 = (x_lag >= 62.72 && x_lag <= 62.73) ? "GLOBALNE" : "LOKALNE"; // 2 dla globalnego, 1 dla lokalnego
+	std::string minimum_type_lag3 = (lagrange2.flag == -1) ? "ERROR" : minimum_type_lag2;
+	std::cout << x_lag << "," << y_lag << "," << solution::f_calls << "," << minimum_type_lag3 << "\n";
+	solution::clear_calls();
 
 	delete [] expansionResults;
 }
