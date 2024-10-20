@@ -161,6 +161,7 @@ solution lag(matrix(*ff)(matrix, matrix, matrix), double a, double b, double eps
 	try
 	{
 		solution Xopt;  // Zmienna przechowująca rozwiązanie
+		Xopt.ud = b - a; // Dodanie długosci przedzialu
 
 		solution A(a), B(b), C; // Krok 2: a(0), b(0)
 		C.x = (a + b) / 2;  // Krok 2: c(0) = (a + b) / 2
@@ -231,6 +232,9 @@ solution lag(matrix(*ff)(matrix, matrix, matrix), double a, double b, double eps
 				Xopt.flag = -1; // Krok 32: Flaga błędu (error)
 				return Xopt;    // Zakończenie algorytmu
 			} // Krok 33 & 24
+
+			// Zapisanie długości przedziału do wyniku
+			Xopt.ud.add_row((B.x - A.x)());
 
 			// Krok 39: Sprawdzenie warunku zakończenia
 			if (B.x - A.x < epsilon || abs(D.x() - D_old.x()) < gamma)
