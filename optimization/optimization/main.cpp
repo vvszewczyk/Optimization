@@ -76,10 +76,14 @@ void lab1()
 
 	double* expansionResults = new double[2];
 	double d = 1.0;
-	double alpha = 2.0;
+
+	double alpha1 = 25.0; // współczynnik ekspansji
+	double alpha2 = 1.5; // współczynnik ekspansji
+	double alpha3 = 2.5; // współczynnik ekspansji
+
 	int Nmax = 10000;
 	double epsilon = 1e-2;
-	double gamma = 1e-200;
+	double gamma = 1e-180;
 
 	ofstream expToFile("./expansion.csv");
 	ofstream fibToFile("./fibonacci.csv");
@@ -89,16 +93,23 @@ void lab1()
 	{
 		int x0 = dis(gen);
 
-		expansionResults = expansion(df1, x0, d, alpha, Nmax, 0);
+		expansionResults = expansion(df1, x0, d, alpha2, Nmax, 0);
 		expToFile << x0 << "," << expansionResults[0] << "," << expansionResults[1] << "," << solution::f_calls << endl;
 		solution::clear_calls();
 
 		solution fibonacci = fib(df1, expansionResults[0], expansionResults[1], epsilon);
-		fibToFile << x0 << "," << m2d(fibonacci.x) << "," << m2d(fibonacci.y) << "," << solution::f_calls << "\n";
+		double x_fib = m2d(fibonacci.x);
+		double y_fib = m2d(fibonacci.y);
+		std::string minimum_type_fib = (x_fib >= 62.72 && x_fib <= 62.73) ? "GLOBALNE" : "LOKALNE"; // 2 dla globalnego, 1 dla lokalnego
+		fibToFile << x_fib << "," << y_fib << "," << solution::f_calls << "," << minimum_type_fib << "\n";
 		solution::clear_calls();
 
 		solution lagrange = lag(df1, expansionResults[0], expansionResults[1], epsilon, gamma, Nmax);
-		lagToFile << x0 << "," << m2d(lagrange.x) << "," << m2d(lagrange.y) << "," << solution::f_calls << "\n";
+		double x_lag = m2d(lagrange.x);
+		double y_lag = m2d(lagrange.y);
+		std::string minimum_type_lag = (x_lag >= 62.72 && x_lag <= 62.73) ? "GLOBALNE" : "LOKALNE"; // 2 dla globalnego, 1 dla lokalnego
+		std::string minimum_type_lag2 = (lagrange.flag == -1) ? "ERROR" : minimum_type_lag;
+		lagToFile << x_lag << "," << y_lag << "," << solution::f_calls << "," << minimum_type_lag2 << "\n";
 		solution::clear_calls();
 
 	}
