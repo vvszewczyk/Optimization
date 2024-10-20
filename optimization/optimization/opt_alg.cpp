@@ -101,7 +101,7 @@ solution fib(matrix(*ff)(matrix, matrix, matrix), double a, double b, double eps
 		// b(0) = b
 		double bi = b;
 
-		// c(0) = b(0) - (fi(k-1) / fi(k)) * (b(0) * a(0))
+		// c(0) = b(0) - (fi(k-1) / fi(k)) * (b(0) - a(0))
 		double ci = bi - (fik_prev / fik) * (bi - ai);
 
 		// d(0) = a(0) + b(0) - c(0)
@@ -115,41 +115,35 @@ solution fib(matrix(*ff)(matrix, matrix, matrix), double a, double b, double eps
 		{
 			matrix x_c(1, 1, ci);
 			matrix x_d(1, 1, di);
+
 			double fc = m2d(ff(x_c, ud1, ud2));
 			double fd = m2d(ff(x_d, ud1, ud2));
 
+			solution::f_calls += 2;
+
 			if (fc < fd)
 			{
-				// a(i+1) = a(i)
 				ai = ai;
-				// b(i+1) = d(i)
 				bi = di;
 			}
 			else
 			{
-				// a(i+1) = c(i)
 				ai = ci;
-				// b(i+1) = b(i)
 				bi = bi;
 			}
 
 			// Aktualizacja dla następnej iteracji
 			bufor = fik_prev;
-			fik_prev = fik - fik_prev;    // fi(k-1) -> fi(k-2)
-			fik = bufor;                   // fi(k) -> fi(k-1)
+			fik_prev = fik - fik_prev;
+			fik = bufor;
 
-			// c(i+1) = b(i+1) - (fi(k-i-2) / fi(k-i-1)) * (b(i+1) - a(i+1))
 			ci = bi - (fik_prev / fik) * (bi - ai);
-
-			// d(i+1) = a(i+1) + b(i+1) - c(i+1)
 			di = ai + bi - ci;
 
 			std::cout << "i = " << i + 1 << ": Range = " << bi - ai << std::endl;
 		}
 
-		// x* = c(i+1)
 		Xopt.x = matrix(1, 1, ci);
-
 		Xopt.fit_fun(ff, ud1, ud2);
 
 		return Xopt;
@@ -159,6 +153,7 @@ solution fib(matrix(*ff)(matrix, matrix, matrix), double a, double b, double eps
 		throw ("solution fib(...):\n" + ex_info);
 	}
 }
+
 
 
 solution lag(matrix(*ff)(matrix, matrix, matrix), double a, double b, double epsilon, double gamma, int Nmax, matrix ud1, matrix ud2)

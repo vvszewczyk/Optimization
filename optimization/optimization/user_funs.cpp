@@ -42,15 +42,20 @@ matrix df1(matrix x, matrix ud1, matrix ud2)
 
 matrix f1(double t, matrix Y, matrix ud1, matrix ud2)
 {
-	const double a = 0.98;
-	const double b = 0.63;
-	const double g = 9.81;
-	const double PA = 0.75;
-	const double TA = 90;
-	const double PB = 1.0;
-	const double DB = 0.00365665;
-	const double Fin = 0.01;
-	const double Tin = 10;
+	const double PA = 0.5;  // Pole podstawy zbiornika A [m^2]
+	const double TA = 90;   // Temperatura w zbiorniku A [°C]
+	
+
+	const double a = 0.98;  // Wspó³czynnik lepkoœci cieczy
+	const double b = 0.63;  // Wspó³czynnik zwê¿enia strumienia
+	const double g = 9.81;  // Przyspieszenie ziemskie [m/s^2]
+
+
+	const double PB = 1.0;  // Pole podstawy zbiornika B [m^2]
+	const double DB = 0.00365665;  // Pole przekroju otworu w zbiorniku B [m^2]
+	const double Fin = 0.01;  // Szybkoœæ nap³ywu wody do zbiornika B [m^3/s]
+	const double Tin = 20;    // Temperatura nap³ywaj¹cej wody [°C]
+
 
 	matrix dY(3, 1);
 

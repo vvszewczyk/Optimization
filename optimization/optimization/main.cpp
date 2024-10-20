@@ -69,6 +69,7 @@ void lab0()
 
 void lab1()
 {
+	// TABELA 1
     // Random starting point
 	std::random_device rd;  // Ziarno losowe
 	std::mt19937 gen(rd()); // Generator Mersenne Twister
@@ -89,7 +90,8 @@ void lab1()
 	ofstream fibToFile("./fibonacci.csv");
 	ofstream lagToFile("./lagrange.csv");
 
-	/*for (int i = 0; i < 100; i++)
+	/*
+	for (int i = 0; i < 100; i++)
 	{
 		int x0 = dis(gen);
 
@@ -114,11 +116,14 @@ void lab1()
 
 	}*/
 
+	// WYKRES + ostatni rekord z tabeli 1
+	
+	/*
 	solution fibonacci2 = fib(df1, -100, 100, epsilon);
 	double x_fib = m2d(fibonacci2.x);
 	double y_fib = m2d(fibonacci2.y);
 	std::string minimum_type_fib2 = (x_fib >= 62.72 && x_fib <= 62.73) ? "GLOBALNE" : "LOKALNE"; // 2 dla globalnego, 1 dla lokalnego
-	//std::cout << x_fib << "," << y_fib << "," << solution::f_calls << "," << minimum_type_fib2 << "\n";
+	std::cout << x_fib << "," << y_fib << "," << solution::f_calls << "," << minimum_type_fib2 << "\n";
 	std::cout <<"Fibonacci" << std::endl;
 	std::cout << fibonacci2;
 	solution::clear_calls();
@@ -128,10 +133,33 @@ void lab1()
 	double y_lag = m2d(lagrange2.y);
 	std::string minimum_type_lag2 = (x_lag >= 62.72 && x_lag <= 62.73) ? "GLOBALNE" : "LOKALNE"; // 2 dla globalnego, 1 dla lokalnego
 	std::string minimum_type_lag3 = (lagrange2.flag == -1) ? "ERROR" : minimum_type_lag2;
-	//std::cout << x_lag << "," << y_lag << "," << solution::f_calls << "," << minimum_type_lag3 << "\n";
+	std::cout << x_lag << "," << y_lag << "," << solution::f_calls << "," << minimum_type_lag3 << "\n";
 	std::cout << "Lagrange" << std::endl;
 	std::cout << lagrange2;
 	solution::clear_calls();
+	*/
+	
+
+	// TABELA 3
+
+	std::cout << "\n\nZADANIE 2\n\n";
+	solution fibEx2 = fib(f2, 1e-4, 1e-2, 1e-5);
+	std::cout << "Fib" << std::endl << fibEx2 << endl;
+
+	solution::clear_calls();
+
+	solution lagEx2 = lag(f2, 1e-4, 1e-2, 1e-5, 1e-200, 2000);
+	std::cout << "Lag" << std::endl << lagEx2 << endl;
+	
+	std::cout << "\n\nSYMULACJA\n\n";
+	// SYMULACJA
+	matrix symY01 = matrix(3, new double[3]{5, 10, 20});
+	matrix* Yz1 = solve_ode(f1, 0, 1, 2000, symY01, NAN, fibEx2.x(0));
+	std::cout << Yz1[1] << std::endl << std::endl;
+
+	matrix symY02 = matrix(3, new double[3] {5, 10, 20});
+	matrix* Yz2 = solve_ode(f1, 0, 1, 2000, symY02, NAN, lagEx2.x(0));
+	std::cout << Yz2[1] << std::endl;
 
 	delete [] expansionResults;
 }
