@@ -90,7 +90,7 @@ void lab1()
 	ofstream fibToFile("./fibonacci.csv");
 	ofstream lagToFile("./lagrange.csv");
 
-	/*
+	
 	for (int i = 0; i < 100; i++)
 	{
 		int x0 = dis(gen);
@@ -114,7 +114,7 @@ void lab1()
 		lagToFile << x_lag << "," << y_lag << "," << solution::f_calls << "," << minimum_type_lag2 << "\n";
 		solution::clear_calls();
 
-	}*/
+	}
 
 	// WYKRES + ostatni rekord z tabeli 1
 	
@@ -144,21 +144,25 @@ void lab1()
 
 	std::cout << "\n\nZADANIE 2\n\n";
 	solution fibEx2 = fib(f2, 1e-4, 1e-2, 1e-5);
-	std::cout << "Fib" << std::endl << fibEx2 << endl;
+	//std::cout << "Fib" << std::endl << fibEx2 << endl;
 
 	solution::clear_calls();
 
 	solution lagEx2 = lag(f2, 1e-4, 1e-2, 1e-5, 1e-200, 2000);
-	std::cout << "Lag" << std::endl << lagEx2 << endl;
+	//std::cout << "Lag" << std::endl << lagEx2 << endl;
 	
 	std::cout << "\n\nSYMULACJA\n\n";
+	ofstream simFib("simulation_fibonacci.csv");
+	ofstream simLag("simulation_lagrange.csv");
 	// SYMULACJA
-	matrix symY01 = matrix(3, new double[3]{5, 10, 20});
+	matrix symY01 = matrix(3, new double[3]{5, 1, 20});
 	matrix* Yz1 = solve_ode(f1, 0, 1, 2000, symY01, NAN, fibEx2.x(0));
+	simFib << Yz1[1] << std::endl << std::endl;
 	std::cout << Yz1[1] << std::endl << std::endl;
 
-	matrix symY02 = matrix(3, new double[3] {5, 10, 20});
+	matrix symY02 = matrix(3, new double[3] {5, 1, 20});
 	matrix* Yz2 = solve_ode(f1, 0, 1, 2000, symY02, NAN, lagEx2.x(0));
+	simLag << Yz2[1] << std::endl;
 	std::cout << Yz2[1] << std::endl;
 
 	delete [] expansionResults;
