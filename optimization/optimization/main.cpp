@@ -69,8 +69,6 @@ void lab0()
 
 void lab1()
 {
-	// TABELA 1
-    // Random starting point
 	std::random_device rd;  // Ziarno losowe
 	std::mt19937 gen(rd()); // Generator Mersenne Twister
 	std::uniform_int_distribution<> dis(-100, 100); // Definiujemy zakres od -100 do 100
@@ -78,9 +76,10 @@ void lab1()
 	double* expansionResults = new double[2];
 	double d = 1.0;
 
-	double alpha1 = 1.01; // współczynnik ekspansji
-	double alpha2 = 1.2; // współczynnik ekspansji
-	double alpha3 = 1.3; // współczynnik ekspansji
+	// Współczynniki ekspansji
+	double alpha1 = 1.01;
+	double alpha2 = 1.2;
+	double alpha3 = 1.3;
 
 	int Nmax = 10000;
 	double epsilon = 1e-2;
@@ -90,7 +89,8 @@ void lab1()
 	ofstream fibToFile("./fibonacci.csv");
 	ofstream lagToFile("./lagrange.csv");
 
-	
+	// TABELA 1
+
 	for (int i = 0; i < 100; i++)
 	{
 		int x0 = dis(gen);
@@ -102,14 +102,14 @@ void lab1()
 		solution fibonacci = fib(df1, expansionResults[0], expansionResults[1], epsilon);
 		double x_fib = m2d(fibonacci.x);
 		double y_fib = m2d(fibonacci.y);
-		std::string minimum_type_fib = (x_fib >= 62.72 && x_fib <= 62.73) ? "GLOBALNE" : "LOKALNE"; // 2 dla globalnego, 1 dla lokalnego
+		std::string minimum_type_fib = (x_fib >= 62.72 && x_fib <= 62.73) ? "GLOBALNE" : "LOKALNE";
 		fibToFile << x_fib << "," << y_fib << "," << solution::f_calls << "," << minimum_type_fib << "\n";
 		solution::clear_calls();
 
 		solution lagrange = lag(df1, expansionResults[0], expansionResults[1], epsilon, gamma, Nmax);
 		double x_lag = m2d(lagrange.x);
 		double y_lag = m2d(lagrange.y);
-		std::string minimum_type_lag = (x_lag >= 62.72 && x_lag <= 62.73) ? "GLOBALNE" : "LOKALNE"; // 2 dla globalnego, 1 dla lokalnego
+		std::string minimum_type_lag = (x_lag >= 62.72 && x_lag <= 62.73) ? "GLOBALNE" : "LOKALNE";
 		std::string minimum_type_lag2 = (lagrange.flag == -1) ? "ERROR" : minimum_type_lag;
 		lagToFile << x_lag << "," << y_lag << "," << solution::f_calls << "," << minimum_type_lag2 << "\n";
 		solution::clear_calls();
@@ -118,11 +118,10 @@ void lab1()
 
 	// WYKRES + ostatni rekord z tabeli 1
 	
-	/*
 	solution fibonacci2 = fib(df1, -100, 100, epsilon);
 	double x_fib = m2d(fibonacci2.x);
 	double y_fib = m2d(fibonacci2.y);
-	std::string minimum_type_fib2 = (x_fib >= 62.72 && x_fib <= 62.73) ? "GLOBALNE" : "LOKALNE"; // 2 dla globalnego, 1 dla lokalnego
+	std::string minimum_type_fib2 = (x_fib >= 62.72 && x_fib <= 62.73) ? "GLOBALNE" : "LOKALNE";
 	std::cout << x_fib << "," << y_fib << "," << solution::f_calls << "," << minimum_type_fib2 << "\n";
 	std::cout <<"Fibonacci" << std::endl;
 	std::cout << fibonacci2;
@@ -131,39 +130,41 @@ void lab1()
 	solution lagrange2 = lag(df1, -100, 100, epsilon, gamma, Nmax);
 	double x_lag = m2d(lagrange2.x);
 	double y_lag = m2d(lagrange2.y);
-	std::string minimum_type_lag2 = (x_lag >= 62.72 && x_lag <= 62.73) ? "GLOBALNE" : "LOKALNE"; // 2 dla globalnego, 1 dla lokalnego
+	std::string minimum_type_lag2 = (x_lag >= 62.72 && x_lag <= 62.73) ? "GLOBALNE" : "LOKALNE";
 	std::string minimum_type_lag3 = (lagrange2.flag == -1) ? "ERROR" : minimum_type_lag2;
 	std::cout << x_lag << "," << y_lag << "," << solution::f_calls << "," << minimum_type_lag3 << "\n";
 	std::cout << "Lagrange" << std::endl;
 	std::cout << lagrange2;
 	solution::clear_calls();
-	*/
 	
 
 	// TABELA 3
 
 	std::cout << "\n\nZADANIE 2\n\n";
-	solution fibEx2 = fib(f2, 1e-4, 1e-2, 1e-5);
-	//std::cout << "Fib" << std::endl << fibEx2 << endl;
+	solution fibEx2 = fib(f2, 1e-4, 1e-2, 1e-5); // ====================================== tu do sprawdzenia 2 3 4 argument czy są gdzieś =========================
+	std::cout << "Fib" << std::endl << fibEx2 << endl;
 
 	solution::clear_calls();
 
-	solution lagEx2 = lag(f2, 1e-4, 1e-2, 1e-5, 1e-200, 2000);
-	//std::cout << "Lag" << std::endl << lagEx2 << endl;
-	
+	solution lagEx2 = lag(f2, 1e-4, 1e-2, 1e-5, 1e-200, 2000); // ====================================== tu do sprawdzenia 2 3 4 5 argument czy są gdzieś =========================
+	std::cout << "Lag" << std::endl << lagEx2 << endl;
+
+
+	// SYMULACJA
+
 	std::cout << "\n\nSYMULACJA\n\n";
 	ofstream simFib("simulation_fibonacci.csv");
 	ofstream simLag("simulation_lagrange.csv");
-	// SYMULACJA
-	matrix symY01 = matrix(3, new double[3]{5, 1, 20});
-	matrix* Yz1 = solve_ode(f1, 0, 1, 2000, symY01, NAN, fibEx2.x(0));
-	simFib << Yz1[1] << std::endl << std::endl;
-	std::cout << Yz1[1] << std::endl << std::endl;
 
-	matrix symY02 = matrix(3, new double[3] {5, 1, 20});
-	matrix* Yz2 = solve_ode(f1, 0, 1, 2000, symY02, NAN, lagEx2.x(0));
-	simLag << Yz2[1] << std::endl;
-	std::cout << Yz2[1] << std::endl;
+	matrix symFib = matrix(3, new double[3]{5, 1, 20});
+	matrix* solved1 = solve_ode(f1, 0, 1, 2000, symFib, NAN, fibEx2.x(0));
+	simFib << solved1[1] << std::endl << std::endl;
+	std::cout << solved1[1] << std::endl << std::endl;
+
+	matrix symLag = matrix(3, new double[3] {5, 1, 20});
+	matrix* solved2 = solve_ode(f1, 0, 1, 2000, symLag, NAN, lagEx2.x(0));
+	simLag << solved2[1] << std::endl;
+	std::cout << solved2[1] << std::endl;
 
 	delete [] expansionResults;
 }
