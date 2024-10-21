@@ -186,7 +186,7 @@ solution lag(matrix(*ff)(matrix, matrix, matrix), double a, double b, double eps
             m = m2d(A.y * (m2d(B.x) - m2d(C.x)) + B.y * (m2d(C.x) - m2d(A.x)) + C.y * (m2d(A.x) - m2d(B.x)));
 
             // Sprawdzenie, czy m <= 0
-            if (m <= 0)
+			if (m <= 0)
             {
                 Xopt = D_old;  // Zwrócenie poprzedniego rozwiązania
                 Xopt.flag = -1; // Flaga błędu (error)
@@ -232,6 +232,7 @@ solution lag(matrix(*ff)(matrix, matrix, matrix), double a, double b, double eps
 			{
 				Xopt = D_old;  // Zwrócenie poprzedniego rozwiązania
 				Xopt.flag = -1; // Krok 32: Flaga błędu (error)
+				if (m2d(B.x) - m2d(A.x) < 1) Xopt.flag = 0;
 				return Xopt;    // Zakończenie algorytmu
 			} // Krok 33 & 24
 

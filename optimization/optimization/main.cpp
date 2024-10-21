@@ -90,7 +90,6 @@ void lab1()
 	ofstream lagToFile("./lagrange.csv");
 
 	// TABELA 1, 2
-
 	for (int i = 0; i < 100; i++)
 	{
 		int x0 = dis(gen);
@@ -109,7 +108,7 @@ void lab1()
 		solution lagrange = lag(df1, expansionResults[0], expansionResults[1], epsilon, gamma, Nmax);
 		double x_lag = m2d(lagrange.x);
 		double y_lag = m2d(lagrange.y);
-		std::string minimum_type_lag = (x_lag >= 62.72 && x_lag <= 62.73) ? "GLOBALNE" : "LOKALNE";
+		std::string minimum_type_lag = (x_lag >= 62.71 && x_lag <= 62.74) ? "GLOBALNE" : "LOKALNE";
 		std::string minimum_type_lag2 = (lagrange.flag == -1) ? "ERROR" : minimum_type_lag;
 		lagToFile << x_lag << "," << y_lag << "," << solution::f_calls << "," << minimum_type_lag2 << "\n";
 		solution::clear_calls();
@@ -117,8 +116,9 @@ void lab1()
 	}
 
 	// WYKRES + ostatni rekord z tabeli 1
-	
 	solution fibonacci2 = fib(df1, -100, 100, epsilon);
+
+
 	double x_fib = m2d(fibonacci2.x);
 	double y_fib = m2d(fibonacci2.y);
 	std::string minimum_type_fib2 = (x_fib >= 62.72 && x_fib <= 62.73) ? "GLOBALNE" : "LOKALNE";
@@ -140,13 +140,13 @@ void lab1()
 
 	// TABELA 3
 
-	std::cout << "\n\nZADANIE 2\n\n";
-	solution fibEx2 = fib(f2, 1e-4, 1e-2, epsilon); // ====================================== tu do sprawdzenia 2 3 argument czy są gdzieś =========================
+	std::cout << "\n\nTABELA 3\n\n";
+	solution fibEx2 = fib(f2, 1e-4, 1e-2, epsilon);
 	std::cout << "Fib" << std::endl << fibEx2 << endl;
 
 	solution::clear_calls();
 
-	solution lagEx2 = lag(f2, 1e-4, 1e-2, epsilon, gamma, 2000); // ====================================== tu do sprawdzenia 2 3 argument czy są gdzieś =========================
+	solution lagEx2 = lag(f2, 1e-4, 1e-2, epsilon, gamma, 2000);
 	std::cout << "Lag" << std::endl << lagEx2 << endl;
 
 
