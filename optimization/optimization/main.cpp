@@ -82,14 +82,14 @@ void lab1()
 	double alpha3 = 1.3;
 
 	int Nmax = 10000;
-	double epsilon = 1e-2;
+	double epsilon = 1e-5;
 	double gamma = 1e-180;
 
 	ofstream expToFile("./expansion.csv");
 	ofstream fibToFile("./fibonacci.csv");
 	ofstream lagToFile("./lagrange.csv");
 
-	// TABELA 1
+	// TABELA 1, 2
 
 	for (int i = 0; i < 100; i++)
 	{
@@ -141,12 +141,12 @@ void lab1()
 	// TABELA 3
 
 	std::cout << "\n\nZADANIE 2\n\n";
-	solution fibEx2 = fib(f2, 1e-4, 1e-2, 1e-5); // ====================================== tu do sprawdzenia 2 3 4 argument czy są gdzieś =========================
+	solution fibEx2 = fib(f2, 1e-4, 1e-2, epsilon); // ====================================== tu do sprawdzenia 2 3 argument czy są gdzieś =========================
 	std::cout << "Fib" << std::endl << fibEx2 << endl;
 
 	solution::clear_calls();
 
-	solution lagEx2 = lag(f2, 1e-4, 1e-2, 1e-5, 1e-200, 2000); // ====================================== tu do sprawdzenia 2 3 4 5 argument czy są gdzieś =========================
+	solution lagEx2 = lag(f2, 1e-4, 1e-2, epsilon, gamma, 2000); // ====================================== tu do sprawdzenia 2 3 argument czy są gdzieś =========================
 	std::cout << "Lag" << std::endl << lagEx2 << endl;
 
 
