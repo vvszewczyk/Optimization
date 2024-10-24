@@ -1,3 +1,7 @@
+# Cmake files
+cmake-build-debug/
+
+# Visual studio files
 optimization/optimization/x64/
 optimization/x64/
 optimization/.vs/
