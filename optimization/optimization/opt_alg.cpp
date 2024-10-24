@@ -155,7 +155,6 @@ solution fib(matrix(*ff)(matrix, matrix, matrix), double a, double b, double eps
 }
 
 
-
 solution lag(matrix(*ff)(matrix, matrix, matrix), double a, double b, double epsilon, double gamma, int Nmax, matrix ud1, matrix ud2)
 {
     try
@@ -272,8 +271,6 @@ solution lag(matrix(*ff)(matrix, matrix, matrix), double a, double b, double eps
 }
 
 
-
-
 solution HJ(matrix(*ff)(matrix, matrix, matrix), matrix x0, double s, double alpha, double epsilon, int Nmax, matrix ud1, matrix ud2)
 {
 	try
@@ -293,7 +290,39 @@ solution HJ_trial(matrix(*ff)(matrix, matrix, matrix), solution XB, double s, ma
 {
 	try
 	{
-		//Tu wpisz kod funkcji
+		int n = get_dim(XB);
+		for (int j = 0; j < n; j++)
+		{
+			// wektor jednostkowy e_j
+			matrix ej(n, 1, 0.0);
+			ej(j, 0) = 1.0;
+
+			// Testowanie x + s * e_j
+			solution temp_forward = XB;
+
+			// w kierunku dodatnim
+			temp_forward.x = XB.x + s * ej; 
+			temp_forward.fit_fun(ff, ud1, ud2);
+
+			if (temp_forward.y < XB.y)
+			{
+				XB = temp_forward;
+			}
+			else
+			{
+				// Testowanie x - s * e_j
+				solution temp_backward = XB;
+
+				// w kierunku ujemnym
+				temp_backward.x = XB.x - s * ej;  
+				temp_backward.fit_fun(ff, ud1, ud2);
+
+				if (temp_backward.y < XB.y) 
+				{
+					XB = temp_backward; 
+				}
+			}
+		}
 
 		return XB;
 	}
@@ -302,6 +331,8 @@ solution HJ_trial(matrix(*ff)(matrix, matrix, matrix), solution XB, double s, ma
 		throw ("solution HJ_trial(...):\n" + ex_info);
 	}
 }
+
+
 
 solution Rosen(matrix(*ff)(matrix, matrix, matrix), matrix x0, matrix s0, double alpha, double beta, double epsilon, int Nmax, matrix ud1, matrix ud2)
 {
