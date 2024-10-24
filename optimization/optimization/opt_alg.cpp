@@ -308,8 +308,72 @@ solution Rosen(matrix(*ff)(matrix, matrix, matrix), matrix x0, matrix s0, double
 	try
 	{
 		solution Xopt;
-		//Tu wpisz kod funkcji
-
+		Xopt.ud = trans(x0);
+		solution XB(x0), X;
+		int n = get_dim(XB);
+		matrix l(n,1), p(n,1), s(s0), D = ident_mat(n);
+		XB.fit_fun(ff, ud1, ud2);
+		do {
+			for(int i = 0; i < n; i++) {
+				X.x = XB.x +s(i)*D[i];
+				X.fit_fun(ff, ud1, ud2);
+				if(X.y<XB.y) {
+					XB=X;
+					l(i) += s(i);
+					s(i) *= alpha;
+				}
+				else {
+					s(i) = - beta * s(i);
+					++p(i);
+				}
+			}
+			Xopt.ud.add_row(trans(XB.x));
+			bool change = true;
+			for(int i = 0; i < n; i++) {
+				if(l(i) == 0 || p(i) ==0) {
+					change = false;
+					break;
+				}
+			}
+			if(change) {
+				matrix Q(n,n), v(n,1);
+				for(int i = 0; i < n; i++) {
+					for(int j = 0; j <= i; j++) {
+						Q(i,j) = l(i);
+					}
+				}
+				Q = Q*D;
+				v = Q[0] / norm(Q[0]);
+				D.set_col(v, 0);
+				for (int i = 1; i < n; i++) {
+					matrix tmp(n,1);
+					for(int j = 0; j < i; j++) {
+						tmp = tmp + trans(Q[i])*D[j]*D[j];
+					}
+					v = (Q[i]-tmp)/norm(Q[i]-tmp);
+					D.set_col(v,i);
+				}
+				s = s0;
+				l = matrix(n,1);
+				p = matrix(n,1);
+			}
+			double max_s = abs(s(0));
+			for(int i = 0; i < n; i++) {
+				if(max_s<abs(s(i))) {
+					max_s = abs(s(i));
+				}
+			}
+			if(max_s < epsilon) {
+				Xopt = XB;
+				Xopt.flag = 0;
+				break;
+			}
+			if(solution::f_calls > Nmax) {
+				Xopt = XB;
+				Xopt.flag = 0;
+				break;
+			}
+		}while(true);
 		return Xopt;
 	}
 	catch (string ex_info)
