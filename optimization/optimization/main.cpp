@@ -172,12 +172,14 @@ void lab1()
 void lab2()
 {
 	double epsilon = 1e-2;
-	int Nmax = 100;
-	matrix x0(2, 1, 0.0);  // Początkowy punkt
-	double s = 0.1;        // Rozmiar kroku
+	int Nmax = 10000;
+	double alpha = 0.5;
+	matrix x0(2, 1, 0.0);
+	double s = 0.1;
 
-	solution opt = HJ(df2, x0, s, 0.9, epsilon, Nmax);  // Testowanie optymalizacji Hooke-Jeeves
-	cout << "Optimized solution: " << opt << endl;
+
+	solution opt = HJ(df2, x0, s, alpha, epsilon, Nmax);
+	cout << "HJ solution:\n " << opt << endl;
 }
 
 

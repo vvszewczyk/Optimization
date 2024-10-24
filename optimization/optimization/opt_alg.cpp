@@ -275,7 +275,58 @@ solution HJ(matrix(*ff)(matrix, matrix, matrix), matrix x0, double s, double alp
 {
 	try
 	{
-		
+		solution Xopt;
+		Xopt.ud = trans(x0);
+		solution XB, XBOld, X(x0);
+		X.fit_fun(ff, ud1, ud2);
+		while (true)
+		{
+			XB = X;
+			X = HJ_trial(ff, XB, s, ud1, ud2);
+			if (X.y < XB.y)
+			{
+				while (true)
+				{
+					XBOld = XB;
+					XB = X;
+
+					X.x = 2 * XB.x - XBOld.x;
+					X.fit_fun(ff, ud1, ud2);
+					X = HJ_trial(ff, X, s, ud1, ud2);
+
+					if (solution::f_calls > Nmax)
+					{
+						Xopt = XB;
+						Xopt.flag = 0;
+						return Xopt;
+					}
+					if (X.y >= XB.y)
+					{
+						break;
+					}
+				}
+				XB = X;
+			}
+			else
+			{
+				s = alpha * s;
+			}
+
+			if (solution::f_calls > Nmax)
+			{
+				Xopt = XB;
+				Xopt.flag = 0;
+				break;
+			}
+
+			if (s < epsilon)
+			{
+				Xopt = XB;
+				Xopt.flag = 1;
+				break;
+			}
+		}
+		return Xopt;
 	}
 	catch (string ex_info)
 	{

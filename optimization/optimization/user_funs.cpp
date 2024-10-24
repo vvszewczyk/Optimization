@@ -89,27 +89,14 @@ matrix f2(matrix x, matrix ud1, matrix ud2)
 	return y;
 }
 
-matrix df2(matrix x1, matrix x2, matrix ud1)
+matrix df2(matrix x, matrix ud2, matrix ud1)
 {
-	if (get_len(x1) != 1 || get_len(x2) != 1)
-	{
-		throw string("matrix df2(...): Argumenty musz¹ byæ skalarami (macierz 1x1).");
-	}
-
-	double x1_scalar = m2d(x1);  // Konwersja macierzy 1x1 na skalar
-	double x2_scalar = m2d(x2);  // Konwersja macierzy 1x1 na skalar
-
-	// Debugowanie wartoœci skalarów
-	cout << "x1_scalar = " << x1_scalar << ", x2_scalar = " << x2_scalar << endl;
-
-	matrix y;
-	y = pow(x1_scalar, 2) + pow(x2_scalar, 2) - cos(2.5 * PI * x1_scalar) - cos(2.5 * PI * x2_scalar) + 2;
-
-	cout << "Calculated y = " << m2d(y) << endl;  // Debugowanie wyniku
-
-	return y;
+	double x1 = x(0, 0);
+	double x2 = x(1, 0);
+	matrix result(1, 1);
+	result(0, 0) = pow(x1, 2) + pow(x2, 2) - cos(2.5 * PI * x1) - cos(2.5 * PI * x2) + 2;
+	return result;
 }
-
 
 
 
