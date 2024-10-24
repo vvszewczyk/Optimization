@@ -1,4 +1,5 @@
 #include"user_funs.h"
+#define PI 3.14
 
 matrix ff0T(matrix x, matrix ud1, matrix ud2)
 {
@@ -36,7 +37,7 @@ matrix df0(double t, matrix Y, matrix ud1, matrix ud2)
 matrix df1(matrix x, matrix ud1, matrix ud2)
 {
 	matrix y;
-	y = -cos(0.1 * x(0)) * exp(-pow(0.1 * x(0) - (2 * 3.14), 2)) + 0.002 * pow(0.1 * x(0), 2);
+	y = -cos(0.1 * x(0)) * exp(-pow(0.1 * x(0) - (2 * PI), 2)) + 0.002 * pow(0.1 * x(0), 2);
 	return y;
 }
 
@@ -87,3 +88,28 @@ matrix f2(matrix x, matrix ud1, matrix ud2)
 	
 	return y;
 }
+
+matrix df2(matrix x1, matrix x2, matrix ud1)
+{
+	if (get_len(x1) != 1 || get_len(x2) != 1)
+	{
+		throw string("matrix df2(...): Argumenty musz¹ byæ skalarami (macierz 1x1).");
+	}
+
+	double x1_scalar = m2d(x1);  // Konwersja macierzy 1x1 na skalar
+	double x2_scalar = m2d(x2);  // Konwersja macierzy 1x1 na skalar
+
+	// Debugowanie wartoœci skalarów
+	cout << "x1_scalar = " << x1_scalar << ", x2_scalar = " << x2_scalar << endl;
+
+	matrix y;
+	y = pow(x1_scalar, 2) + pow(x2_scalar, 2) - cos(2.5 * PI * x1_scalar) - cos(2.5 * PI * x2_scalar) + 2;
+
+	cout << "Calculated y = " << m2d(y) << endl;  // Debugowanie wyniku
+
+	return y;
+}
+
+
+
+

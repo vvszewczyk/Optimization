@@ -275,10 +275,56 @@ solution HJ(matrix(*ff)(matrix, matrix, matrix), matrix x0, double s, double alp
 {
 	try
 	{
-		solution Xopt;
-		//Tu wpisz kod funkcji
+		solution xB(x0);   // Inicjalizujemy xB jako punkt startowy
+		solution x = HJ_trial(ff, xB, s, ud1, ud2);  // Pierwsza próba w punkcie startowym
+		int f_calls_start = solution::f_calls;  // Licznik wywołań funkcji celu
 
-		return Xopt;
+		while (s > epsilon)
+		{
+			if (x.y < xB.y)  // Sprawdzamy, czy nowy punkt jest lepszy
+			{
+				while (true)
+				{
+					solution xB_temp = xB;  // Kopiujemy xB jako punkt odniesienia
+
+					// Extrapolacja w nowym kierunku
+					xB = x;
+					x.x = 2 * xB.x - xB_temp.x;
+
+					// Próba w nowym punkcie
+					x = HJ_trial(ff, x, s, ud1, ud2);
+
+					if (solution::f_calls - f_calls_start > Nmax)
+					{
+						xB.flag = -1;  // Przekroczono maksymalną liczbę iteracji
+						return xB;
+					}
+
+					if (x.y >= xB.y)  // Jeśli nie ma poprawy, kończymy wewnętrzną pętlę
+					{
+						x.x = xB.x;  // Wracamy do poprzedniego punktu
+						break;
+					}
+				}
+			}
+			else
+			{
+				// Zmniejszamy rozmiar kroku, jeśli nie było poprawy
+				s *= alpha;
+			}
+
+			if (solution::f_calls - f_calls_start > Nmax)
+			{
+				xB.flag = -1;  // Przekroczono maksymalną liczbę iteracji
+				return xB;
+			}
+
+			// Próba z aktualnym rozmiarem kroku
+			x = HJ_trial(ff, xB, s, ud1, ud2);
+		}
+
+		xB.flag = 1;  // Sukces, zakończono poprawnie
+		return xB;     // Zwracamy najlepszy punkt
 	}
 	catch (string ex_info)
 	{
@@ -286,51 +332,52 @@ solution HJ(matrix(*ff)(matrix, matrix, matrix), matrix x0, double s, double alp
 	}
 }
 
+
 solution HJ_trial(matrix(*ff)(matrix, matrix, matrix), solution XB, double s, matrix ud1, matrix ud2)
 {
 	try
 	{
-		int n = get_dim(XB);
+		int n = get_dim(XB);  // Pobieramy liczbę wymiarów z rozwiązania
+		matrix e(n, 1);       // Tworzymy jednostkowy wektor
 		for (int j = 0; j < n; j++)
 		{
-			// wektor jednostkowy e_j
-			matrix ej(n, 1, 0.0);
-			ej(j, 0) = 1.0;
+			e(j, 0) = 1;  // Ustawiamy j-ty element jednostkowego wektora na 1
 
 			// Testowanie x + s * e_j
-			solution temp_forward = XB;
+			solution temp = XB;
+			temp.x = XB.x + s * e;  // Aktualizacja rozwiązania w kierunku dodatnim
+			temp.fit_fun(ff, ud1, ud2);  // Wywołanie funkcji celu (ff) z pełną macierzą `x`
 
-			// w kierunku dodatnim
-			temp_forward.x = XB.x + s * ej; 
-			temp_forward.fit_fun(ff, ud1, ud2);
-
-			if (temp_forward.y < XB.y)
+			if (temp.y < XB.y)  // Jeśli nowa wartość jest lepsza, aktualizujemy XB
 			{
-				XB = temp_forward;
+				XB = temp;
 			}
 			else
 			{
 				// Testowanie x - s * e_j
-				solution temp_backward = XB;
+				temp.x = XB.x - s * e;  // Aktualizacja rozwiązania w kierunku ujemnym
+				temp.fit_fun(ff, ud1, ud2);  // Wywołanie funkcji celu z pełną macierzą `x`
 
-				// w kierunku ujemnym
-				temp_backward.x = XB.x - s * ej;  
-				temp_backward.fit_fun(ff, ud1, ud2);
-
-				if (temp_backward.y < XB.y) 
+				if (temp.y < XB.y)  // Jeśli wartość jest lepsza, aktualizujemy XB
 				{
-					XB = temp_backward; 
+					XB = temp;
 				}
 			}
+
+			e(j, 0) = 0;  // Resetowanie jednostkowego wektora
 		}
 
-		return XB;
+		return XB;  // Zwracamy zaktualizowane rozwiązanie
 	}
 	catch (string ex_info)
 	{
 		throw ("solution HJ_trial(...):\n" + ex_info);
 	}
 }
+
+
+
+
 
 
 
