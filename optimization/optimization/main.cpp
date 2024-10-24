@@ -177,9 +177,18 @@ void lab2()
 	matrix x0(2, 1, 0.0);
 	double s = 0.1;
 
-
+	// Testowanie metody Hooke'a-Jeevesa
 	solution opt = HJ(df2, x0, s, alpha, epsilon, Nmax);
-	cout << "HJ solution:\n " << opt << endl;
+	std::cout << "HJ solution:\n " << opt << endl;
+
+	solution::clear_calls();
+
+	// Testowanie Ribbentrop - Molotova
+	alpha = 2;
+	double betha = 0.5;
+	opt = Rosen(df2, x0, s, alpha, betha, epsilon, Nmax);
+	std::cout << "Rosen solution:\n " << opt << endl;
+
 }
 
 

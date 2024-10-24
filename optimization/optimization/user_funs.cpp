@@ -34,6 +34,7 @@ matrix df0(double t, matrix Y, matrix ud1, matrix ud2)
 	return dY;
 }
 
+// LAB1
 matrix df1(matrix x, matrix ud1, matrix ud2)
 {
 	matrix y;
@@ -89,6 +90,8 @@ matrix f2(matrix x, matrix ud1, matrix ud2)
 	return y;
 }
 
+
+// LAB2
 matrix df2(matrix x, matrix ud2, matrix ud1)
 {
 	double x1 = x(0, 0);
