@@ -184,9 +184,14 @@ void lab2()
 	solution::clear_calls();
 
 	// Testowanie Ribbentrop - Molotova
+	matrix x1(2, 1, 0.0);
+	s = 0.1;
 	alpha = 2;
+	epsilon = 1e-2;
 	double betha = 0.5;
-	opt = Rosen(df2, x0, s, alpha, betha, epsilon, Nmax);
+	Nmax = 10000;
+
+	opt = Rosen(df2, x1, s, alpha, betha, epsilon, Nmax);
 	std::cout << "Rosen solution:\n " << opt << endl;
 
 }

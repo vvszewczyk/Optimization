@@ -154,7 +154,6 @@ solution fib(matrix(*ff)(matrix, matrix, matrix), double a, double b, double eps
 	}
 }
 
-
 solution lag(matrix(*ff)(matrix, matrix, matrix), double a, double b, double epsilon, double gamma, int Nmax, matrix ud1, matrix ud2)
 {
     try
@@ -270,7 +269,6 @@ solution lag(matrix(*ff)(matrix, matrix, matrix), double a, double b, double eps
     }
 }
 
-
 solution HJ(matrix(*ff)(matrix, matrix, matrix), matrix x0, double s, double alpha, double epsilon, int Nmax, matrix ud1, matrix ud2)
 {
 	try
@@ -334,17 +332,16 @@ solution HJ(matrix(*ff)(matrix, matrix, matrix), matrix x0, double s, double alp
 	}
 }
 
-
 solution HJ_trial(matrix(*ff)(matrix, matrix, matrix), solution XB, double s, matrix ud1, matrix ud2)
 {
 	try
 	{
 		int n = get_dim(XB);
-		matrix identMat = ident_mat(n);
+		matrix e = ident_mat(n);
 		solution X;
 		for (int j = 0; j < n; j++)
 		{
-			X.x = XB.x + s * identMat[j];
+			X.x = XB.x + s * e[j]; // Przesunięcie w kierunku e_j
 			X.fit_fun(ff, ud1, ud2);
 
 			if (X.y < XB.y)
@@ -353,7 +350,7 @@ solution HJ_trial(matrix(*ff)(matrix, matrix, matrix), solution XB, double s, ma
 			}
 			else
 			{
-				X.x = XB.x - s * identMat[j];
+				X.x = XB.x - s * e[j]; // Przesunięcie w przeciwnym kierunku e_j
 				X.fit_fun(ff, ud1, ud2);
 
 				if (X.y < XB.y)
@@ -370,7 +367,6 @@ solution HJ_trial(matrix(*ff)(matrix, matrix, matrix), solution XB, double s, ma
 		throw ("solution HJ_trial(...):\n" + ex_info);
 	}
 }
-
 
 solution Rosen(matrix(*ff)(matrix, matrix, matrix), matrix x0, matrix s0, double alpha, double beta, double epsilon, int Nmax, matrix ud1, matrix ud2)
 {
