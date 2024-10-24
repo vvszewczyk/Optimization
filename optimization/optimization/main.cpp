@@ -23,7 +23,7 @@ int main()
 {
 	try
 	{
-		lab1();
+		lab2();
 	}
 	catch (string EX_INFO)
 	{
@@ -171,7 +171,13 @@ void lab1()
 
 void lab2()
 {
+	double epsilon = 1e-2;
+	int Nmax = 100;
+	matrix x0(2, 1, 0.0);  // Początkowy punkt
+	double s = 0.1;        // Rozmiar kroku
 
+	solution opt = HJ(ff0T, x0, s, 0.9, epsilon, Nmax);  // Testowanie optymalizacji Hooke-Jeeves
+	cout << "Optimized solution: " << opt << endl;
 }
 
 void lab3()
