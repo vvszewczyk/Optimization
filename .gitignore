@@ -1,5 +1,9 @@
 # Cmake files
 cmake-build-debug/
+CMakeLists.txt
+
+# Clion files
+.idea/
 
 # Visual studio files
 optimization/optimization/x64/
