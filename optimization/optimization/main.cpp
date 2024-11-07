@@ -10,6 +10,7 @@ Data ostatniej modyfikacji: 19.09.2023
 
 #include"opt_alg.h"
 #include <random>
+#define M_PI 3.14159265358979323846
 
 void lab0();
 void lab1();
@@ -59,7 +60,7 @@ void lab0()
 	cout << opt << endl << endl;
 	solution::clear_calls();
 
-	//Zapis symulacji do pliku csv
+	//ZaM_PIs symulacji do pliku csv
 	matrix Y0 = matrix(2, 1), MT = matrix(2, new double[2]{ m2d(opt.x),0.5 });
 	matrix* Y = solve_ode(df0, 0, 0.1, 10, Y0, NAN, MT);
 	ofstream Sout("symulacja_lab0.csv");
@@ -173,7 +174,7 @@ void lab1()
 
 void lab2() {
 
-	// Nie wiedziałem czy chcecie zebym to usuwal więc zakomentowalem i zostawilem ;) //
+	// ---------------- WOJTEK I IGOR DEBUG ----------------- //
 	//double epsilon = 1e-2;
 	//int Nmax = 100;
 	//matrix x0(2, 1, 0.0);  // Początkowy punkt
@@ -194,8 +195,9 @@ void lab2() {
 	std::ofstream fileHJ("Hooke-Jeeves.csv");
 	std::ofstream fileRosen("Rosenbrock.csv");
 
-	if (!fileHJ.is_open() || !fileRosen.is_open()) {
-		std::cerr << "Nie udało się otworzyć plików do zapisu.\n";
+	if (!fileHJ.is_open() || !fileRosen.is_open())
+	{
+		std::cerr << "Nie udało się otworzyć plików do zaM_PIsu.\n";
 		return;
 	}
 
@@ -213,22 +215,22 @@ void lab2() {
 			x0(0, 0) = dis(gen);
 			x0(1, 0) = dis(gen);
 
-			// Testowanie metody Hooke'a-Jeevesa i zapis do pliku Hooke-Jeeves.csv
+			// Testowanie metody Hooke'a-Jeevesa i zaM_PIs do pliku Hooke-Jeeves.csv
 			solution optHJ = HJ(df2, x0, step, alphaHJ, epsilon, Nmax);
 			fileHJ << "Hooke-Jeeves;" << step << ";" << x0(0, 0) << ";" << x0(1, 0) << ";"
 				<< optHJ.x(0, 0) << ";" << optHJ.x(1, 0) << ";" << optHJ.f_calls << ";"
 				<< optHJ.y << ";" << (optHJ.flag == 1 ? "TAK" : "NIE") << "\n";
 
-			solution::clear_calls();  // Reset liczby wywołań funkcji celu
+			solution::clear_calls();
 
-			// Testowanie metody Rosenbrocka i zapis do pliku Rosenbrock.csv
+			// Testowanie metody Rosenbrocka i zaM_PIs do pliku Rosenbrock.csv
 			matrix s0(2, 1, step);
 			solution optRosen = Rosen(df2, x0, s0, alphaR, beta, epsilon, Nmax);
 			fileRosen << "Rosenbrock;" << step << ";" << x0(0, 0) << ";" << x0(1, 0) << ";"
 				<< optRosen.x(0, 0) << ";" << optRosen.x(1, 0) << ";" << optRosen.f_calls << ";"
 				<< optRosen.y << ";" << (optRosen.flag == 1 ? "TAK" : "NIE") << "\n";
 
-			solution::clear_calls();  // Reset liczby wywołań funkcji celu
+			solution::clear_calls(); 
 		}
 	}
 
@@ -239,9 +241,46 @@ void lab2() {
 	std::cout << "Wyniki zapisane do plików Hooke-Jeeves.csv i Rosenbrock.csv\n";
 
 	// -------- Problem rzeczywisty --------- //
+	
+	double s = 0.1;
+	matrix s0 = matrix(2, 1, s);
 
+	matrix x0 = matrix(2, 1, 5);
+	cout << x0 << "\n\n";
+
+	// Pliki CSV 
+	std::ofstream HookeSimulation("HookeSimulation.csv");
+	std::ofstream RosenbrockSimulation("RosenbrockSimulation.csv");
+	std::ofstream Simulation("Simulation.csv");
+
+	solution HookeR = HJ(df2, x0, s, alphaHJ, epsilon, Nmax);
+	int a = solution::f_calls;
+	HookeSimulation << HookeR.x << ":" << HookeR.y << ";" << a << ";" << endl;
+	solution::clear_calls();
+
+	solution RosenbrockR = Rosen(df2, x0, s0, alphaR, beta, epsilon, Nmax);
+	int b = solution::f_calls;
+	RosenbrockSimulation << RosenbrockR.x << ":" << RosenbrockR.y << ";" << b << ";" << endl;
+	solution::clear_calls();
+	HookeSimulation.close();
+
+	double t0 = 0;
+	double td = 0.1;
+	double tend = 100;
+
+	// Symulacja
+	matrix y0_1 = matrix(2, 1);
+	matrix ud1(2, new double[2] {M_PI, 0});
+	matrix* yz1 = solve_ode(Q, t0, td, tend, y0_1, ud1, HookeR.x);
+	cout << yz1[1] << endl;
+	Simulation << yz1[1] << endl;
+
+	matrix y0_2 = matrix(2, 1);
+	matrix* yz2 = solve_ode(Q, t0, td, tend, y0_2, ud1, RosenbrockR.x);
+	cout << yz2[1] << endl;
+	Simulation << yz2[1] << endl;
+	Simulation.close();
 }
-
 
 
 void lab3()
