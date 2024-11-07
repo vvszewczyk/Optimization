@@ -19,6 +19,8 @@ void lab4();
 void lab5();
 void lab6();
 
+double global_min_threshold = 0.01; // Placeholder threshold for global minimum
+
 int main()
 {
 	try
@@ -123,7 +125,7 @@ void lab1()
 	double y_fib = m2d(fibonacci2.y);
 	std::string minimum_type_fib2 = (x_fib >= 62.72 && x_fib <= 62.73) ? "GLOBALNE" : "LOKALNE";
 	std::cout << x_fib << "," << y_fib << "," << solution::f_calls << "," << minimum_type_fib2 << "\n";
-	std::cout <<"Fibonacci" << std::endl;
+	std::cout << "Fibonacci" << std::endl;
 	std::cout << fibonacci2;
 	solution::clear_calls();
 
@@ -136,7 +138,7 @@ void lab1()
 	std::cout << "Lagrange" << std::endl;
 	std::cout << lagrange2;
 	solution::clear_calls();
-	
+
 
 	// TABELA 3
 
@@ -156,7 +158,7 @@ void lab1()
 	ofstream simFib("simulation_fibonacci.csv");
 	ofstream simLag("simulation_lagrange.csv");
 
-	matrix symFib = matrix(3, new double[3]{5, 1, 20});
+	matrix symFib = matrix(3, new double[3] {5, 1, 20});
 	matrix* solved1 = solve_ode(f1, 0, 1, 2000, symFib, NAN, fibEx2.x(0));
 	simFib << solved1[1] << std::endl << std::endl;
 	std::cout << solved1[1] << std::endl << std::endl;
@@ -166,33 +168,77 @@ void lab1()
 	simLag << solved2[1] << std::endl;
 	std::cout << solved2[1] << std::endl;
 
-	delete [] expansionResults;
+	delete[] expansionResults;
 }
 
-void lab2()
-{
-	double epsilon = 1e-2;
-	int Nmax = 10000;
-	double alpha = 0.5;
-	matrix x0(2, 1, 0.0);
-	double s = 0.1;
+void lab2() {
 
-	// Testowanie metody Hooke'a-Jeevesa
-	solution opt = HJ(df2, x0, s, alpha, epsilon, Nmax);
-	std::cout << "HJ solution:\n " << opt << endl;
+	// Nie wiedziałem czy chcecie zebym to usuwal więc zakomentowalem i zostawilem ;) //
+	//double epsilon = 1e-2;
+	//int Nmax = 100;
+	//matrix x0(2, 1, 0.0);  // Początkowy punkt
+	//double s = 0.1;        // Rozmiar kroku
 
-	solution::clear_calls();
+	//solution opt = HJ(ff0T, x0, s, 0.9, epsilon, Nmax);  // Testowanie optymalizacji Hooke-Jeeves
+	//cout << "Optimized solution: " << opt << endl;
 
-	// Testowanie Ribbentrop - Molotova
-	matrix x1(2, 1, 0.0);
-	matrix s1(2, 1, 0.5);
-	alpha = 2;
-	epsilon = 1e-2;
-	double betha = 0.5;
-	Nmax = 10000;
+	// -------- Funkcja Testująca --------- //
+	double epsilon = 1e-3;
+	int Nmax = 1000;
+	double alphaHJ = 0.5;
+	double alphaR = 0.5;
+	double beta = 0.5;
+	std::vector<double> steps = { 0.1, 0.5, 1.0 };
 
-	opt = Rosen(df2, x1, s1, alpha, betha, epsilon, Nmax);
-	std::cout << "Rosen solution:\n " << opt << endl;
+	// Otwarcie dwóch osobnych plików CSV dla każdej z metod
+	std::ofstream fileHJ("Hooke-Jeeves.csv");
+	std::ofstream fileRosen("Rosenbrock.csv");
+
+	if (!fileHJ.is_open() || !fileRosen.is_open()) {
+		std::cerr << "Nie udało się otworzyć plików do zapisu.\n";
+		return;
+	}
+
+	// Nagłówki kolumn z separatorem średnika
+	fileHJ << "Metoda;Długość kroku;x0(1);x0(2);x(1);x(2);f_calls;Minimum Globalne;Sukces\n";
+	fileRosen << "Metoda;Długość kroku;x0(1);x0(2);x(1);x(2);f_calls;Minimum Globalne;Sukces\n";
+
+	std::random_device rd;
+	std::mt19937 gen(rd());
+	std::uniform_real_distribution<> dis(-1.0, 1.0);
+
+	for (double step : steps) {
+		for (int i = 0; i < 100; i++) {
+			matrix x0(2, 1);
+			x0(0, 0) = dis(gen);
+			x0(1, 0) = dis(gen);
+
+			// Testowanie metody Hooke'a-Jeevesa i zapis do pliku Hooke-Jeeves.csv
+			solution optHJ = HJ(df2, x0, step, alphaHJ, epsilon, Nmax);
+			fileHJ << "Hooke-Jeeves;" << step << ";" << x0(0, 0) << ";" << x0(1, 0) << ";"
+				<< optHJ.x(0, 0) << ";" << optHJ.x(1, 0) << ";" << optHJ.f_calls << ";"
+				<< optHJ.y << ";" << (optHJ.flag == 1 ? "TAK" : "NIE") << "\n";
+
+			solution::clear_calls();  // Reset liczby wywołań funkcji celu
+
+			// Testowanie metody Rosenbrocka i zapis do pliku Rosenbrock.csv
+			matrix s0(2, 1, step);
+			solution optRosen = Rosen(df2, x0, s0, alphaR, beta, epsilon, Nmax);
+			fileRosen << "Rosenbrock;" << step << ";" << x0(0, 0) << ";" << x0(1, 0) << ";"
+				<< optRosen.x(0, 0) << ";" << optRosen.x(1, 0) << ";" << optRosen.f_calls << ";"
+				<< optRosen.y << ";" << (optRosen.flag == 1 ? "TAK" : "NIE") << "\n";
+
+			solution::clear_calls();  // Reset liczby wywołań funkcji celu
+		}
+	}
+
+	// Zamknięcie plików
+	fileHJ.close();
+	fileRosen.close();
+
+	std::cout << "Wyniki zapisane do plików Hooke-Jeeves.csv i Rosenbrock.csv\n";
+
+	// -------- Problem rzeczywisty --------- //
 
 }
 
