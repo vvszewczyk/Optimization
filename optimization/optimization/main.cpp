@@ -179,6 +179,7 @@ void lab1()
 
 void lab2() 
 {
+
 	// -------- Funkcja Testująca --------- //
 	double epsilon = 1e-06;
 	int Nmax = 1000;
