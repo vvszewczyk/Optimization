@@ -144,5 +144,3 @@ matrix Q(double t, matrix Y, matrix ud1, matrix ud2)
 
 	return dY;
 }
-
-
