@@ -142,7 +142,7 @@ void lab1()
 	std::string minimum_type_lag2 = (x_lag >= 62.72 && x_lag <= 62.73) ? "GLOBALNE" : "LOKALNE";
 	std::string minimum_type_lag3 = (lagrange2.flag == -1) ? "ERROR" : minimum_type_lag2;
 	std::cout << x_lag << delimiter << y_lag << delimiter << solution::f_calls << delimiter << minimum_type_lag3 << "\n";
-	std::cout << "Lagrange" << std::endl;
+	std::cout << "Lagrange\n";
 	std::cout << lagrange2;
 	solution::clear_calls();
 
