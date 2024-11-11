@@ -161,8 +161,8 @@ void lab1()
 
 	// Symulacja
 	std::cout << "\n\nSymulacja\n\n";
-	ofstream simFib("simulation_fibonacci.csv");
-	ofstream simLag("simulation_lagrange.csv");
+	ofstream simFib("Symulacja_fibonacci.csv");
+	ofstream simLag("Symulacja_lagrange.csv");
 
 	matrix symFib = matrix(3, new double[3] {5, 1, 20});
 	matrix* solved1 = solve_ode(f1, 0, 1, 2000, symFib, NAN, fibEx2.x(0));
@@ -177,10 +177,9 @@ void lab1()
 	delete[] expansionResults;
 }
 
-void lab2() 
+void lab2()
 {
-
-	// -------- Funkcja Testująca --------- //
+	// -------- Funkcja Testująca (Tabele 1 i 2) --------- //
 	double epsilon = 1e-06;
 	int Nmax = 1000;
 	double alphaHJ = 0.5;
@@ -200,38 +199,38 @@ void lab2()
 	}
 
 	// Nagłówki kolumn z separatorem średnika
-	fileHJ << "Metoda;Długość kroku;x0(1);x0(2);x(1);x(2);f_calls;Minimum Globalne;Sukces\n";
-	fileRosen << "Metoda;Długość kroku;x0(1);x0(2);x(1);x(2);f_calls;Minimum Globalne;Sukces\n";
+	fileHJ << "Metoda;Dlugosc kroku;x0(1);x0(2);x(1);x(2);f_calls;Minimum Globalne;Sukces\n";
+	fileRosen << "Metoda;Dlugosc kroku;x0(1);x0(2);x(1);x(2);f_calls;Minimum Globalne;Sukces\n";
 
 	// Generator liczb losowych
 	std::random_device rd;
 	std::mt19937 gen(rd());
 	std::uniform_real_distribution<> dis(-1.0, 1.0);
 
-	for (double step : steps) 
+	for (double step : steps)
 	{
-		for (int i = 0; i < 100; i++) 
+		for (int i = 0; i < 100; i++)
 		{
 			matrix x0(2, 1);
 			x0(0, 0) = dis(gen);
 			x0(1, 0) = dis(gen);
 
 			// Testowanie metody Hooke'a-Jeevesa i zapis do pliku Hooke-Jeeves.csv
-			solution optHJ = HJ(df2, x0, step, alphaHJ, epsilon, Nmax);
+			solution y0HJ = HJ(ff2T, x0, step, alphaHJ, epsilon, Nmax);
 			fileHJ << "Hooke-Jeeves;" << step << delimiter << x0(0, 0) << delimiter << x0(1, 0) << delimiter
-				<< optHJ.x(0, 0) << delimiter << optHJ.x(1, 0) << delimiter << optHJ.f_calls << delimiter
-				<< optHJ.y << delimiter << (optHJ.flag == 1 ? "TAK" : "NIE") << "\n";
+				<< y0HJ.x(0, 0) << delimiter << y0HJ.x(1, 0) << delimiter << solution::f_calls << delimiter
+				<< y0HJ.y << ((abs(m2d(y0HJ.y)) < epsilon) ? "TAK" : "NIE") << "\n";
 
 			solution::clear_calls();
 
 			// Testowanie metody Rosenbrocka i zapis do pliku Rosenbrock.csv
 			matrix s0(2, 1, step);
-			solution optRosen = Rosen(df2, x0, s0, alphaR, beta, epsilon, Nmax);
+			solution y0Rosen = Rosen(ff2T, x0, s0, alphaR, beta, epsilon, Nmax);
 			fileRosen << "Rosenbrock;" << step << delimiter << x0(0, 0) << delimiter << x0(1, 0) << delimiter
-				<< optRosen.x(0, 0) << delimiter << optRosen.x(1, 0) << delimiter << optRosen.f_calls << delimiter
-				<< optRosen.y << delimiter << (optRosen.flag == 1 ? "TAK" : "NIE") << "\n";
+				<< y0Rosen.x(0, 0) << delimiter << y0Rosen.x(1, 0) << delimiter << solution::f_calls << delimiter
+				<< y0Rosen.y << ((abs(m2d(y0Rosen.y)) < epsilon) ? "TAK" : "NIE") << "\n";
 
-			solution::clear_calls(); 
+			solution::clear_calls();
 		}
 	}
 
@@ -241,49 +240,64 @@ void lab2()
 
 	std::cout << "Wyniki zapisane do plików Hooke-Jeeves.csv i Rosenbrock.csv\n";
 
-	// -------- Problem rzeczywisty --------- //
-	
-	double s = 0.1;
-	matrix s0 = matrix(2, 1, s);
+	// -------- Problem rzeczywisty (Tabela 3 i symulacja) --------- //
+	// Otwarcie plików CSV dla wyników problemu rzeczywistego
+	std::ofstream HookeSymulacja("HookeSymulacja.csv");
+	std::ofstream RosenbrockSymulacja("RosenbrockSymulacja.csv");
+	std::ofstream Symulacja("Symulacja.csv");
 
-	matrix x0 = matrix(2, 1, 5);
-	cout << x0 << "\n\n";
+	if (!HookeSymulacja.is_open() || !RosenbrockSymulacja.is_open() || !Symulacja.is_open())
+	{
+		std::cerr << "Cannot open output files for real-world problem.\n";
+		return;
+	}
 
-	// Pliki CSV 
-	std::ofstream HookeSimulation("HookeSimulation.csv");
-	std::ofstream RosenbrockSimulation("RosenbrockSimulation.csv");
-	std::ofstream Simulation("Simulation.csv");
+	double start = 0.1;
+	double k_values[2] = { 5.0, 5.0 };
+	matrix x0(2, k_values);
+	std::cout << x0 << "\n\n";
 
-	solution HookeR = HJ(df2, x0, s, alphaHJ, epsilon, Nmax);
-	int a = solution::f_calls;
-	HookeSimulation << HookeR.x << ":" << HookeR.y << delimiter << a << delimiter << endl;
+	// Optymalizacja metodą Hooke-Jeeves
+	solution HookeR = HJ(ff2R, x0, start, alphaHJ, epsilon, Nmax);
+	HookeSymulacja << HookeR.x(0) << delimiter << HookeR.x(1) << delimiter
+		<< m2d(HookeR.y) << delimiter << solution::f_calls << delimiter << HookeR.flag << "\n";
 	solution::clear_calls();
 
-	solution RosenbrockR = Rosen(df2, x0, s0, alphaR, beta, epsilon, Nmax);
-	int b = solution::f_calls;
-	RosenbrockSimulation << RosenbrockR.x << ":" << RosenbrockR.y << delimiter << b << delimiter << endl;
+	// Optymalizacja metodą Rosenbrocka
+	solution RosenbrockR = Rosen(ff2R, x0, matrix(2, 1, start), alphaR, beta, epsilon, Nmax);
+	RosenbrockSymulacja << RosenbrockR.x(0) << delimiter << RosenbrockR.x(1) << delimiter
+		<< m2d(RosenbrockR.y) << delimiter << solution::f_calls << delimiter << RosenbrockR.flag << "\n";
 	solution::clear_calls();
-	HookeSimulation.close();
 
+	// Zamknięcie plików wynikowych dla optymalizacji
+	HookeSymulacja.close();
+	RosenbrockSymulacja.close();
+
+	// -------- Symulacja z optymalnymi parametrami -------- //
+	// Parametry czasowe
 	double t0 = 0;
 	double td = 0.1;
 	double tend = 100;
 
-	// Symulacja
-	matrix y0_1 = matrix(2, 1);
-	matrix ud1(2, new double[2] {M_PI, 0});
-	matrix* yz1 = solve_ode(Q, t0, td, tend, y0_1, ud1, HookeR.x);
-	cout << yz1[1] << endl;
-	Simulation << yz1[1] << endl;
+	// Parametry przemieszczenia
+	matrix y0(2, new double[2] {0.0, 0.0}); // początkowy
 
-	Simulation << "\n\n\n";
+	// Symulacja dla wyników optymalnych z Hooke-Jeeves
+	matrix* yz1 = solve_ode(df2, t0, td, tend, y0, HookeR.x(0), HookeR.x(1));
+	Symulacja << "Symulacja dla Hooke-Jeeves\n" << yz1[1] << "\n\n";
+	delete[] yz1; // czyszczenie pamięci
 
-	matrix y0_2 = matrix(2, 1);
-	matrix* yz2 = solve_ode(Q, t0, td, tend, y0_2, ud1, RosenbrockR.x);
-	cout << yz2[1] << endl;
-	Simulation << yz2[1] << endl;
-	Simulation.close();
+	// Symulacja dla wyników optymalnych z Rosenbrocka
+	matrix* yz2 = solve_ode(df2, t0, td, tend, y0, RosenbrockR.x(0), RosenbrockR.x(1));
+	Symulacja << "Symulacja dla Rosenbrock\n" << yz2[1] << "\n";
+	delete[] yz2; // czyszczenie pamięci
+
+	// Zamknięcie pliku symulacji
+	Symulacja.close();
+
+	std::cout << "Wyniki zapisane do plików symulacji.\n";
 }
+
 
 
 void lab3()

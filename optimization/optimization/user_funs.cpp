@@ -92,7 +92,7 @@ matrix f2(matrix x, matrix ud1, matrix ud2)
 }
 
 // LAB2
-matrix df2(matrix x, matrix ud2, matrix ud1)
+matrix ff2T(matrix x, matrix ud2, matrix ud1)
 {
 	double x1 = x(0, 0);
 	double x2 = x(1, 0);
@@ -101,46 +101,77 @@ matrix df2(matrix x, matrix ud2, matrix ud1)
 	return result;
 }
 
-// Funkcja kontrolna
+// Moment
 double M(double alpha, double omega, double k1, double k2)
 {
-	double alpha_ref = M_PI;  // Docelowy kąt (π rad)
-	double omega_ref = 0.0;   // Docelowa prędkość kątowa (0 rad/s)
-	return k1 * (alpha_ref - alpha) + k2 * (omega_ref - omega);
+	const double alpha_ref = M_PI;  // Docelowy kąt (π rad)
+	const double omega_ref = 0.0;   // Docelowa prędkość kątowa (0 rad/s)
+
+	double alpha_diff = alpha_ref - alpha;
+	double omega_diff = omega_ref - omega;
+	return k1 * alpha_diff + k2 * omega_diff;
 }
 
 // Funkcja różniczkowa Q dla dynamiki układu z solve_ode
-matrix Q(double t, matrix Y, matrix ud1, matrix ud2)
+matrix df2(double t, matrix Y, matrix ud1, matrix ud2)
 {
-	// Wyodrębnienie zmiennych stanu
-	double alpha = m2d(Y(0, 0));  // Pozycja kątowa
-	double omega = m2d(Y(1, 0));  // Prędkość kątowa
+    // Parametry fizyczne
+    const double l = 1.0;    // Długość ramienia
+    const double mr = 1.0;   // Masa ramienia
+    const double mc = 5.0;   // Masa ciężarka
+    const double b = 0.5;    // Współczynnik tarcia
+    const double I = ((mr / 3) + mc) * pow(l, 2); // Moment bezwładności
 
-	// Docelowy kąt (π rad)
-	double alpha_ref = M_PI;
+    // Wyciąganie współczynników sterowania k1 i k2
+    double k1 = m2d(ud1);  // Zakładamy, że ud1 to k1
+    double k2 = m2d(ud2);  // Zakładamy, że ud2 to k2
 
-	// Stałe dla dynamiki układu
-	const double l = 1.0;  // Długość ramienia robota [m]
-	const double mr = 1.0; // Masa ramienia robota [kg]
-	const double mc = 5.0; // Masa ciężarka [kg]
-	const double b = 0.5;  // Współczynnik tarcia [Nms]
-	const double I = (1.0 / 3.0) * mr * pow(l, 2) + mc * pow(l, 2); // Moment bezwładności ramienia robota
+    // Obecna pozycja i prędkość
+    double alpha = m2d(Y(0, 0));
+    double omega = m2d(Y(1, 0));
 
-	// Wyodrębnienie wzmocnień regulatora z ud2
-	double k1 = m2d(ud2(0, 0));
-	double k2 = m2d(ud2(1, 0));
+    // Obliczenie momentu kontrolnego M(t) przy użyciu funkcji M
+    double control_torque = M(alpha, omega, k1, k2);
 
-	// Obliczenie momentu siły kontrolnej M(t)
-	double control_torque = M(alpha, omega, k1, k2);
+    // Obliczenie pochodnych
+    matrix dY(2, 1);
+    dY(0, 0) = omega;
+    dY(1, 0) = (control_torque - b * omega) / I;
 
-	// Definicja pochodnych na podstawie równań różniczkowych układu
-	double d_alpha_dt = omega;
-	double d_omega_dt = (control_torque - b * omega) / I;
+    return dY;
+}
 
-	// Zwrócenie pochodnych w formacie macierzy 2x1
-	matrix dY(2, 1);
-	dY(0, 0) = d_alpha_dt;
-	dY(1, 0) = d_omega_dt;
+matrix ff2R(matrix x, matrix ud1, matrix ud2) {
+	// Wyciąganie optymalnych wartości współczynników sterowania k1 i k2 z wektora x
+	double k1 = m2d(x(0));
+	double k2 = m2d(x(1));
 
-	return dY;
+	// Ustawienie początkowych warunków symulacji
+	double start_time = 0.0;
+	double end_time = 100.0;
+	double time_step = 0.1;
+
+	// Początkowe warunki: kąt początkowy i prędkość początkowa
+	matrix Y0(2, new double[2] {0.0, 0.0}); // początkowy kąt i prędkość
+
+	// Symulacja ruchu ramienia przy użyciu solve_ode i funkcji Q
+	matrix* results = solve_ode(df2, start_time, time_step, end_time, Y0, matrix(1, 1, k1), matrix(1, 1, k2));
+
+	// Obliczenie jakości funkcji Q jako sumy kwadratów różnic od wartości docelowych
+	double Q = 0.0;
+	for (int i = 0; i < get_len(results[0]); i++) {
+		double alpha_diff = results[1](i, 0) - M_PI;    // Różnica pozycji od wartości docelowej (pi radianów)
+		double omega_diff = results[1](i, 1);           // Różnica prędkości od zera
+
+		double control_torque = M(m2d(results[1](i, 0)), m2d(results[1](i, 1)), k1, k2);
+
+		// Skumulowana wartość jakości funkcji Q
+		Q += (10 * pow(alpha_diff, 2) + pow(omega_diff, 2) + pow(control_torque, 2)) * time_step;
+	}
+
+	// Czyszczenie pamięci wyników solve_ode
+	delete[] results;
+
+	// Zwracanie wyniku jako macierzy, co jest zgodne z funkcjami optymalizacji
+	return matrix(Q);
 }
