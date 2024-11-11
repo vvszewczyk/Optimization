@@ -183,7 +183,7 @@ void lab2()
 	double epsilon = 1e-06;
 	int Nmax = 1000;
 	double alphaHJ = 0.5;
-	double alphaR = 0.5;
+	double alphaR = 2.0;
 	double beta = 0.5;
 	std::vector<double> steps = { 0.1, 0.5, 1.0 };
 	std::string delimiter = ",";
@@ -283,12 +283,14 @@ void lab2()
 
 	// Symulacja dla wyników optymalnych z Hooke-Jeeves
 	matrix* yz1 = solve_ode(df2, t0, td, tend, y0, HookeR.x(0), HookeR.x(1));
-	Symulacja << "lab2/Symulacja dla Hooke-Jeeves\n" << yz1[1] << "\n\n";
+	Symulacja << "Symulacja dla Hooke-Jeeves\n" << yz1[1] << "\n\n";
+	std::cout << "Symulacja dla Hooke-Jeeves\n" << yz1[1] << "\n\n";
 	delete[] yz1; // czyszczenie pamięci
 
 	// Symulacja dla wyników optymalnych z Rosenbrocka
 	matrix* yz2 = solve_ode(df2, t0, td, tend, y0, RosenbrockR.x(0), RosenbrockR.x(1));
-	Symulacja << "lab2/Symulacja dla Rosenbrock\n" << yz2[1] << "\n";
+	Symulacja << "Symulacja dla Rosenbrock\n" << yz2[1] << "\n";
+	std::cout << "Symulacja dla Rosenbrock\n" << yz2[1] << "\n";
 	delete[] yz2; // czyszczenie pamięci
 
 	// Zamknięcie pliku symulacji
