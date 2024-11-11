@@ -199,8 +199,8 @@ void lab2()
 	}
 
 	// Nagłówki kolumn z separatorem średnika
-	fileHJ << "Metoda;Dlugosc kroku;x0(1);x0(2);x(1);x(2);f_calls;Minimum Globalne;Sukces\n";
-	fileRosen << "Metoda;Dlugosc kroku;x0(1);x0(2);x(1);x(2);f_calls;Minimum Globalne;Sukces\n";
+	fileHJ << "Metoda,Dlugosc kroku,x0(1),x0(2),x(1),x(2),f_calls,Minimum Globalne,Sukces\n";
+	fileRosen << "Metoda,Dlugosc kroku,x0(1),x0(2),x(1),x(2),f_calls,Minimum Globalne,Sukces\n";
 
 	// Generator liczb losowych
 	std::random_device rd;
