@@ -199,8 +199,8 @@ void lab2()
 	}
 
 	// Nagłówki kolumn z separatorem średnika
-	fileHJ << "Metoda,Dlugosc kroku,x0(1),x0(2),x(1),x(2),f_calls,Minimum Globalne,Sukces\n";
-	fileRosen << "Metoda,Dlugosc kroku,x0(1),x0(2),x(1),x(2),f_calls,Minimum Globalne,Sukces\n";
+	fileHJ << "Metoda,Dlugosc kroku,x0(1),x0(2),x(1),x(2),y*,f_calls,Minimum Globalne\n";
+	fileRosen << "Metoda,Dlugosc kroku,x0(1),x0(2),x(1),x(2),y*,f_calls,Minimum Globalne\n";
 
 	// Generator liczb losowych
 	std::random_device rd;
@@ -218,8 +218,8 @@ void lab2()
 			// Testowanie metody Hooke'a-Jeevesa i zapis do pliku Hooke-Jeeves.csv
 			solution y0HJ = HJ(ff2T, x0, step, alphaHJ, epsilon, Nmax);
 			fileHJ << "Hooke-Jeeves" << delimiter << step << delimiter << x0(0, 0) << delimiter << x0(1, 0) << delimiter
-				<< y0HJ.x(0, 0) << delimiter << y0HJ.x(1, 0) << delimiter << solution::f_calls << delimiter
-				<< y0HJ.y << ((abs(m2d(y0HJ.y)) < epsilon) ? "TAK" : "NIE") << "\n";
+				<< y0HJ.x(0, 0) << delimiter << y0HJ.x(1, 0) << delimiter << m2d(y0HJ.y) << delimiter << solution::f_calls
+				<<delimiter<< ((abs(m2d(y0HJ.y)) < epsilon) ? "TAK" : "NIE")<< delimiter << "\n";
 
 			solution::clear_calls();
 
@@ -227,8 +227,8 @@ void lab2()
 			matrix s0(2, 1, step);
 			solution y0Rosen = Rosen(ff2T, x0, s0, alphaR, beta, epsilon, Nmax);
 			fileRosen << "Rosenbrock" << delimiter << step << delimiter << x0(0, 0) << delimiter << x0(1, 0) << delimiter
-				<< y0Rosen.x(0, 0) << delimiter << y0Rosen.x(1, 0) << delimiter << solution::f_calls << delimiter
-				<< y0Rosen.y << ((abs(m2d(y0Rosen.y)) < epsilon) ? "TAK" : "NIE") << "\n";
+				<< y0Rosen.x(0, 0) << delimiter << y0Rosen.x(1, 0) << delimiter <<m2d(y0HJ.y) <<delimiter<< solution::f_calls << delimiter
+				 << ((abs(m2d(y0Rosen.y)) < epsilon) ? "TAK" : "NIE") << "\n";
 
 			solution::clear_calls();
 		}
