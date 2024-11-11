@@ -253,7 +253,7 @@ void lab2()
 	}
 
 	double step = 0.8;
-	double k_values[2] = { 2.5, 7.0 };
+	double k_values[2] = { 2.5, 7.5 };
 	matrix x0(2, k_values);
 
 	solution::clear_calls();
@@ -286,14 +286,15 @@ void lab2()
 	// Symulacja dla wyników optymalnych z Hooke-Jeeves
 	matrix* yz1 = solve_ode(df2, t0, dt, tend, y0, HookeR.x(0), HookeR.x(1));
 	Symulacja << "Symulacja dla Hooke-Jeeves\n" << yz1[1] << "\n\n";
-	std::cout << "Symulacja dla Hooke-Jeeves\n" << yz1[1] << "\n\n";
 	delete[] yz1;
+	solution::clear_calls();
+
 
 	// Symulacja dla wyników optymalnych z Rosenbrocka
 	matrix* yz2 = solve_ode(df2, t0, dt, tend, y0, RosenbrockR.x(0), RosenbrockR.x(1));
 	Symulacja << "Symulacja dla Rosenbrock\n" << yz2[1] << "\n";
-	std::cout << "Symulacja dla Rosenbrock\n" << yz2[1] << "\n";
 	delete[] yz2;
+	solution::clear_calls();
 
 	// Zamknięcie pliku symulacji
 	Symulacja.close();
