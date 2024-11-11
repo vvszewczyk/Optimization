@@ -107,9 +107,9 @@ double M(double alpha, double omega, double k1, double k2)
 	const double alpha_ref = M_PI;  // Docelowy kąt (π rad)
 	const double omega_ref = 0.0;   // Docelowa prędkość kątowa (0 rad/s)
 
-	double alpha_diff = alpha_ref - alpha;
-	double omega_diff = omega_ref - omega;
-	return k1 * alpha_diff + k2 * omega_diff;
+	double alphaDiff = alpha_ref - alpha;
+	double omegaDiff = omega_ref - omega;
+	return k1 * alphaDiff + k2 * omegaDiff;
 }
 
 // Funkcja różniczkowa Q dla dynamiki układu z solve_ode
@@ -131,12 +131,12 @@ matrix df2(double t, matrix Y, matrix ud1, matrix ud2)
     double omega = m2d(Y(1, 0));
 
     // Obliczenie momentu kontrolnego M(t) przy użyciu funkcji M
-    double control_torque = M(alpha, omega, k1, k2);
+    double controlMomentum = M(alpha, omega, k1, k2);
 
     // Obliczenie pochodnych
     matrix dY(2, 1);
     dY(0, 0) = omega;
-    dY(1, 0) = (control_torque - b * omega) / I;
+    dY(1, 0) = (controlMomentum - b * omega) / I;
 
     return dY;
 }
@@ -147,26 +147,27 @@ matrix ff2R(matrix x, matrix ud1, matrix ud2) {
 	double k2 = m2d(x(1));
 
 	// Ustawienie początkowych warunków symulacji
-	double start_time = 0.0;
-	double end_time = 100.0;
-	double time_step = 0.1;
+	double t0 = 0.0;
+	double td = 0.1;
+	double tend = 100.0;
 
 	// Początkowe warunki: kąt początkowy i prędkość początkowa
 	matrix Y0(2, new double[2] {0.0, 0.0}); // początkowy kąt i prędkość
 
 	// Symulacja ruchu ramienia przy użyciu solve_ode i funkcji Q
-	matrix* results = solve_ode(df2, start_time, time_step, end_time, Y0, matrix(1, 1, k1), matrix(1, 1, k2));
+	matrix* results = solve_ode(df2, t0, td, tend, Y0, matrix(1, 1, k1), matrix(1, 1, k2));
 
 	// Obliczenie jakości funkcji Q jako sumy kwadratów różnic od wartości docelowych
 	double Q = 0.0;
-	for (int i = 0; i < get_len(results[0]); i++) {
-		double alpha_diff = results[1](i, 0) - M_PI;    // Różnica pozycji od wartości docelowej (pi radianów)
-		double omega_diff = results[1](i, 1);           // Różnica prędkości od zera
+	for (int i = 0; i < get_len(results[0]); i++)
+	{
+		double alphaDiff = results[1](i, 0) - M_PI;    // Różnica pozycji od wartości docelowej (pi radianów)
+		double omegaDiff = results[1](i, 1);           // Różnica prędkości od zera
 
-		double control_torque = M(m2d(results[1](i, 0)), m2d(results[1](i, 1)), k1, k2);
+		double controlMomentum = M(m2d(results[1](i, 0)), m2d(results[1](i, 1)), k1, k2);
 
 		// Skumulowana wartość jakości funkcji Q
-		Q += (10 * pow(alpha_diff, 2) + pow(omega_diff, 2) + pow(control_torque, 2)) * time_step;
+		Q += (10 * pow(alphaDiff, 2) + pow(omegaDiff, 2) + pow(controlMomentum, 2)) * td;
 	}
 
 	// Czyszczenie pamięci wyników solve_ode
