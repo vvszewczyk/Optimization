@@ -1,6 +1,9 @@
 ﻿#include"user_funs.h"
 #include <cmath>
+
+#ifndef M_PI
 #define M_PI 3.14159265358979323846
+#endif
 
 matrix ff0T(matrix x, matrix ud1, matrix ud2)
 {
