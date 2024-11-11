@@ -104,36 +104,35 @@ matrix ff2T(matrix x, matrix ud2, matrix ud1)
 	return result;
 }
 
-// Moment
+// Moment kontorlny
 double M(double alpha, double omega, double k1, double k2)
 {
-	const double alpha_ref = M_PI;  // Docelowy kąt (π rad)
-	const double omega_ref = 0.0;   // Docelowa prędkość kątowa (0 rad/s)
+	const double alphaRef = M_PI;  // Docelowy kąt [π rad]
+	const double omegaRef = 0.0;   // Docelowa prędkość kątowa [0 rad/s]
 
-	double alphaDiff = alpha_ref - alpha;
-	double omegaDiff = omega_ref - omega;
+	double alphaDiff = alphaRef - alpha;
+	double omegaDiff = omegaRef - omega;
 	return k1 * alphaDiff + k2 * omegaDiff;
 }
 
-// Funkcja różniczkowa Q dla dynamiki układu z solve_ode
 matrix df2(double t, matrix Y, matrix ud1, matrix ud2)
 {
     // Parametry fizyczne
-    const double l = 1.0;    // Długość ramienia
-    const double mr = 1.0;   // Masa ramienia
-    const double mc = 5.0;   // Masa ciężarka
-    const double b = 0.5;    // Współczynnik tarcia
-    const double I = ((mr / 3) + mc) * pow(l, 2); // Moment bezwładności
+    const double l = 1.0;    // Długość ramienia [m]
+    const double mr = 1.0;   // Masa ramienia [kg]
+    const double mc = 5.0;   // Masa ciężarka [kg]
+    const double b = 0.5;    // Współczynnik tarcia [Nms]
+    const double I = ((mr / 3) + mc) * pow(l, 2); // Moment bezwładności [kg * m^2]
 
-    // Wyciąganie współczynników sterowania k1 i k2
-    double k1 = m2d(ud1);  // Zakładamy, że ud1 to k1
-    double k2 = m2d(ud2);  // Zakładamy, że ud2 to k2
+    // Współczynniki sterowania k1 i k2
+    double k1 = m2d(ud1);
+    double k2 = m2d(ud2);
 
     // Obecna pozycja i prędkość
     double alpha = m2d(Y(0, 0));
     double omega = m2d(Y(1, 0));
 
-    // Obliczenie momentu kontrolnego M(t) przy użyciu funkcji M
+    // Obliczenie momentu kontrolnego M(t)
     double controlMomentum = M(alpha, omega, k1, k2);
 
     // Obliczenie pochodnych
@@ -144,38 +143,35 @@ matrix df2(double t, matrix Y, matrix ud1, matrix ud2)
     return dY;
 }
 
-matrix ff2R(matrix x, matrix ud1, matrix ud2) {
-	// Wyciąganie optymalnych wartości współczynników sterowania k1 i k2 z wektora x
+matrix ff2R(matrix x, matrix ud1, matrix ud2)
+{
+	// Optymalne wartości współczynników sterowania k1 i k2 z wektora x
 	double k1 = m2d(x(0));
 	double k2 = m2d(x(1));
 
-	// Ustawienie początkowych warunków symulacji
+	// Ustawienie warunków czasowych
 	double t0 = 0.0;
 	double td = 0.1;
 	double tend = 100.0;
 
-	// Początkowe warunki: kąt początkowy i prędkość początkowa
-	matrix Y0(2, new double[2] {0.0, 0.0}); // początkowy kąt i prędkość
+	// początkowy kąt i prędkość
+	matrix Y0(2, new double[2] {0.0, 0.0}); 
 
-	// Symulacja ruchu ramienia przy użyciu solve_ode i funkcji Q
+	// Symulacja ruchu ramienia 
 	matrix* results = solve_ode(df2, t0, td, tend, Y0, matrix(1, 1, k1), matrix(1, 1, k2));
 
 	// Obliczenie jakości funkcji Q jako sumy kwadratów różnic od wartości docelowych
 	double Q = 0.0;
 	for (int i = 0; i < get_len(results[0]); i++)
 	{
-		double alphaDiff = results[1](i, 0) - M_PI;    // Różnica pozycji od wartości docelowej (pi radianów)
-		double omegaDiff = results[1](i, 1);           // Różnica prędkości od zera
+		double alphaDiff = results[1](i, 0) - M_PI; // Różnica pozycji od wartości docelowej
+		double omegaDiff = results[1](i, 1); // Różnica prędkości od zera
 
 		double controlMomentum = M(m2d(results[1](i, 0)), m2d(results[1](i, 1)), k1, k2);
 
-		// Skumulowana wartość jakości funkcji Q
 		Q += (10 * pow(alphaDiff, 2) + pow(omegaDiff, 2) + pow(controlMomentum, 2)) * td;
 	}
 
-	// Czyszczenie pamięci wyników solve_ode
 	delete[] results;
-
-	// Zwracanie wyniku jako macierzy, co jest zgodne z funkcjami optymalizacji
 	return matrix(Q);
 }

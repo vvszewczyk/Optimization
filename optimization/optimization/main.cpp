@@ -227,7 +227,7 @@ void lab2()
 			matrix s0(2, 1, step);
 			solution y0Rosen = Rosen(ff2T, x0, s0, alphaR, beta, epsilon, Nmax);
 			fileRosen << "Rosenbrock" << delimiter << step << delimiter << x0(0, 0) << delimiter << x0(1, 0) << delimiter
-				<< y0Rosen.x(0, 0) << delimiter << y0Rosen.x(1, 0) << delimiter <<m2d(y0HJ.y) <<delimiter<< solution::f_calls << delimiter
+				 << y0Rosen.x(0, 0) << delimiter << y0Rosen.x(1, 0) << delimiter <<m2d(y0HJ.y) <<delimiter<< solution::f_calls << delimiter
 				 << ((abs(m2d(y0Rosen.y)) < epsilon) ? "TAK" : "NIE") << "\n";
 
 			solution::clear_calls();
@@ -255,6 +255,8 @@ void lab2()
 	double step = 0.8;
 	double k_values[2] = { 2.5, 7.0 };
 	matrix x0(2, k_values);
+
+	solution::clear_calls();
 
 	// Optymalizacja metodą Hooke-Jeeves
 	solution HookeR = HJ(ff2R, x0, step, alphaHJ, epsilon, Nmax);

@@ -390,7 +390,7 @@ solution Rosen(matrix(*ff)(matrix, matrix, matrix), matrix x0, matrix s0, double
 				else {
 					s(i) = - beta * s(i);
 					++p(i);
-				}
+				}	
 			}
 			Xopt.ud.add_row(trans(XB.x));
 			bool change = true;
@@ -435,7 +435,7 @@ solution Rosen(matrix(*ff)(matrix, matrix, matrix), matrix x0, matrix s0, double
 			}
 			if(solution::f_calls > Nmax) {
 				Xopt = XB;
-				Xopt.flag = 0;
+				Xopt.flag = 1;
 				break;
 			}
 		}while(true);
