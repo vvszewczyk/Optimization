@@ -252,7 +252,7 @@ void lab2()
 		return;
 	}
 
-	double step = 0.1;
+	double step = 0.8;
 	double k_values[2] = { 2.5, 7.0 };
 	matrix x0(2, k_values);
 
@@ -275,28 +275,28 @@ void lab2()
 	// -------- Symulacja z optymalnymi parametrami -------- //
 	// Parametry czasowe
 	double t0 = 0;
-	double td = 0.1;
+	double dt = 0.1;
 	double tend = 100;
 
 	// Parametry przemieszczenia
 	matrix y0(2, new double[2] {0.0, 0.0}); // początkowy
 
 	// Symulacja dla wyników optymalnych z Hooke-Jeeves
-	matrix* yz1 = solve_ode(df2, t0, td, tend, y0, HookeR.x(0), HookeR.x(1));
+	matrix* yz1 = solve_ode(df2, t0, dt, tend, y0, HookeR.x(0), HookeR.x(1));
 	Symulacja << "Symulacja dla Hooke-Jeeves\n" << yz1[1] << "\n\n";
 	std::cout << "Symulacja dla Hooke-Jeeves\n" << yz1[1] << "\n\n";
-	delete[] yz1; // czyszczenie pamięci
+	delete[] yz1;
 
 	// Symulacja dla wyników optymalnych z Rosenbrocka
-	matrix* yz2 = solve_ode(df2, t0, td, tend, y0, RosenbrockR.x(0), RosenbrockR.x(1));
+	matrix* yz2 = solve_ode(df2, t0, dt, tend, y0, RosenbrockR.x(0), RosenbrockR.x(1));
 	Symulacja << "Symulacja dla Rosenbrock\n" << yz2[1] << "\n";
 	std::cout << "Symulacja dla Rosenbrock\n" << yz2[1] << "\n";
-	delete[] yz2; // czyszczenie pamięci
+	delete[] yz2;
 
 	// Zamknięcie pliku symulacji
 	Symulacja.close();
 
-	std::cout << "Wyniki zapisane do plików symulacji.\n";
+	std::cout << "Wyniki zapisane do plikow symulacji.\n";
 }
 
 
