@@ -253,9 +253,8 @@ void lab2()
 	}
 
 	double step = 0.1;
-	double k_values[2] = { 5.0, 5.0 };
+	double k_values[2] = { 2.5, 7.0 };
 	matrix x0(2, k_values);
-	std::cout << x0 << "\n\n";
 
 	// Optymalizacja metodą Hooke-Jeeves
 	solution HookeR = HJ(ff2R, x0, step, alphaHJ, epsilon, Nmax);
