@@ -189,8 +189,8 @@ void lab2()
 	std::string delimiter = ",";
 
 	// Otwarcie dwóch osobnych plików CSV dla każdej z metod
-	std::ofstream fileHJ("Hooke-Jeeves.csv");
-	std::ofstream fileRosen("Rosenbrock.csv");
+	std::ofstream fileHJ("lab2/Hooke-Jeeves.csv");
+	std::ofstream fileRosen("lab2/Rosenbrock.csv");
 
 	if (!fileHJ.is_open() || !fileRosen.is_open())
 	{
@@ -217,7 +217,7 @@ void lab2()
 
 			// Testowanie metody Hooke'a-Jeevesa i zapis do pliku Hooke-Jeeves.csv
 			solution y0HJ = HJ(ff2T, x0, step, alphaHJ, epsilon, Nmax);
-			fileHJ << "Hooke-Jeeves;" << step << delimiter << x0(0, 0) << delimiter << x0(1, 0) << delimiter
+			fileHJ << "Hooke-Jeeves" << delimiter << step << delimiter << x0(0, 0) << delimiter << x0(1, 0) << delimiter
 				<< y0HJ.x(0, 0) << delimiter << y0HJ.x(1, 0) << delimiter << solution::f_calls << delimiter
 				<< y0HJ.y << ((abs(m2d(y0HJ.y)) < epsilon) ? "TAK" : "NIE") << "\n";
 
@@ -226,7 +226,7 @@ void lab2()
 			// Testowanie metody Rosenbrocka i zapis do pliku Rosenbrock.csv
 			matrix s0(2, 1, step);
 			solution y0Rosen = Rosen(ff2T, x0, s0, alphaR, beta, epsilon, Nmax);
-			fileRosen << "Rosenbrock;" << step << delimiter << x0(0, 0) << delimiter << x0(1, 0) << delimiter
+			fileRosen << "Rosenbrock" << delimiter << step << delimiter << x0(0, 0) << delimiter << x0(1, 0) << delimiter
 				<< y0Rosen.x(0, 0) << delimiter << y0Rosen.x(1, 0) << delimiter << solution::f_calls << delimiter
 				<< y0Rosen.y << ((abs(m2d(y0Rosen.y)) < epsilon) ? "TAK" : "NIE") << "\n";
 
@@ -242,9 +242,9 @@ void lab2()
 
 	// -------- Problem rzeczywisty (Tabela 3 i symulacja) --------- //
 	// Otwarcie plików CSV dla wyników problemu rzeczywistego
-	std::ofstream HookeSymulacja("HookeSymulacja.csv");
-	std::ofstream RosenbrockSymulacja("RosenbrockSymulacja.csv");
-	std::ofstream Symulacja("Symulacja.csv");
+	std::ofstream HookeSymulacja("lab2/HookeSymulacja.csv");
+	std::ofstream RosenbrockSymulacja("lab2/RosenbrockSymulacja.csv");
+	std::ofstream Symulacja("lab2/Symulacja.csv");
 
 	if (!HookeSymulacja.is_open() || !RosenbrockSymulacja.is_open() || !Symulacja.is_open())
 	{
@@ -252,19 +252,19 @@ void lab2()
 		return;
 	}
 
-	double start = 0.1;
+	double step = 0.1;
 	double k_values[2] = { 5.0, 5.0 };
 	matrix x0(2, k_values);
 	std::cout << x0 << "\n\n";
 
 	// Optymalizacja metodą Hooke-Jeeves
-	solution HookeR = HJ(ff2R, x0, start, alphaHJ, epsilon, Nmax);
+	solution HookeR = HJ(ff2R, x0, step, alphaHJ, epsilon, Nmax);
 	HookeSymulacja << HookeR.x(0) << delimiter << HookeR.x(1) << delimiter
 		<< m2d(HookeR.y) << delimiter << solution::f_calls << delimiter << HookeR.flag << "\n";
 	solution::clear_calls();
 
 	// Optymalizacja metodą Rosenbrocka
-	solution RosenbrockR = Rosen(ff2R, x0, matrix(2, 1, start), alphaR, beta, epsilon, Nmax);
+	solution RosenbrockR = Rosen(ff2R, x0, matrix(2, 1, step), alphaR, beta, epsilon, Nmax);
 	RosenbrockSymulacja << RosenbrockR.x(0) << delimiter << RosenbrockR.x(1) << delimiter
 		<< m2d(RosenbrockR.y) << delimiter << solution::f_calls << delimiter << RosenbrockR.flag << "\n";
 	solution::clear_calls();
@@ -284,12 +284,12 @@ void lab2()
 
 	// Symulacja dla wyników optymalnych z Hooke-Jeeves
 	matrix* yz1 = solve_ode(df2, t0, td, tend, y0, HookeR.x(0), HookeR.x(1));
-	Symulacja << "Symulacja dla Hooke-Jeeves\n" << yz1[1] << "\n\n";
+	Symulacja << "lab2/Symulacja dla Hooke-Jeeves\n" << yz1[1] << "\n\n";
 	delete[] yz1; // czyszczenie pamięci
 
 	// Symulacja dla wyników optymalnych z Rosenbrocka
 	matrix* yz2 = solve_ode(df2, t0, td, tend, y0, RosenbrockR.x(0), RosenbrockR.x(1));
-	Symulacja << "Symulacja dla Rosenbrock\n" << yz2[1] << "\n";
+	Symulacja << "lab2/Symulacja dla Rosenbrock\n" << yz2[1] << "\n";
 	delete[] yz2; // czyszczenie pamięci
 
 	// Zamknięcie pliku symulacji
