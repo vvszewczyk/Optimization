@@ -183,7 +183,7 @@ void lab2()
 	double epsilon = 1e-06;
 	int Nmax = 1000;
 	double alphaHJ = 0.5;
-	double alphaR = 0.5;
+	double alphaR = 2.0;
 	double beta = 0.5;
 	std::vector<double> steps = { 0.1, 0.5, 1.0 };
 	std::string delimiter = ",";
@@ -199,8 +199,8 @@ void lab2()
 	}
 
 	// Nagłówki kolumn z separatorem średnika
-	fileHJ << "Metoda,Dlugosc kroku,x0(1),x0(2),x(1),x(2),f_calls,Minimum Globalne,Sukces\n";
-	fileRosen << "Metoda,Dlugosc kroku,x0(1),x0(2),x(1),x(2),f_calls,Minimum Globalne,Sukces\n";
+	fileHJ << "Metoda,Dlugosc kroku,x0(1),x0(2),x(1),x(2),y*,f_calls,Minimum Globalne\n";
+	fileRosen << "Metoda,Dlugosc kroku,x0(1),x0(2),x(1),x(2),y*,f_calls,Minimum Globalne\n";
 
 	// Generator liczb losowych
 	std::random_device rd;
@@ -218,8 +218,8 @@ void lab2()
 			// Testowanie metody Hooke'a-Jeevesa i zapis do pliku Hooke-Jeeves.csv
 			solution y0HJ = HJ(ff2T, x0, step, alphaHJ, epsilon, Nmax);
 			fileHJ << "Hooke-Jeeves" << delimiter << step << delimiter << x0(0, 0) << delimiter << x0(1, 0) << delimiter
-				<< y0HJ.x(0, 0) << delimiter << y0HJ.x(1, 0) << delimiter << solution::f_calls << delimiter
-				<< y0HJ.y << ((abs(m2d(y0HJ.y)) < epsilon) ? "TAK" : "NIE") << "\n";
+				<< y0HJ.x(0, 0) << delimiter << y0HJ.x(1, 0) << delimiter << m2d(y0HJ.y) << delimiter << solution::f_calls
+				<<delimiter<< ((abs(m2d(y0HJ.y)) < epsilon) ? "TAK" : "NIE")<< delimiter << "\n";
 
 			solution::clear_calls();
 
@@ -227,8 +227,8 @@ void lab2()
 			matrix s0(2, 1, step);
 			solution y0Rosen = Rosen(ff2T, x0, s0, alphaR, beta, epsilon, Nmax);
 			fileRosen << "Rosenbrock" << delimiter << step << delimiter << x0(0, 0) << delimiter << x0(1, 0) << delimiter
-				<< y0Rosen.x(0, 0) << delimiter << y0Rosen.x(1, 0) << delimiter << solution::f_calls << delimiter
-				<< y0Rosen.y << ((abs(m2d(y0Rosen.y)) < epsilon) ? "TAK" : "NIE") << "\n";
+				<< y0Rosen.x(0, 0) << delimiter << y0Rosen.x(1, 0) << delimiter <<m2d(y0HJ.y) <<delimiter<< solution::f_calls << delimiter
+				 << ((abs(m2d(y0Rosen.y)) < epsilon) ? "TAK" : "NIE") << "\n";
 
 			solution::clear_calls();
 		}
@@ -253,9 +253,8 @@ void lab2()
 	}
 
 	double step = 0.1;
-	double k_values[2] = { 5.0, 5.0 };
+	double k_values[2] = { 2.5, 7.0 };
 	matrix x0(2, k_values);
-	std::cout << x0 << "\n\n";
 
 	// Optymalizacja metodą Hooke-Jeeves
 	solution HookeR = HJ(ff2R, x0, step, alphaHJ, epsilon, Nmax);
@@ -284,12 +283,14 @@ void lab2()
 
 	// Symulacja dla wyników optymalnych z Hooke-Jeeves
 	matrix* yz1 = solve_ode(df2, t0, td, tend, y0, HookeR.x(0), HookeR.x(1));
-	Symulacja << "lab2/Symulacja dla Hooke-Jeeves\n" << yz1[1] << "\n\n";
+	Symulacja << "Symulacja dla Hooke-Jeeves\n" << yz1[1] << "\n\n";
+	std::cout << "Symulacja dla Hooke-Jeeves\n" << yz1[1] << "\n\n";
 	delete[] yz1; // czyszczenie pamięci
 
 	// Symulacja dla wyników optymalnych z Rosenbrocka
 	matrix* yz2 = solve_ode(df2, t0, td, tend, y0, RosenbrockR.x(0), RosenbrockR.x(1));
-	Symulacja << "lab2/Symulacja dla Rosenbrock\n" << yz2[1] << "\n";
+	Symulacja << "Symulacja dla Rosenbrock\n" << yz2[1] << "\n";
+	std::cout << "Symulacja dla Rosenbrock\n" << yz2[1] << "\n";
 	delete[] yz2; // czyszczenie pamięci
 
 	// Zamknięcie pliku symulacji
