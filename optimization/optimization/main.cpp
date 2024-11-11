@@ -186,7 +186,7 @@ void lab2()
 	double alphaR = 0.5;
 	double beta = 0.5;
 	std::vector<double> steps = { 0.1, 0.5, 1.0 };
-	std::string delimiter = ";";
+	std::string delimiter = ",";
 
 	// Otwarcie dwóch osobnych plików CSV dla każdej z metod
 	std::ofstream fileHJ("Hooke-Jeeves.csv");
@@ -194,7 +194,7 @@ void lab2()
 
 	if (!fileHJ.is_open() || !fileRosen.is_open())
 	{
-		std::cerr << "Cannot open file.\n";
+		std::cerr << "Nie mozna otworzyc pliku poczatkowych\n";
 		return;
 	}
 
@@ -238,7 +238,7 @@ void lab2()
 	fileHJ.close();
 	fileRosen.close();
 
-	std::cout << "Wyniki zapisane do plików Hooke-Jeeves.csv i Rosenbrock.csv\n";
+	std::cout << "Wyniki zapisane do plikow Hooke-Jeeves.csv i Rosenbrock.csv\n";
 
 	// -------- Problem rzeczywisty (Tabela 3 i symulacja) --------- //
 	// Otwarcie plików CSV dla wyników problemu rzeczywistego
@@ -248,7 +248,7 @@ void lab2()
 
 	if (!HookeSymulacja.is_open() || !RosenbrockSymulacja.is_open() || !Symulacja.is_open())
 	{
-		std::cerr << "Cannot open output files for real-world problem.\n";
+		std::cerr << "Nie mozna otworzyc pliku symulacji\n";
 		return;
 	}
 
