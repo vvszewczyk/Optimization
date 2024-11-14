@@ -29,7 +29,7 @@ int main()
 {
 	try
 	{
-		lab2();
+		lab3();
 	}
 	catch (string EX_INFO)
 	{
@@ -318,7 +318,7 @@ void lab5()
 {
 
 }
-
+  
 void lab6()
 {
 

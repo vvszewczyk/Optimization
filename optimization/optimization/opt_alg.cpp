@@ -465,16 +465,105 @@ solution sym_NM(matrix(*ff)(matrix, matrix, matrix), matrix x0, double s, double
 {
 	try
 	{
-		solution Xopt;
-		//Tu wpisz kod funkcji
+		// Initialize the simplex
+		int* size = get_size(x0);
+		int n = size[0]; // Assuming x0 is a column vector
+		delete[] size;
 
+		std::vector<matrix> simplex(n + 1, x0); // Simplex vertices
+		for (int i = 0; i < n; ++i) {
+			matrix unit_vector(n, 1, 0.0);
+			unit_vector(i, 0) = 1.0;
+			simplex[i + 1] = x0 + s * unit_vector;
+		}
+
+		// Create a solution instance
+		solution sol;
+
+		// Iterative Nelder-Mead Process
+		int f_calls = 0;
+		int min_idx = 0;
+		int max_idx = 0;
+		matrix pmin, pmax;
+
+		while (f_calls < Nmax) {
+			// Evaluate function at simplex vertices
+			std::vector<double> f_values;
+			for (const auto& vertex : simplex) {
+				f_values.push_back(m2d(sol.fit_fun(ff, vertex, ud1)));
+			}
+
+			// Find indices of pmin and pmax
+			auto min_max = std::minmax_element(f_values.begin(), f_values.end());
+			min_idx = std::distance(f_values.begin(), min_max.first); // Declare and initialize min_idx
+			max_idx = std::distance(f_values.begin(), min_max.second); // Declare and initialize max_idx
+
+			// Define and initialize pmin and pmax
+			matrix pmin = simplex[min_idx]; // pmin initialized using min_idx
+			matrix pmax = simplex[max_idx]; // pmax initialized using max_idx
+
+			// Centroid calculation
+			matrix centroid(n, 1, 0.0);
+			for (int i = 0; i <= n; ++i) {
+				if (i != max_idx) centroid = centroid + simplex[i];
+			}
+			centroid = centroid / n;
+
+			// Reflection
+			matrix podb = centroid + alpha * (centroid - pmax);
+			double f_podb = m2d(sol.fit_fun(ff, podb, ud1));
+			++f_calls;
+
+			if (f_podb < f_values[min_idx]) {
+				// Expansion
+				matrix pe = centroid + gamma * (podb - centroid);
+				double f_pe = m2d(sol.fit_fun(ff, pe, ud1));
+				++f_calls;
+
+				if (f_pe < f_podb) simplex[max_idx] = pe;
+				else simplex[max_idx] = podb;
+
+			}
+			else if (f_podb < f_values[max_idx]) {
+				simplex[max_idx] = podb;
+			}
+			else {
+				matrix pz = centroid + beta * (pmax - centroid);
+				double f_pz = m2d(sol.fit_fun(ff, pz, ud1));
+				++f_calls;
+
+				if (f_pz < f_values[max_idx]) simplex[max_idx] = pz;
+				else {
+					for (int i = 0; i <= n; ++i) {
+						if (i != min_idx) simplex[i] = delta * (simplex[i] + pmin);
+					}
+				}
+			}
+
+			// Termination check
+			double max_dist = 0.0;
+			for (int i = 0; i <= n; ++i) {
+				max_dist = std::max(max_dist, norm(simplex[i] - pmin));
+			}
+			if (max_dist < epsilon) break;
+		}
+
+		// Return solution
+		solution Xopt;
+		Xopt.x = simplex[min_idx];
+		Xopt.y = sol.fit_fun(ff, pmin, ud1);
+		Xopt.flag = (f_calls >= Nmax) ? 1 : 0;
+		Xopt.f_calls = f_calls;
 		return Xopt;
 	}
-	catch (string ex_info)
+	catch (std::string ex_info)
 	{
 		throw ("solution sym_NM(...):\n" + ex_info);
 	}
 }
+
+
+
 
 solution SD(matrix(*ff)(matrix, matrix, matrix), matrix(*gf)(matrix, matrix, matrix), matrix x0, double h0, double epsilon, int Nmax, matrix ud1, matrix ud2)
 {
