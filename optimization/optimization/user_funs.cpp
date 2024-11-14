@@ -175,3 +175,39 @@ matrix ff2R(matrix x, matrix ud1, matrix ud2)
 	delete[] results;
 	return matrix(Q);
 }
+
+// LAB3
+
+// Funkcja celu
+matrix ff3T(matrix x, matrix ud1, matrix ud2) 
+{
+	double x1 = x(0, 0);
+	double x2 = x(1, 0);
+	matrix result(1, 1);
+	double denominator = M_PI * sqrt(pow(x1 / M_PI, 2) + pow(x2 / M_PI, 2));
+	if (denominator == 0) 
+	{
+		std::cerr << "ff3T - dividing by 0\n";
+		result(0, 0) = 0;
+	}
+	else 
+	{
+		result(0, 0) = sin(M_PI * sqrt(pow(x1 / M_PI, 2) + pow(x2 / M_PI, 2))) / denominator;
+	}
+	return result;
+}
+
+// Ograniczenia do funkcji celu (nie wiem czy wszystkie na raz mają być sprawdzane, ale tak przyjąłem. Jak coś to zmieniajcie do woli ~WS)
+bool check_constraints_2D(matrix x, matrix ud1) 
+{
+	double x1 = x(0, 0);
+	double x2 = x(1, 0);
+	double a = ud1(0, 0); // Parametr a przekazywany przez ud1
+
+	// Ograniczenia
+	double g1 = -x1 + 1;                          // g1(x1) <= 0
+	double g2 = -x2 + 1;                          // g2(x2) <= 0
+	double g3 = sqrt(pow(x1, 2) + pow(x2, 2)) - a; // g3(x1, x2) <= 0
+
+	return (g1 <= 0) && (g2 <= 0) && (g3 <= 0);
+}

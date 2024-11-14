@@ -29,7 +29,7 @@ int main()
 {
 	try
 	{
-		lab2();
+		lab3();
 	}
 	catch (string EX_INFO)
 	{
@@ -302,11 +302,9 @@ void lab2()
 	std::cout << "Wyniki zapisane do plikow symulacji.\n";
 }
 
-
-
 void lab3()
 {
-
+	
 }
 
 void lab4()
