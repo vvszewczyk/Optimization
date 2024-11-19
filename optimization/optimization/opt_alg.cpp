@@ -450,61 +450,8 @@ solution Rosen(matrix(*ff)(matrix, matrix, matrix), matrix x0, matrix s0, double
 solution pen(matrix(*ff)(matrix, matrix, matrix), matrix x0, double c, double dc, double epsilon, int Nmax, matrix ud1, matrix ud2)
 {
 	try {
-		solution Xopt(x0); 
-		solution Xprev;   
-		int iter = 0;      
-
-		// Statyczne zmienne do przechowywania danych
-		static matrix(*global_ff)(matrix, matrix, matrix) = nullptr;
-		static double global_c = 0.0;
-		static matrix global_ud1, global_ud2;
-
-		// Funkcja celu z karą jako funkcja globalna
-		auto penalized_ff = [](matrix x, matrix ud1, matrix ud2) -> matrix {
-			// Obliczenie ograniczeń
-			matrix g = global_ff(x, global_ud1, global_ud2);
-
-			// Obliczanie kary zewnętrznej
-			double penalty = 0.0;
-			int constraints = get_len(g);
-			for (int i = 0; i < constraints; ++i)
-			{
-				penalty += std::max(0.0, g(i));
-			}
-
-			// Obliczanie wartości funkcji celu z karą
-			matrix f_value = global_ff(x, global_ud1, global_ud2);
-			return f_value + global_c * penalty;
-		};
-
-		// Przypisanie wskaźników globalnych
-		global_ff = ff;
-		global_ud1 = ud1;
-		global_ud2 = ud2;
-
-		while (iter < Nmax)
-		{
-			// Aktualizacja współczynnika kary w globalnym kontekście
-			global_c = c;
-
-			// Wyznaczanie minimum funkcji z karą
-			Xprev = Xopt;
-			Xopt.fit_fun(penalized_ff, ud1, ud2);
-
-			// Sprawdzenie kryterium zakończenia
-			if (norm(Xopt.x - Xprev.x) < epsilon)
-			{
-				Xopt.flag = 0; 
-				return Xopt;
-			}
-			c *= dc; // Aktualizacja współczynnika kary
-			iter++;
-			if (iter >= Nmax)
-			{
-				Xopt.flag = 1; 
-				break;
-			}
-		}
+		solution Xopt;
+		//Tu wpisz kod funkcji
 
 		return Xopt;
 	}
@@ -513,7 +460,6 @@ solution pen(matrix(*ff)(matrix, matrix, matrix), matrix x0, double c, double dc
 		throw ("solution pen(...):\n" + ex_info);
 	}
 }
-
 
 solution sym_NM(matrix(*ff)(matrix, matrix, matrix), matrix x0, double s, double alpha, double beta, double gamma, double delta, double epsilon, int Nmax, matrix ud1, matrix ud2)
 {
