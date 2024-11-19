@@ -1,4 +1,0 @@
-Metoda,Dlugosc kroku,x0(1),x0(2),x(1),x(2),f_calls,Minimum Globalne,Sukces
-Hooke-Jeeves,0.1,0.0630505,-0.382477,-3.89282e-07,-6.20152e-07,192,1,70717e-11; TAK
-Hooke-Jeeves,0.5,-0.342323,-0.0742522,4.89509e-07,8.37478e-07,185,2,99636e-11; TAK
-Hooke-Jeeves,1,-0.909371,-0.169698,-5.05948e-07,0.774716,188,0,619837; NIE

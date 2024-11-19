@@ -5,6 +5,9 @@ CMakeLists.txt
 # Clion files
 .idea/
 
+# CSV files
+*.csv
+
 # Visual studio files
 optimization/optimization/x64/
 optimization/x64/
