@@ -302,8 +302,6 @@ void lab2()
 	std::cout << "Wyniki zapisane do plikow symulacji.\n";
 }
 
-
-
 void lab3()
 {
 
