@@ -12,5 +12,6 @@ matrix df2(double t, matrix Y, matrix ud1, matrix ud2);
 matrix ff2R(matrix x, matrix ud1, matrix ud2);
 matrix ff3T(matrix, matrix = NAN, matrix = NAN);
 matrix df3(double t, matrix Y, matrix = NAN, matrix = NAN);
+matrix ff3R(matrix x, matrix = NAN, matrix = NAN);
 matrix f1(double, matrix, matrix = NAN, matrix = NAN);
 matrix f2(matrix, matrix = NAN, matrix = NAN);

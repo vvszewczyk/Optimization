@@ -242,3 +242,54 @@ matrix df3(double t, matrix Y, matrix ud1, matrix ud2)
 	return dY;
 }
 
+matrix ff3R(matrix x, matrix ud1, matrix ud2) 
+{
+	double v0x = x(0); // początkowa prędkość pozioma
+	double omega = x(1); // początkowa rotacja
+
+	matrix Y0(4, new double[4] {0, v0x, 100, 0}); // warunki początkowe
+	matrix* Y = solve_ode(df3, 0.0, 0.01, 7.0, Y0, ud1, matrix(1, 1, omega));
+
+	int n = get_len(Y[0]);
+	int i0 = 0, i50 = 0;
+
+	// Znajdowanie indeksów dla y = 0 i y = 50
+	for (int i = 0; i < n; i++) 
+	{
+		if (abs(Y[1](i, 2) - 50) < abs(Y[1](i50, 2) - 50)) 
+		{
+			i50 = i;
+		}
+		if (abs(Y[1](i, 2)) < abs(Y[1](i0, 2))) 
+		{
+			i0 = i;
+		}
+	}
+
+	double x_end = Y[1](i0, 0); // X na końcu
+	double x50 = Y[1](i50, 0); // X na wysokości 50
+
+	// Ograniczenia
+	double penalty = 0.0;
+	if (abs(v0x) > 10) 
+	{
+		penalty += ud2(0) * pow(abs(v0x) - 10, 2);
+	}
+	if (abs(omega) > 15) 
+	{
+		penalty += ud2(0) * pow(abs(omega) - 15, 2);
+	}
+	if (abs(x50 - 5) > 0.5) 
+	{
+		penalty += ud2(0) * pow(abs(x50 - 5) - 0.5, 2);
+	}
+
+	// Wynik
+	double result = -x_end + penalty;
+
+	Y[0].~matrix();
+	Y[1].~matrix();
+	return matrix(1, 1, result);
+}
+
+
