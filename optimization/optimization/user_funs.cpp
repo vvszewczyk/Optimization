@@ -230,15 +230,15 @@ matrix df3(double t, matrix Y, matrix ud1, matrix ud2)
 	// Siły
 	double Dx = 0.5 * C * rho * S * v * vx; // siła oporu pozioma
 	double Dy = 0.5 * C * rho * S * v * vy; // siła oporu pionowa
-	double FMx = rho * v * ud2(0) * 2 * M_PI * pow(r, 3); // siła Magnusa pozioma
-	double FMy = rho * v * ud2(0) * 2 * M_PI * pow(r, 3); // siła Magnusa pionowa
+	double FMx = rho * vy * ud2(0) * 2 * M_PI * pow(r, 3); // siła Magnusa pozioma
+	double FMy = rho * vx * ud2(0) * 2 * M_PI * pow(r, 3); // siła Magnusa pionowa
 
 	// Równania różniczkowe
 	matrix dY(4, 1);
 	dY(0) = vx; // dx/dt
-	dY(1) = (-Dx + FMx) / m; // d^2x/dt^2
+	dY(1) = (-Dx - FMx) / m; // d^2x/dt^2
 	dY(2) = vy; // dy/dt
-	dY(3) = (-m * g - Dy + FMy) / m; // d^2y/dt^2
+	dY(3) = (-m * g - Dy - FMy) / m; // d^2y/dt^2
 	return dY;
 }
 

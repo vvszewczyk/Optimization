@@ -23,13 +23,15 @@ void lab3();
 void lab4();
 void lab5();
 void lab6();
+void validate_model();
 
 
 int main()
 {
 	try
 	{
-		lab3();
+		//lab3();
+		validate_model();
 	}
 	catch (string EX_INFO)
 	{
@@ -302,10 +304,65 @@ void lab2()
 	std::cout << "Wyniki zapisane do plikow symulacji.\n";
 }
 
-void lab3()
+void lab3() 
 {
 	
 }
+
+void validate_model() 
+{
+	// Warunki początkowe (testowe)
+	double v0x = 5.0;       // Początkowa prędkość pozioma
+	double omega = 10.0;    // Początkowa rotacja
+	double y0 = 100.0;      // Początkowa wysokość
+	double t_end = 7.0;     // Czas symulacji
+	double dt = 0.01;       // Krok czasowy
+
+	// Tworzenie wektora warunków początkowych
+	matrix Y0(4, new double[4] {0.0, v0x, y0, 0.0});
+
+	// Rozwiązanie równań różniczkowych dla zadanych warunków
+	matrix* Y = solve_ode(df3, 0.0, dt, t_end, Y0, matrix(), matrix(1, 1, omega));
+
+	// Znalezienie x_end i x dla y = 50 m
+	int n = get_len(Y[0]); // Długość wynikowego wektora czasu
+	int i0 = 0, i50 = 0;
+
+	for (int i = 0; i < n; ++i) 
+	{
+		// Szukanie indeksu dla y = 0 (x_end)
+		if (abs(Y[1](i, 2)) < abs(Y[1](i0, 2))) 
+		{
+			i0 = i;
+		}
+		// Szukanie indeksu dla y = 50
+		if (abs(Y[1](i, 2) - 50.0) < abs(Y[1](i50, 2) - 50.0)) 
+		{
+			i50 = i;
+		}
+	}
+
+	// Odczyt wyników
+	double x_end = Y[1](i0, 0);    // Położenie x, gdy y = 0
+	double x_50 = Y[1](i50, 0);   // Położenie x, gdy y ≈ 50 m
+	double t_hit_ground = Y[0](i0); // Czas uderzenia w ziemię
+
+	// Wyświetlenie wyników
+	cout << "Testowa symulacja dla v0x = 5 m/s i omega = 10 rad/s:" << endl;
+	cout << "x_end (przy y = 0) = " << x_end << " m" << endl;
+	cout << "x (przy y = 50 m) = " << x_50 << " m" << endl;
+	cout << "Czas uderzenia w ziemie: t = " << t_hit_ground << " s" << endl;
+
+	// Zapis trajektorii do pliku CSV
+	ofstream file("test_trajektoria.csv");
+	file << hcat(Y[0], Y[1]); // Łączymy czas i współrzędne w jeden plik
+	file.close();
+
+	// Zwolnienie pamięci
+	Y[0].~matrix();
+	Y[1].~matrix();
+}
+
 
 void lab4()
 {
