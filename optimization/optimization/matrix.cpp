@@ -103,17 +103,24 @@ matrix matrix::operator[](int nv) const
 	return A;
 }
 
-double& matrix::operator()(int nv, int mv)
-{
-	if (nv >= n || mv >= m || nv < 0 || mv < 0)
-		throw string("double& matrix::operator()(int,int):\nindeks jest poza zakresem");
+double& matrix::operator()(int nv, int mv) {
+	if (nv >= n || mv >= m || nv < 0 || mv < 0) {
+		std::cerr << "Invalid access: (" << nv << ", " << mv << ")"
+			<< " for matrix of size " << n << " x " << m << "\n";
+		throw std::out_of_range("Invalid matrix access");
+	}
 	return M[nv][mv];
 }
 
 double matrix::operator()(int nv, int mv) const
 {
 	if (nv >= n || mv >= m || nv < 0 || mv < 0)
-		throw string("double matrix::operator()(int,int) const:\nindeks jest poza zakresem");
+	{
+		std::string s = "Invalid access: (" + std::to_string(nv) + ", " + std::to_string(mv) + ")\n";
+		std::string s2 = "double matrix::operator()(int,int) const:\nindeks jest poza zakresem\n";
+		std::string s3 = s + s2;
+		throw std::string(s3);
+	}
 	return M[nv][mv];
 }
 
