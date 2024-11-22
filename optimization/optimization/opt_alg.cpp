@@ -450,8 +450,19 @@ solution Rosen(matrix(*ff)(matrix, matrix, matrix), matrix x0, matrix s0, double
 solution pen(matrix(*ff)(matrix, matrix, matrix), matrix x0, double c, double dc, double epsilon, int Nmax, matrix ud1, matrix ud2)
 {
 	try {
-		solution Xopt;
-		//Tu wpisz kod funkcji
+		solution Xopt(x0), Xprev;
+		matrix S(2,1);
+		S(0) = c;
+		S(1) = ud1(0);
+		while(norm(Xopt.x- Xprev.x) >= epsilon) {
+			Xprev = Xopt;
+			Xopt = sym_NM(ff, Xopt.x, ud1(1), ud1(2), ud1(3), ud1(4), ud1(5), ud1(6), Nmax, S);
+			if (solution::f_calls > Nmax) {
+				Xopt.flag = -2;
+				break;
+			}
+			S(0) = c*dc;
+		}
 
 		return Xopt;
 	}
