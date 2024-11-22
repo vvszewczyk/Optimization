@@ -454,15 +454,45 @@ solution pen(matrix(*ff)(matrix, matrix, matrix), matrix x0, double c, double dc
 		matrix S(2,1);
 		S(0) = c;
 		S(1) = ud1(0);
-		while(norm(Xopt.x- Xprev.x) >= epsilon) {
+
+		std::cout << "Debug pen: Initialization\n";
+		std::cout << "Xopt.x = " << Xopt.x << "\n";
+		std::cout << "Xprev.x = " << Xprev.x << "\n\n";
+		std::cout << solution::f_calls<< "\n\n";
+
+
+		while(norm(Xopt.x- Xprev.x) >= epsilon) 
+		{
+			// Debugowanie: Wyświetlenie informacji o bieżącej iteracji
+			std::cout << "Penalty iteration: " << solution::f_calls << "\n";
+			std::cout << "Current x: " << Xopt.x << "\n";
+			std::cout << "Current penalty coefficient (c): " << S(0) << "\n";
+			std::cout << "Previous x: " << Xprev.x << "\n";
+			
 			Xprev = Xopt;
 			Xopt = sym_NM(ff, Xopt.x, ud1(1), ud1(2), ud1(3), ud1(4), ud1(5), ud1(6), Nmax, S);
-			if (solution::f_calls > Nmax) {
+			
+			std::cout << "Debug pen: After sym_NM\n";
+			std::cout << "Current solution: x = " << Xopt.x << ", y = " << Xopt.y << ", flag = " << Xopt.flag << "\n";
+
+			// Debugowanie: Wyświetlenie wyników optymalizacji dla danej iteracji
+			std::cout << "New x: " << Xopt.x << "\n";
+			std::cout << "Function value: " << Xopt.y << "\n";
+			
+			if (solution::f_calls > Nmax) 
+			{
 				Xopt.flag = -2;
+				std::cout << "Max function calls exceeded. Exiting penalty loop.\n";
 				break;
 			}
 			S(0) = c*dc;
 		}
+
+		// Debugowanie: Wyświetlenie końcowego rozwiązania
+		std::cout << "Final penalty solution:\n";
+		std::cout << "x = " << Xopt.x << "\n";
+		std::cout << "y (function value): " << Xopt.y << "\n";
+		std::cout << "Flag: " << Xopt.flag << "\n";
 
 		return Xopt;
 	}
@@ -492,6 +522,7 @@ solution sym_NM(matrix(*ff)(matrix, matrix, matrix), matrix x0, double s, double
 
 		// Evaluate function at each vertex of the simplex
 		matrix f_values(DIM + 1, 1);
+
 		for (int i = 0; i <= DIM; ++i)
 		{
 			Xopt.x = p[i];       // Set the current point in Xopt
@@ -500,7 +531,14 @@ solution sym_NM(matrix(*ff)(matrix, matrix, matrix), matrix x0, double s, double
 
 		double max_norm;
 		do
-		{
+		{	
+			// Debugowanie: Wyświetlenie aktualnego stanu sympleksu
+			cout << "Iteration: " << solution::f_calls << "\n";
+			cout << "Current simplex:\n";
+			for (int i = 0; i <= DIM; ++i) 
+			{
+				cout << "Vertex " << i << ": x = " << p[i] << ", f(x) = " << f_values(i) << "\n";
+			}
 			// Step 2: Order vertices by function value
 			int p_min = 0, p_max = 0;
 			for (int i = 1; i <= DIM; ++i)
@@ -582,6 +620,9 @@ solution sym_NM(matrix(*ff)(matrix, matrix, matrix), matrix x0, double s, double
 					max_norm = norm_diff;
 			}
 
+			// Debugowanie: Wyświetlenie maksymalnej normy
+			cout << "Max norm: " << max_norm << "\n";
+
 			if (solution::f_calls > Nmax)
 			{
 				Xopt.flag = -2; // Max function calls exceeded
@@ -600,6 +641,13 @@ solution sym_NM(matrix(*ff)(matrix, matrix, matrix), matrix x0, double s, double
 		Xopt.x = p[p_min];
 		Xopt.y = f_values(p_min);
 		Xopt.flag = 1; // Success
+
+		// Debugowanie: Wyświetlenie końcowego rozwiązania
+		cout << "Final solution:\n";
+		cout << "x = " << Xopt.x << "\n";
+		cout << "y (function value): " << Xopt.y << "\n";
+		cout << "Flag: " << Xopt.flag << "\n";
+
 		return Xopt;
 	}
 	catch (string ex_info)

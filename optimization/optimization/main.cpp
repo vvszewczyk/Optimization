@@ -304,10 +304,56 @@ void lab2()
 	std::cout << "Wyniki zapisane do plikow symulacji.\n";
 }
 
-void lab3() 
+void lab3()
 {
-	
+	// Problem rzeczywisty
+	double epsilon = 1e-3;   // Dokładność
+	int Nmax = 1000;         // Maksymalna liczba iteracji
+	double c = 1.0;          // Współczynnik kary początkowej
+	double dc = 10.0;        // Współczynnik zwiększenia kary
+
+	// Ograniczenia dla v0x i omega
+	matrix lb(2, new double[2] {-10.0, -15.0}); // Dolne granice
+	matrix ub(2, new double[2] {10.0, 15.0});   // Górne granice
+	matrix x0(2, new double[2] {5.0, 0.0});     // Punkt startowy
+
+	// Parametry do sympleksu przekazane przez ud1
+	// s = 1.0, alpha = 1.0, beta = 0.5, gamma = 2.0, delta = 0.5, epsilon = 1e-3, Nmax = 1000
+	matrix ud1(7, new double[7] {1.0, 1.0, 0.5, 2.0, 0.5, epsilon, static_cast<double>(Nmax)});
+
+	// Współczynnik kary dla funkcji celu
+	matrix ud2(1, 1, 100.0);
+
+	// Debugowanie inicjalizacji
+	cout << "Debug: Initializing ud1 and ud2...\n";
+	cout << "ud1: " << ud1 << "\n";
+	cout << "ud2: " << ud2 << "\n";
+
+	// Rozwiązanie problemu optymalizacji
+	solution opt = pen(ff3R, x0, c, dc, epsilon, Nmax, ud1, ud2);
+
+	// Wyświetlenie wyników optymalizacji
+	cout << "Optymalne wyniki:\n";
+	cout << "v0x = " << opt.x(0) << " m/s, omega = " << opt.x(1) << " rad/s\n";
+	cout << "Wartość funkcji celu (negatywne x_end): " << opt.y << "\n";
+	cout << "Flaga zakończenia: " << opt.flag << "\n";
+
+	// Symulacja trajektorii dla optymalnych parametrów
+	matrix Y0(4, new double[4] {0, opt.x(0), 100, 0}); // Warunki początkowe
+	matrix* Y = solve_ode(df3, 0.0, 0.01, 7.0, Y0, matrix(), matrix(1, 1, opt.x(1)));
+
+	// Zapis trajektorii do pliku CSV
+	ofstream file("optimal_trajectory.csv");
+	file << hcat(Y[0], Y[1]); // Łączenie czasu i współrzędnych w jeden plik
+	file.close();
+
+	// Wyświetlenie trajektorii
+	cout << "Trajektoria zapisana w pliku 'optimal_trajectory.csv'.\n";
+
+	// Zwolnienie pamięci
+	delete[] Y;
 }
+
 
 void validate_model() 
 {

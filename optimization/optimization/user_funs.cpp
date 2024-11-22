@@ -233,6 +233,12 @@ matrix df3(double t, matrix Y, matrix ud1, matrix ud2)
 	double FMx = rho * vy * ud2(0) * 2 * M_PI * pow(r, 3); // siła Magnusa pozioma
 	double FMy = rho * vx * ud2(0) * 2 * M_PI * pow(r, 3); // siła Magnusa pionowa
 
+	// Debugowanie sił
+	cout << "Debug df3:\n";
+	cout << "vx = " << vx << ", vy = " << vy << ", v = " << v << "\n";
+	cout << "Dx = " << Dx << ", Dy = " << Dy << "\n";
+	cout << "FMx = " << FMx << ", FMy = " << FMy << "\n";
+
 	// Równania różniczkowe
 	matrix dY(4, 1);
 	dY(0) = vx; // dx/dt
@@ -249,6 +255,11 @@ matrix ff3R(matrix x, matrix ud1, matrix ud2)
 
 	matrix Y0(4, new double[4] {0, v0x, 100, 0}); // warunki początkowe
 	matrix* Y = solve_ode(df3, 0.0, 0.01, 7.0, Y0, ud1, matrix(1, 1, omega));
+
+	cout << "Debug ff3R: Results from solve_ode\n";
+	cout << "Time vector:\n" << Y[0] << "\n";
+	cout << "State matrix:\n" << Y[1] << "\n";
+
 
 	int n = get_len(Y[0]);
 	int i0 = 0, i50 = 0;
@@ -269,23 +280,32 @@ matrix ff3R(matrix x, matrix ud1, matrix ud2)
 	double x_end = Y[1](i0, 0); // X na końcu
 	double x50 = Y[1](i50, 0); // X na wysokości 50
 
+	// Debugowanie wartości
+	cout << "Debug ff3R:\n";
+	cout << "v0x = " << v0x << ", omega = " << omega << "\n";
+	cout << "x_end = " << x_end << ", x50 = " << x50 << "\n";
+
 	// Ograniczenia
 	double penalty = 0.0;
 	if (abs(v0x) > 10) 
 	{
 		penalty += ud2(0) * pow(abs(v0x) - 10, 2);
+		cout << "Penalty for v0x: " << penalty << "\n";
 	}
 	if (abs(omega) > 15) 
 	{
 		penalty += ud2(0) * pow(abs(omega) - 15, 2);
+		cout << "Penalty for omega: " << penalty << "\n";
 	}
 	if (abs(x50 - 5) > 0.5) 
 	{
 		penalty += ud2(0) * pow(abs(x50 - 5) - 0.5, 2);
+		cout << "Penalty for x50: " << penalty << "\n";
 	}
 
 	// Wynik
 	double result = -x_end + penalty;
+	cout << "Result (function value): " << result << "\n";
 
 	Y[0].~matrix();
 	Y[1].~matrix();
