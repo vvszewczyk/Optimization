@@ -30,8 +30,8 @@ int main()
 {
 	try
 	{
-		//lab3();
-		validate_model();
+		lab3();
+		//validate_model();
 	}
 	catch (string EX_INFO)
 	{
@@ -309,7 +309,7 @@ void lab3()
 	// Problem rzeczywisty
 	double epsilon = 1e-3;   // Dokładność
 	int Nmax = 1000;         // Maksymalna liczba iteracji
-	double c = 1.0;          // Współczynnik kary początkowej
+	double c = 10.0;          // Współczynnik kary początkowej
 	double dc = 10.0;        // Współczynnik zwiększenia kary
 
 	// Ograniczenia dla v0x i omega
@@ -325,9 +325,9 @@ void lab3()
 	matrix ud2(1, 1, 100.0);
 
 	// Debugowanie inicjalizacji
-	cout << "Debug: Initializing ud1 and ud2...\n";
-	cout << "ud1: " << ud1 << "\n";
-	cout << "ud2: " << ud2 << "\n";
+	//cout << "Debug: Initializing ud1 and ud2...\n";
+	//cout << "ud1: " << ud1 << "\n";
+	//cout << "ud2: " << ud2 << "\n";
 
 	// Rozwiązanie problemu optymalizacji
 	solution opt = pen(ff3R, x0, c, dc, epsilon, Nmax, ud1, ud2);
@@ -348,7 +348,7 @@ void lab3()
 	file.close();
 
 	// Wyświetlenie trajektorii
-	cout << "Trajektoria zapisana w pliku 'optimal_trajectory.csv'.\n";
+	//cout << "Trajektoria zapisana w pliku 'optimal_trajectory.csv'.\n";
 
 	// Zwolnienie pamięci
 	delete[] Y;

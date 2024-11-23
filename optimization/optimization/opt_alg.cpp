@@ -455,35 +455,35 @@ solution pen(matrix(*ff)(matrix, matrix, matrix), matrix x0, double c, double dc
 		S(0) = c;
 		S(1) = ud1(0);
 
-		std::cout << "Debug pen: Initialization\n";
+		/*std::cout << "Debug pen: Initialization\n";
 		std::cout << "Xopt.x = " << Xopt.x << "\n";
 		std::cout << "Xprev.x = " << Xprev.x << "\n\n";
 		std::cout << solution::f_calls<< "\n\n";
-
+		*/
 		bool change = true;
 		double check = 0;
 		while(change)
 		{
 			// Debugowanie: Wyświetlenie informacji o bieżącej iteracji
-			std::cout << "Penalty iteration: " << solution::f_calls << "\n";
+			/*std::cout << "Penalty iteration: " << solution::f_calls << "\n";
 			std::cout << "Current x: " << Xopt.x << "\n";
 			std::cout << "Current penalty coefficient (c): " << S(0) << "\n";
-			std::cout << "Previous x: " << Xprev.x << "\n";
+			std::cout << "Previous x: " << Xprev.x << "\n";*/
 			
 
 			Xopt = sym_NM(ff, Xopt.x, ud1(1), ud1(2), ud1(3), ud1(4), ud1(5), ud1(6), Nmax, S);
 			Xprev = Xopt;
-			std::cout << "Debug pen: After sym_NM\n";
-			std::cout << "Current solution: x = " << Xopt.x << ", y = " << Xopt.y << ", flag = " << Xopt.flag << "\n";
+			//std::cout << "Debug pen: After sym_NM\n";
+			//std::cout << "Current solution: x = " << Xopt.x << ", y = " << Xopt.y << ", flag = " << Xopt.flag << "\n";
 
 			// Debugowanie: Wyświetlenie wyników optymalizacji dla danej iteracji
-			std::cout << "New x: " << Xopt.x << "\n";
-			std::cout << "Function value: " << Xopt.y << "\n";
+			//std::cout << "New x: " << Xopt.x << "\n";
+			//std::cout << "Function value: " << Xopt.y << "\n";
 			
 			if (solution::f_calls > Nmax) 
 			{
 				Xopt.flag = -2;
-				std::cout << "Max function calls exceeded. Exiting penalty loop.\n";
+				//std::cout << "Max function calls exceeded. Exiting penalty loop.\n";
 				break;
 			}
 			S(0) = c*dc;
@@ -494,10 +494,10 @@ solution pen(matrix(*ff)(matrix, matrix, matrix), matrix x0, double c, double dc
 		}
 
 		// Debugowanie: Wyświetlenie końcowego rozwiązania
-		std::cout << "Final penalty solution:\n";
-		std::cout << "x = " << Xopt.x << "\n";
-		std::cout << "y (function value): " << Xopt.y << "\n";
-		std::cout << "Flag: " << Xopt.flag << "\n";
+		//std::cout << "Final penalty solution:\n";
+		//std::cout << "x = " << Xopt.x << "\n";
+		//std::cout << "y (function value): " << Xopt.y << "\n";
+		//std::cout << "Flag: " << Xopt.flag << "\n";
 
 		return Xopt;
 	}
@@ -511,6 +511,7 @@ solution sym_NM(matrix(*ff)(matrix, matrix, matrix), matrix x0, double s, double
 {
 	try
 	{
+		cout << "===========================================================\n";
 		solution Xopt;
 		int DIM = get_len(x0); // Dimensionality of the problem
 
@@ -532,6 +533,12 @@ solution sym_NM(matrix(*ff)(matrix, matrix, matrix), matrix x0, double s, double
 		{
 			Xopt.x = p[i];       // Set the current point in Xopt
 			f_values(i) = m2d(Xopt.fit_fun(ff, ud1, ud2)); // Automatic increment inside fit_fun
+		}
+
+		cout << "Initial simplex:\n";
+		for (int i = 0; i <= DIM; ++i)
+		{
+			cout << "Vertex " << i << ": x = " << p[i] << ", f(x) = " << f_values(i) << "\n";
 		}
 
 		double max_norm;
@@ -564,12 +571,14 @@ solution sym_NM(matrix(*ff)(matrix, matrix, matrix), matrix x0, double s, double
 			// Step 3: Reflect the worst point
 			Xopt.x = centroid + alpha * (centroid - p[p_max]); // Set Xopt to reflection point
 			double f_reflect = m2d(Xopt.fit_fun(ff, ud1, ud2)); // Automatic increment
+			cout << "Reflection point: x = " << Xopt.x << ", f(x) = " << f_reflect << "\n";
 
 			if (f_reflect < f_values(p_min))
 			{
 				// Step 4a: Expansion
 				Xopt.x = centroid + gamma * (Xopt.x - centroid); // Set Xopt to expansion point
 				double f_expand = m2d(Xopt.fit_fun(ff, ud1, ud2)); // Automatic increment
+				cout << "Expansion point: x = " << Xopt.x << ", f(x) = " << f_expand << "\n";
 
 				if (f_expand < f_reflect)
 				{
@@ -595,6 +604,7 @@ solution sym_NM(matrix(*ff)(matrix, matrix, matrix), matrix x0, double s, double
 				// Step 4c: Contraction
 				Xopt.x = centroid + beta * (p[p_max] - centroid); // Set Xopt to contraction point
 				double f_contract = m2d(Xopt.fit_fun(ff, ud1, ud2)); // Automatic increment
+				cout << "Contraction point: x = " << Xopt.x << ", f(x) = " << f_contract << "\n";
 
 				if (f_contract < f_values(p_max))
 				{
@@ -605,12 +615,14 @@ solution sym_NM(matrix(*ff)(matrix, matrix, matrix), matrix x0, double s, double
 				else
 				{
 					// Step 4d: Shrink the simplex
+					cout << "Shrinking simplex:\n";
 					for (int i = 0; i <= DIM; ++i)
 					{
 						if (i == p_min) continue;
 						p.set_col(p[p_min] + delta * (p[i] - p[p_min]), i);
 						Xopt.x = p[i]; // Set Xopt for shrinking
 						f_values(i) = m2d(Xopt.fit_fun(ff, ud1, ud2)); // Automatic increment
+						cout << "New vertex " << i << ": x = " << p[i] << ", f(x) = " << f_values(i) << "\n";
 					}
 				}
 			}
@@ -652,7 +664,7 @@ solution sym_NM(matrix(*ff)(matrix, matrix, matrix), matrix x0, double s, double
 		cout << "x = " << Xopt.x << "\n";
 		cout << "y (function value): " << Xopt.y << "\n";
 		cout << "Flag: " << Xopt.flag << "\n";
-
+		cout << "===========================================================\n";
 		return Xopt;
 	}
 	catch (string ex_info)

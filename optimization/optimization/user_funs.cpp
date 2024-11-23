@@ -256,9 +256,9 @@ matrix ff3R(matrix x, matrix ud1, matrix ud2)
 	matrix Y0(4, new double[4] {0, v0x, 100, 0}); // warunki początkowe
 	matrix* Y = solve_ode(df3, 0.0, 0.01, 7.0, Y0, ud1, matrix(1, 1, omega));
 
-	cout << "Debug ff3R: Results from solve_ode\n";
-	cout << "Time vector:\n" << Y[0] << "\n";
-	cout << "State matrix:\n" << Y[1] << "\n";
+	//cout << "Debug ff3R: Results from solve_ode\n";
+	//cout << "Time vector:\n" << Y[0] << "\n";
+	//cout << "State matrix:\n" << Y[1] << "\n";
 
 
 	int n = get_len(Y[0]);
@@ -280,10 +280,22 @@ matrix ff3R(matrix x, matrix ud1, matrix ud2)
 	double x_end = Y[1](i0, 0); // X na końcu
 	double x50 = Y[1](i50, 0); // X na wysokości 50
 
-	// Debugowanie wartości
-	cout << "Debug ff3R:\n";
+	// Dodanie debugowania trajektorii
+	cout << "Debugging trajectory for current x:\n";
 	cout << "v0x = " << v0x << ", omega = " << omega << "\n";
-	cout << "x_end = " << x_end << ", x50 = " << x50 << "\n";
+	cout << "x_end = " << Y[1](i0, 0) << ", x50 = " << Y[1](i50, 0) << "\n";
+
+	// Debuguj konkretną trajektorię dla tego przypadku
+	double debug_v0x = 4.0;
+	double debug_omega = 1.5;
+	matrix debug_Y0(4, new double[4] {0, debug_v0x, 100, 0});
+	matrix* debug_Y = solve_ode(df3, 0.0, 0.01, 7.0, debug_Y0, ud1, matrix(1, 1, debug_omega));
+	cout << "Debug x50 for (v0x = 4.0, omega = 1.5): " << debug_Y[1](i50, 0) << "\n";
+
+	// Debugowanie wartości
+	//cout << "Debug ff3R:\n";
+	//cout << "v0x = " << v0x << ", omega = " << omega << "\n";
+	//cout << "x_end = " << x_end << ", x50 = " << x50 << "\n";
 
 	// Ograniczenia
 	double penalty = 0.0;
@@ -297,11 +309,16 @@ matrix ff3R(matrix x, matrix ud1, matrix ud2)
 		penalty += ud1(0) * pow(abs(omega) - 15, 2);
 		cout << "Penalty for omega: " << penalty << "\n";
 	}
-	if (abs(x50 - 5) > 0.5) 
+	if (abs(x50 - 5) <= 0.5)
 	{
-		penalty += ud1(0) * pow(abs(x50 - 5) - 0.5, 2);
-		cout << "Penalty for x50: " << penalty << "\n";
+		cout << "Success: x50 = " << x50 << " is within the acceptable range [4.5, 5.5].\n";
 	}
+	else
+	{
+		penalty += 10 * ud1(0) * pow(abs(x50 - 5) - 0.5, 2);
+		cout << "Warning: x50 = " << x50 << " is out of range [4.5, 5.5]. Penalty applied: " << penalty << "\n";
+	}
+
 
 	// Wynik
 	double result = -x_end + penalty;
