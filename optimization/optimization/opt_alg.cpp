@@ -470,9 +470,8 @@ solution pen(matrix(*ff)(matrix, matrix, matrix), matrix x0, double c, double dc
 			std::cout << "Current penalty coefficient (c): " << S(0) << "\n";
 			std::cout << "Previous x: " << Xprev.x << "\n";*/
 			
-
-			Xopt = sym_NM(ff, Xopt.x, ud1(1), ud1(2), ud1(3), ud1(4), ud1(5), ud1(6), Nmax, S);
 			Xprev = Xopt;
+			Xopt = sym_NM(ff, Xopt.x, ud1(1), ud1(2), ud1(3), ud1(4), ud1(5), ud1(6), Nmax, S, ud2);
 			//std::cout << "Debug pen: After sym_NM\n";
 			//std::cout << "Current solution: x = " << Xopt.x << ", y = " << Xopt.y << ", flag = " << Xopt.flag << "\n";
 
@@ -480,13 +479,8 @@ solution pen(matrix(*ff)(matrix, matrix, matrix), matrix x0, double c, double dc
 			//std::cout << "New x: " << Xopt.x << "\n";
 			//std::cout << "Function value: " << Xopt.y << "\n";
 			
-			if (solution::f_calls > Nmax) 
-			{
-				Xopt.flag = -2;
-				//std::cout << "Max function calls exceeded. Exiting penalty loop.\n";
-				break;
-			}
-			S(0) = c*dc;
+			c = c * dc;
+			S(0) = c * dc;
 			check = norm(Xopt.x - Xprev.x);
 			if (check < epsilon) {
 				change = false;

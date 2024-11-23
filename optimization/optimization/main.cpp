@@ -354,7 +354,6 @@ void lab3()
 	delete[] Y;
 }
 
-
 void validate_model() 
 {
 	// Warunki początkowe (testowe)
