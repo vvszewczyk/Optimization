@@ -450,7 +450,7 @@ solution Rosen(matrix(*ff)(matrix, matrix, matrix), matrix x0, matrix s0, double
 solution pen(matrix(*ff)(matrix, matrix, matrix), matrix x0, double c, double dc, double epsilon, int Nmax, matrix ud1, matrix ud2)
 {
 	try {
-		solution Xopt(x0), Xprev;
+		solution Xopt(x0), Xprev(0);
 		matrix S(2,1);
 		S(0) = c;
 		S(1) = ud1(0);
@@ -460,8 +460,9 @@ solution pen(matrix(*ff)(matrix, matrix, matrix), matrix x0, double c, double dc
 		std::cout << "Xprev.x = " << Xprev.x << "\n\n";
 		std::cout << solution::f_calls<< "\n\n";
 
-
-		while(norm(Xopt.x- Xprev.x) >= epsilon) 
+		bool change = true;
+		double check = 0;
+		while(change)
 		{
 			// Debugowanie: Wyświetlenie informacji o bieżącej iteracji
 			std::cout << "Penalty iteration: " << solution::f_calls << "\n";
@@ -469,9 +470,9 @@ solution pen(matrix(*ff)(matrix, matrix, matrix), matrix x0, double c, double dc
 			std::cout << "Current penalty coefficient (c): " << S(0) << "\n";
 			std::cout << "Previous x: " << Xprev.x << "\n";
 			
-			Xprev = Xopt;
+
 			Xopt = sym_NM(ff, Xopt.x, ud1(1), ud1(2), ud1(3), ud1(4), ud1(5), ud1(6), Nmax, S);
-			
+			Xprev = Xopt;
 			std::cout << "Debug pen: After sym_NM\n";
 			std::cout << "Current solution: x = " << Xopt.x << ", y = " << Xopt.y << ", flag = " << Xopt.flag << "\n";
 
@@ -486,6 +487,10 @@ solution pen(matrix(*ff)(matrix, matrix, matrix), matrix x0, double c, double dc
 				break;
 			}
 			S(0) = c*dc;
+			check = norm(Xopt.x - Xprev.x);
+			if (check < epsilon) {
+				change = false;
+			}
 		}
 
 		// Debugowanie: Wyświetlenie końcowego rozwiązania

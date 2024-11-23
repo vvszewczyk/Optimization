@@ -234,10 +234,10 @@ matrix df3(double t, matrix Y, matrix ud1, matrix ud2)
 	double FMy = rho * vx * ud2(0) * 2 * M_PI * pow(r, 3); // siła Magnusa pionowa
 
 	// Debugowanie sił
-	cout << "Debug df3:\n";
-	cout << "vx = " << vx << ", vy = " << vy << ", v = " << v << "\n";
-	cout << "Dx = " << Dx << ", Dy = " << Dy << "\n";
-	cout << "FMx = " << FMx << ", FMy = " << FMy << "\n";
+	//cout << "Debug df3:\n";
+	//cout << "vx = " << vx << ", vy = " << vy << ", v = " << v << "\n";
+	//cout << "Dx = " << Dx << ", Dy = " << Dy << "\n";
+	//cout << "FMx = " << FMx << ", FMy = " << FMy << "\n";
 
 	// Równania różniczkowe
 	matrix dY(4, 1);
@@ -289,17 +289,17 @@ matrix ff3R(matrix x, matrix ud1, matrix ud2)
 	double penalty = 0.0;
 	if (abs(v0x) > 10) 
 	{
-		penalty += ud2(0) * pow(abs(v0x) - 10, 2);
+		penalty += ud1(0) * pow(abs(v0x) - 10, 2);
 		cout << "Penalty for v0x: " << penalty << "\n";
 	}
 	if (abs(omega) > 15) 
 	{
-		penalty += ud2(0) * pow(abs(omega) - 15, 2);
+		penalty += ud1(0) * pow(abs(omega) - 15, 2);
 		cout << "Penalty for omega: " << penalty << "\n";
 	}
 	if (abs(x50 - 5) > 0.5) 
 	{
-		penalty += ud2(0) * pow(abs(x50 - 5) - 0.5, 2);
+		penalty += ud1(0) * pow(abs(x50 - 5) - 0.5, 2);
 		cout << "Penalty for x50: " << penalty << "\n";
 	}
 
