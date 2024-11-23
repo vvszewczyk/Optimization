@@ -505,7 +505,6 @@ solution sym_NM(matrix(*ff)(matrix, matrix, matrix), matrix x0, double s, double
 {
 	try
 	{
-		cout << "===========================================================\n";
 		solution Xopt;
 		int DIM = get_len(x0); // Dimensionality of the problem
 
@@ -529,22 +528,22 @@ solution sym_NM(matrix(*ff)(matrix, matrix, matrix), matrix x0, double s, double
 			f_values(i) = m2d(Xopt.fit_fun(ff, ud1, ud2)); // Automatic increment inside fit_fun
 		}
 
-		cout << "Initial simplex:\n";
-		for (int i = 0; i <= DIM; ++i)
-		{
-			cout << "Vertex " << i << ": x = " << p[i] << ", f(x) = " << f_values(i) << "\n";
-		}
+		//cout << "Initial simplex:\n";
+		//for (int i = 0; i <= DIM; ++i)
+		//{
+		//	cout << "Vertex " << i << ": x = " << p[i] << ", f(x) = " << f_values(i) << "\n";
+		//}
 
 		double max_norm;
 		do
 		{	
 			// Debugowanie: Wyświetlenie aktualnego stanu sympleksu
-			cout << "Iteration: " << solution::f_calls << "\n";
-			cout << "Current simplex:\n";
-			for (int i = 0; i <= DIM; ++i) 
-			{
-				cout << "Vertex " << i << ": x = " << p[i] << ", f(x) = " << f_values(i) << "\n";
-			}
+			//cout << "Iteration: " << solution::f_calls << "\n";
+			//cout << "Current simplex:\n";
+			//for (int i = 0; i <= DIM; ++i) 
+			//{
+			//	cout << "Vertex " << i << ": x = " << p[i] << ", f(x) = " << f_values(i) << "\n";
+			//}
 			// Step 2: Order vertices by function value
 			int p_min = 0, p_max = 0;
 			for (int i = 1; i <= DIM; ++i)
@@ -565,14 +564,14 @@ solution sym_NM(matrix(*ff)(matrix, matrix, matrix), matrix x0, double s, double
 			// Step 3: Reflect the worst point
 			Xopt.x = centroid + alpha * (centroid - p[p_max]); // Set Xopt to reflection point
 			double f_reflect = m2d(Xopt.fit_fun(ff, ud1, ud2)); // Automatic increment
-			cout << "Reflection point: x = " << Xopt.x << ", f(x) = " << f_reflect << "\n";
+			//cout << "Reflection point: x = " << Xopt.x << ", f(x) = " << f_reflect << "\n";
 
 			if (f_reflect < f_values(p_min))
 			{
 				// Step 4a: Expansion
 				Xopt.x = centroid + gamma * (Xopt.x - centroid); // Set Xopt to expansion point
 				double f_expand = m2d(Xopt.fit_fun(ff, ud1, ud2)); // Automatic increment
-				cout << "Expansion point: x = " << Xopt.x << ", f(x) = " << f_expand << "\n";
+				//cout << "Expansion point: x = " << Xopt.x << ", f(x) = " << f_expand << "\n";
 
 				if (f_expand < f_reflect)
 				{
@@ -598,7 +597,7 @@ solution sym_NM(matrix(*ff)(matrix, matrix, matrix), matrix x0, double s, double
 				// Step 4c: Contraction
 				Xopt.x = centroid + beta * (p[p_max] - centroid); // Set Xopt to contraction point
 				double f_contract = m2d(Xopt.fit_fun(ff, ud1, ud2)); // Automatic increment
-				cout << "Contraction point: x = " << Xopt.x << ", f(x) = " << f_contract << "\n";
+				//cout << "Contraction point: x = " << Xopt.x << ", f(x) = " << f_contract << "\n";
 
 				if (f_contract < f_values(p_max))
 				{
@@ -609,14 +608,14 @@ solution sym_NM(matrix(*ff)(matrix, matrix, matrix), matrix x0, double s, double
 				else
 				{
 					// Step 4d: Shrink the simplex
-					cout << "Shrinking simplex:\n";
+					//cout << "Shrinking simplex:\n";
 					for (int i = 0; i <= DIM; ++i)
 					{
 						if (i == p_min) continue;
 						p.set_col(p[p_min] + delta * (p[i] - p[p_min]), i);
 						Xopt.x = p[i]; // Set Xopt for shrinking
 						f_values(i) = m2d(Xopt.fit_fun(ff, ud1, ud2)); // Automatic increment
-						cout << "New vertex " << i << ": x = " << p[i] << ", f(x) = " << f_values(i) << "\n";
+						//cout << "New vertex " << i << ": x = " << p[i] << ", f(x) = " << f_values(i) << "\n";
 					}
 				}
 			}
@@ -632,7 +631,7 @@ solution sym_NM(matrix(*ff)(matrix, matrix, matrix), matrix x0, double s, double
 			}
 
 			// Debugowanie: Wyświetlenie maksymalnej normy
-			cout << "Max norm: " << max_norm << "\n";
+			//cout << "Max norm: " << max_norm << "\n";
 
 			if (solution::f_calls > Nmax)
 			{
@@ -658,7 +657,6 @@ solution sym_NM(matrix(*ff)(matrix, matrix, matrix), matrix x0, double s, double
 		cout << "x = " << Xopt.x << "\n";
 		cout << "y (function value): " << Xopt.y << "\n";
 		cout << "Flag: " << Xopt.flag << "\n";
-		cout << "===========================================================\n";
 		return Xopt;
 	}
 	catch (string ex_info)

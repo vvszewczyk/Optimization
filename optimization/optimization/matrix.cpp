@@ -579,7 +579,7 @@ ostream& operator<<(ostream& OS, const matrix& A)
 			p = S.find('.');
 			if (p != string::npos)
 				S[p] = SEP_SYMBOL;
-			OS << S << "; ";
+			OS << S << DELIMITER <<" ";
 		}
 		if (i == nA[0] - 1)
 			return OS;
@@ -596,7 +596,7 @@ istream& operator>>(istream& IS, matrix& A)
 	for (int i = 0; i < nA[0]; ++i)
 		for (int j = 0; j < nA[1]; ++j)
 		{
-			getline(IS, S, ';');
+			getline(IS, S, DELIMITER);
 			p = S.find(SEP_SYMBOL);
 			if (p != string::npos)
 				S[p] = '.';
