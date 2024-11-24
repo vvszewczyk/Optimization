@@ -302,27 +302,27 @@ matrix ff3R(matrix x, matrix ud1, matrix ud2)
 	if (abs(v0x) > 10) 
 	{
 		penalty += ud1(0) * pow(abs(v0x) - 10, 2);
-		cout << "Penalty for v0x: " << penalty << "\n";
+		//cout << "Penalty for v0x: " << penalty << "\n";
 	}
 	if (abs(omega) > 15) 
 	{
 		penalty += ud1(0) * pow(abs(omega) - 15, 2);
-		cout << "Penalty for omega: " << penalty << "\n";
+		//cout << "Penalty for omega: " << penalty << "\n";
 	}
 	if (abs(x50 - 5) <= 0.5)
 	{
-		cout << "Success: x50 = " << x50 << " is within the acceptable range [4.5, 5.5].\n";
+		//cout << "Success: x50 = " << x50 << " is within the acceptable range [4.5, 5.5].\n";
 	}
 	else
 	{
-		penalty += 10 * ud1(0) * pow(abs(x50 - 5) - 0.5, 2);
-		cout << "Warning: x50 = " << x50 << " is out of range [4.5, 5.5]. Penalty applied: " << penalty << "\n";
+		penalty += ud1(0) * pow(abs(x50 - 5) - 0.5, 2);
+		//cout << "Warning: x50 = " << x50 << " is out of range [4.5, 5.5]. Penalty applied: " << penalty << "\n";
 	}
 
 
 	// Wynik
 	double result = -x_end + penalty;
-	cout << "Result (function value): " << result << "\n";
+	//cout << "Result (function value): " << result << "\n";
 
 	Y[0].~matrix();
 	Y[1].~matrix();

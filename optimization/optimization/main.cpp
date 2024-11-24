@@ -313,9 +313,7 @@ void lab3()
 	double dc = 10.0;        // Współczynnik zwiększenia kary
 
 	// Ograniczenia dla v0x i omega
-	matrix lb(2, new double[2] {-10.0, -15.0}); // Dolne granice
-	matrix ub(2, new double[2] {10.0, 15.0});   // Górne granice
-	matrix x0(2, new double[2] {5.0, 0.0});     // Punkt startowy
+	matrix x0(2, new double[2] {5.0, .0});     // x0 = 5.0 omega = 0.0
 
 	// Parametry do sympleksu przekazane przez ud1
 	// s = 1.0, alpha = 1.0, beta = 0.5, gamma = 2.0, delta = 0.5, epsilon = 1e-3, Nmax = 1000
@@ -330,6 +328,7 @@ void lab3()
 	//cout << "ud2: " << ud2 << "\n";
 
 	// Rozwiązanie problemu optymalizacji
+	solution::clear_calls;
 	solution opt = pen(ff3R, x0, c, dc, epsilon, Nmax, ud1, ud2);
 
 	// Wyświetlenie wyników optymalizacji
@@ -337,6 +336,7 @@ void lab3()
 	cout << "v0x = " << opt.x(0) << " m/s, omega = " << opt.x(1) << " rad/s\n";
 	cout << "Wartość funkcji celu (negatywne x_end): " << opt.y << "\n";
 	cout << "Flaga zakończenia: " << opt.flag << "\n";
+	cout << "Liczba wywołan funkcji celu: " << solution::f_calls << "\n";
 
 	// Symulacja trajektorii dla optymalnych parametrów
 	matrix Y0(4, new double[4] {0, opt.x(0), 100, 0}); // Warunki początkowe

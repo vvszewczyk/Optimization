@@ -653,10 +653,10 @@ solution sym_NM(matrix(*ff)(matrix, matrix, matrix), matrix x0, double s, double
 		Xopt.flag = 1; // Success
 
 		// Debugowanie: Wyświetlenie końcowego rozwiązania
-		cout << "Final solution:\n";
-		cout << "x = " << Xopt.x << "\n";
-		cout << "y (function value): " << Xopt.y << "\n";
-		cout << "Flag: " << Xopt.flag << "\n";
+		//cout << "Final solution:\n";
+		//cout << "x = " << Xopt.x << "\n";
+		//cout << "y (function value): " << Xopt.y << "\n";
+		//cout << "Flag: " << Xopt.flag << "\n";
 		return Xopt;
 	}
 	catch (string ex_info)
