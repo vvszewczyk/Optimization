@@ -14,4 +14,5 @@ matrix ff3T(matrix, matrix = NAN, matrix = NAN);
 matrix df3(double t, matrix Y, matrix = NAN, matrix = NAN);
 matrix ff3R(matrix x, matrix = NAN, matrix = NAN);
 matrix f1(double, matrix, matrix = NAN, matrix = NAN);
+bool check_constraints_2D(matrix, matrix);
 matrix f2(matrix, matrix = NAN, matrix = NAN);

@@ -306,6 +306,7 @@ void lab2()
 
 void lab3()
 {
+	/*
 	// Problem rzeczywisty
 	double epsilon = 1e-3;   // Dokładność
 	int Nmax = 1000;         // Maksymalna liczba iteracji
@@ -352,62 +353,93 @@ void lab3()
 
 	// Zwolnienie pamięci
 	delete[] Y;
-}
+	*/
+	// Parametry funkcji testowej
+	  // Parametry funkcji testowej
+	double epsilon = 1e-3;
+	int Nmax = 1000;
+	double s = 1.0;      // Rozmiar kroku
+	double alpha = 1.0;  // Współczynnik odbicia
+	double beta = 0.5;   // Współczynnik kontrakcji
+	double gamma = 2.0;  // Współczynnik ekspansji
+	double delta = 0.5;  // Współczynnik zmniejszenia sympleksu
+	double c = 1.0;      // Wstępna wartość kary w `pen`
+	double dc = 2.0;     // Mnożnik zwiększający karę w `pen`
 
-void validate_model() 
-{
-	// Warunki początkowe (testowe)
-	double v0x = 5.0;       // Początkowa prędkość pozioma
-	double omega = 10.0;    // Początkowa rotacja
-	double y0 = 100.0;      // Początkowa wysokość
-	double t_end = 7.0;     // Czas symulacji
-	double dt = 0.01;       // Krok czasowy
+	// Lista wartości `a`
+	std::vector<double> a_values = { 4.0, 4.4934, 5.0 };
 
-	// Tworzenie wektora warunków początkowych
-	matrix Y0(4, new double[4] {0.0, v0x, y0, 0.0});
+	// Otwarcie pliku CSV
+	std::ofstream results_file("results_table_combined.csv");
 
-	// Rozwiązanie równań różniczkowych dla zadanych warunków
-	matrix* Y = solve_ode(df3, 0.0, dt, t_end, Y0, matrix(), matrix(1, 1, omega));
+	if (!results_file.is_open()) {
+		std::cerr << "Nie można otworzyć pliku do zapisu wyników!\n";
+		return;
+	}
 
-	// Znalezienie x_end i x dla y = 50 m
-	int n = get_len(Y[0]); // Długość wynikowego wektora czasu
-	int i0 = 0, i50 = 0;
+	// Nagłówki tabeli
+	results_file << "x1(0),x2(0),"
+		<< "x1*(pen),x2*(pen),r*(pen),y*(pen),Liczba wywołań funkcji celu (pen),"
+		<< "x1*(sym_NM),x2*(sym_NM),r*(sym_NM),y*(sym_NM),Liczba wywołań funkcji celu (sym_NM)\n";
 
-	for (int i = 0; i < n; ++i) 
-	{
-		// Szukanie indeksu dla y = 0 (x_end)
-		if (abs(Y[1](i, 2)) < abs(Y[1](i0, 2))) 
-		{
-			i0 = i;
-		}
-		// Szukanie indeksu dla y = 50
-		if (abs(Y[1](i, 2) - 50.0) < abs(Y[1](i50, 2) - 50.0)) 
-		{
-			i50 = i;
+	// Generator punktów początkowych
+	std::random_device rd;
+	std::mt19937 gen(rd());
+	std::uniform_real_distribution<> dis(-5.0, 5.0); // Punkt początkowy w dopuszczalnym zakresie
+
+	for (double a : a_values) {
+		for (int i = 0; i < 100; i++) {
+			matrix x0(2, 1);
+			bool valid_point = false;
+			while (!valid_point) {
+				x0(0, 0) = dis(gen);
+				x0(1, 0) = dis(gen);
+				// Sprawdzenie ograniczeń
+				double x1 = x0(0, 0);
+				double x2 = x0(1, 0);
+				double g1 = -x1 + 1;                          // g1(x1) <= 0
+				double g2 = -x2 + 1;                          // g2(x2) <= 0
+				double g3 = sqrt(pow(x1, 2) + pow(x2, 2)) - a; // g3(x1, x2) <= 0
+
+				valid_point = (g1 <= 0) && (g2 <= 0) && (g3 <= 0);
+			}
+			// Przygotowanie `ud1` jako macierz 6x1 dla sym_NM i macierz 1x1 dla ograniczeń
+			matrix ud1(7, 1);
+			ud1(0, 0) = a;       // Parametr a dla ograniczeń
+			ud1(1, 0) = s;       // Rozmiar kroku
+			ud1(2, 0) = alpha;   // Odbicie
+			ud1(3, 0) = beta;    // Kontrakcja
+			ud1(4, 0) = gamma;   // Ekspansja
+			ud1(5, 0) = delta;   // Zmniejszenie sympleksu
+			ud1(6, 0) = epsilon;
+
+			matrix ud2; // Pusty, jeśli nieużywany
+
+			try {
+				// Wywołanie funkcji `pen`
+				solution::clear_calls(); // Reset licznika funkcji celu
+				solution opt_pen = pen(ff3T, x0, c, dc, epsilon, Nmax, ud1, ud2);
+				double r_pen = std::sqrt(opt_pen.x(0, 0) * opt_pen.x(0, 0) + opt_pen.x(1, 0) * opt_pen.x(1, 0));
+				cout << solution::f_calls << endl;
+				// Wywołanie funkcji `sym_NM`
+				solution::clear_calls(); // Reset licznika funkcji celu
+				solution opt_sym = sym_NM(ff3T, x0, ud1(1, 0), ud1(2, 0), ud1(3, 0), ud1(4, 0), ud1(5, 0), ud1(6, 0), Nmax, matrix(1, 1, a), ud2);
+				double r_sym = std::sqrt(opt_sym.x(0, 0) * opt_sym.x(0, 0) + opt_sym.x(1, 0) * opt_sym.x(1, 0));
+
+				// Zapis wyników do jednej linii
+				results_file << x0(0, 0) << "," << x0(1, 0) << ","
+					<< opt_pen.x(0, 0) << "," << opt_pen.x(1, 0) << "," << r_pen << "," << opt_pen.y(0, 0) << "," << solution::f_calls << ","
+					<< opt_sym.x(0, 0) << "," << opt_sym.x(1, 0) << "," << r_sym << "," << opt_sym.y(0, 0) << "," << solution::f_calls << "\n";
+			}
+			catch (const std::exception& e) {
+				std::cerr << "Błąd podczas optymalizacji: " << e.what() << "\n";
+			}
 		}
 	}
 
-	// Odczyt wyników
-	double x_end = Y[1](i0, 0);    // Położenie x, gdy y = 0
-	double x_50 = Y[1](i50, 0);   // Położenie x, gdy y ≈ 50 m
-	double t_hit_ground = Y[0](i0); // Czas uderzenia w ziemię
-
-	// Wyświetlenie wyników
-	cout << "Testowa symulacja dla v0x = 5 m/s i omega = 10 rad/s:" << endl;
-	cout << "x_end (przy y = 0) = " << x_end << " m" << endl;
-	cout << "x (przy y = 50 m) = " << x_50 << " m" << endl;
-	cout << "Czas uderzenia w ziemie: t = " << t_hit_ground << " s" << endl;
-
-	// Zapis trajektorii do pliku CSV
-	ofstream file("test_trajektoria.csv");
-	file << hcat(Y[0], Y[1]); // Łączymy czas i współrzędne w jeden plik
-	file.close();
-
-	// Zwolnienie pamięci
-	Y[0].~matrix();
-	Y[1].~matrix();
+	results_file.close();
+	std::cout << "Wyniki zapisane w pliku results_table_combined.csv\n";
 }
-
 
 void lab4()
 {
