@@ -391,10 +391,10 @@ void lab3()
 	std::cout << "Wyniki zapisane w pliku results_table_combined.csv\n";
 
 	// Problem rzeczywisty
-	double epsilon = 1e-3;   // Dokładność
-	int Nmax = 1000;         // Maksymalna liczba iteracji
-	double c = 10.0;          // Współczynnik kary początkowej
-	double dc = 10.0;        // Współczynnik zwiększenia kary
+	epsilon = 1e-3;   // Dokładność
+	Nmax = 1000;         // Maksymalna liczba iteracji
+	c = 10.0;          // Współczynnik kary początkowej
+	dc = 10.0;        // Współczynnik zwiększenia kary
 
 	// Ograniczenia dla v0x i omega
 	matrix x0(2, new double[2] {5.0, .0});     // x0 = 5.0 omega = 0.0
