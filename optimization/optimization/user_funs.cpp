@@ -178,39 +178,43 @@ matrix ff2R(matrix x, matrix ud1, matrix ud2)
 
 // LAB3
 
-// Funkcja celu
-matrix ff3T(matrix x, matrix ud1, matrix ud2) 
+matrix ff3T(matrix x, matrix ud1, matrix ud2)
 {
 	double x1 = x(0, 0);
 	double x2 = x(1, 0);
+	double a = ud1(0, 0); // Parametr a
+	double c = ud2(0, 0); // Współczynnik kary
+
 	matrix result(1, 1);
 	double denominator = M_PI * sqrt(pow(x1 / M_PI, 2) + pow(x2 / M_PI, 2));
-	if (denominator == 0) 
+	if (denominator == 0)
 	{
 		std::cerr << "ff3T - dividing by 0\n";
 		result(0, 0) = 0;
 	}
-	else 
+	else
 	{
 		result(0, 0) = sin(M_PI * sqrt(pow(x1 / M_PI, 2) + pow(x2 / M_PI, 2))) / denominator;
 	}
-	return result;
-}
 
-// Ograniczenia do funkcji celu (nie wiem czy wszystkie na raz mają być sprawdzane, ale tak przyjąłem. Jak coś to zmieniajcie do woli ~WS)
-bool check_constraints_2D(matrix x, matrix ud1) 
-{
-	double x1 = x(0, 0);
-	double x2 = x(1, 0);
-	double a = ud1(0, 0); // Parametr a przekazywany przez ud1
-
-	// Ograniczenia
+	// Obliczenie kar za naruszenie ograniczeń
 	double g1 = -x1 + 1;                          // g1(x1) <= 0
 	double g2 = -x2 + 1;                          // g2(x2) <= 0
 	double g3 = sqrt(pow(x1, 2) + pow(x2, 2)) - a; // g3(x1, x2) <= 0
 
-	return (g1 <= 0) && (g2 <= 0) && (g3 <= 0);
+	double penalty = 0.0;
+
+	// Dodaj karę za każde naruszenie ograniczenia
+	if (g1 > 0) penalty += pow(g1, 2);
+	if (g2 > 0) penalty += pow(g2, 2);
+	if (g3 > 0) penalty += pow(g3, 2);
+
+	// Dodaj sumę kar do funkcji celu, skalowaną przez współczynnik kary c
+	result(0, 0) += c * penalty;
+
+	return result;
 }
+
 
 // Problem rzeczywisty
 matrix df3(double t, matrix Y, matrix ud1, matrix ud2) 

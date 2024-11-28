@@ -413,7 +413,7 @@ void lab3()
 			ud1(5, 0) = delta;   // Zmniejszenie sympleksu
 			ud1(6, 0) = epsilon;
 
-			matrix ud2; // Pusty, jeśli nieużywany
+			matrix ud2(1, 1, c); // wstępna wartość kary
 
 			try {
 				// Wywołanie funkcji `pen`
@@ -422,8 +422,9 @@ void lab3()
 				double r_pen = std::sqrt(opt_pen.x(0, 0) * opt_pen.x(0, 0) + opt_pen.x(1, 0) * opt_pen.x(1, 0));
 				cout << solution::f_calls << endl;
 				// Wywołanie funkcji `sym_NM`
+				matrix ud2_2(1, 1, r_pen); // wstępna wartość kary
 				solution::clear_calls(); // Reset licznika funkcji celu
-				solution opt_sym = sym_NM(ff3T, x0, ud1(1, 0), ud1(2, 0), ud1(3, 0), ud1(4, 0), ud1(5, 0), ud1(6, 0), Nmax, matrix(1, 1, a), ud2);
+				solution opt_sym = sym_NM(ff3T, x0, ud1(1, 0), ud1(2, 0), ud1(3, 0), ud1(4, 0), ud1(5, 0), ud1(6, 0), Nmax, matrix(1, 1, a), ud2_2);
 				double r_sym = std::sqrt(opt_sym.x(0, 0) * opt_sym.x(0, 0) + opt_sym.x(1, 0) * opt_sym.x(1, 0));
 
 				// Zapis wyników do jednej linii
