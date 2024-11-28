@@ -702,12 +702,82 @@ solution SD(matrix(*ff)(matrix, matrix, matrix), matrix(*gf)(matrix, matrix, mat
 	}
 }
 
+// (Conjugate Gradient)
 solution CG(matrix(*ff)(matrix, matrix, matrix), matrix(*gf)(matrix, matrix, matrix), matrix x0, double h0, double epsilon, int Nmax, matrix ud1, matrix ud2)
 {
 	try
 	{
 		solution Xopt;
-		//Tu wpisz kod funkcji
+		int i = 0;
+		Xopt.x = x0;
+		Xopt.y = Xopt.fit_fun(ff, ud1, ud2); // Wartość funkcji celu w punkcie początkowym
+		// Początkowy gradient
+		matrix g_prev = Xopt.grad(gf, ud1, ud2);
+		//Początkowy kierunek przeciwny do gradientu
+		matrix d_prev = -g_prev;
+
+		matrix x_prev;
+		double norm_diff;
+
+		do
+		{
+			// Aktualizacja punktu
+			x_prev = Xopt.x;
+			matrix scale_h0(1, 1);
+			scale_h0(0, 0) = h0;
+			Xopt.x = Xopt.x + (scale_h0 * d_prev);
+
+			// Obliczenie wartości funkcji celu w nowym punkcie
+			Xopt.y = Xopt.fit_fun(ff, ud1, ud2);
+			i++;
+
+			// Obliczenie nowego gradientu
+			matrix g_new = Xopt.grad(gf, ud1, ud2);
+
+			// Obliczenie współczynnika beta
+			double numerator = m2d(trans(g_new) * g_new); // g_new^T * g_new
+			double denominator = m2d(trans(g_prev) * g_prev); // g_prev^T * g_prev
+			double beta = numerator / denominator;
+
+			// Aktualizacja kierunku
+			matrix scale_beta(1, 1);
+			scale_beta(0, 0) = beta;
+			matrix d_new = (-g_new) + (scale_beta * d_prev);
+
+
+			// Obliczenie normy różnicy punktów
+			norm_diff = norm(Xopt.x - x_prev);
+
+			// Debug Print
+			if (i % 100 == 0 || norm_diff < epsilon) 
+			{ // Print co 100 iteracji lub na koniec
+				std::cout << "CG Iteracja: " << i
+					<< ", x: (" << Xopt.x(0, 0) << ", " << Xopt.x(1, 0) << ")"
+					<< ", f(x): " << m2d(Xopt.y)
+					<< ", norm_diff: " << norm_diff
+					<< ", f_calls: " << solution::f_calls
+					<< ", g_calls: " << solution::g_calls
+					<< ", flag: " << Xopt.flag
+					<< std::endl;
+			}
+
+			// Przypisanie nowego gradientu i kierunku do poprzednich
+			g_prev = g_new;
+			d_prev = d_new;
+
+			// Sprawdzenie warunków stopu
+			if (norm_diff < epsilon)
+			{
+				Xopt.flag = 0; // Sukces
+				break;
+			}
+			if (solution::f_calls > Nmax)
+			{
+				Xopt.flag = -1; // Przekroczono maksymalną liczbę wywołań funkcji celu
+				break;
+			}
+		} 
+		while (true);
 
 		return Xopt;
 	}

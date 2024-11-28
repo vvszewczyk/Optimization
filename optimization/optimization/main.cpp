@@ -446,10 +446,15 @@ void lab4()
 	std::vector<double> h_values = { 0.05, 0.12 };
 	std::string delimiter = ",";
 
-	// Otwórz plik do zapisu wyników
-	std::ofstream results_file("output/lab4/lab4_SD_results.csv");
-	results_file << "h0,x0(1),x0(2),x*(1),x*(2),y*,f_calls,g_calls,flag\n";
+	// Otwórz plik do zapisu wyników dla SD
+	std::ofstream results_file_SD("output/lab4/lab4_SD_results.csv");
+	results_file_SD << "Method,h0,x0(1),x0(2),x*(1),x*(2),y*,f_calls,g_calls,flag\n";
 
+	// Otwórz plik do zapisu wyników dla CG
+	std::ofstream results_file_CG("output/lab4/lab4_CG_results.csv");
+	results_file_CG << "Method,h0,x0(1),x0(2),x*(1),x*(2),y*,f_calls,g_calls,flag\n";
+
+	// Generator liczb losowych
 	std::random_device rd;
 	std::mt19937 gen(rd());
 	std::uniform_real_distribution<> dis(-10.0, 10.0);
@@ -462,20 +467,45 @@ void lab4()
 			x0(0, 0) = dis(gen);
 			x0(1, 0) = dis(gen);
 
-			solution::clear_calls();
-			solution sol = SD(ff4T, gf4T, x0, h0, epsilon, Nmax);
+			// Inicjalizacja ud1 i ud2 jako macierze 1x1 z wartością 0.0
+			matrix ud1(1, 1);
+			ud1(0, 0) = 0.0;
+			matrix ud2(1, 1);
+			ud2(0, 0) = 0.0;
 
-			results_file << h0 << delimiter
+			// Metoda Gradientu Prostego (SD)
+			solution::clear_calls();
+			solution sol_SD = SD(ff4T, gf4T, x0, h0, epsilon, Nmax, ud1, ud2);
+
+			results_file_SD << "SD" << delimiter
+				<< h0 << delimiter
 				<< x0(0, 0) << delimiter << x0(1, 0) << delimiter
-				<< sol.x(0, 0) << delimiter << sol.x(1, 0) << delimiter
-				<< m2d(sol.y) << delimiter
+				<< sol_SD.x(0, 0) << delimiter << sol_SD.x(1, 0) << delimiter
+				<< m2d(sol_SD.y) << delimiter
 				<< solution::f_calls << delimiter << solution::g_calls << delimiter
-				<< sol.flag << "\n";
+				<< sol_SD.flag << "\n";
+
+			// Metoda Gradientów Sprzężonych (CG)
+			solution::clear_calls();
+			solution sol_CG = CG(ff4T, gf4T, x0, h0, epsilon, Nmax, ud1, ud2);
+
+			results_file_CG << "CG" << delimiter
+				<< h0 << delimiter
+				<< x0(0, 0) << delimiter << x0(1, 0) << delimiter
+				<< sol_CG.x(0, 0) << delimiter << sol_CG.x(1, 0) << delimiter
+				<< m2d(sol_CG.y) << delimiter
+				<< solution::f_calls << delimiter << solution::g_calls << delimiter
+				<< sol_CG.flag << "\n";
 		}
 	}
 
-	results_file.close();
+	// Zamknięcie plików
+	results_file_SD.close();
+	results_file_CG.close();
+	std::cout << "Wyniki zapisane do plików lab4_SD_results.csv i lab4_CG_results.csv\n";
 }
+
+
 
 
 void lab5()
