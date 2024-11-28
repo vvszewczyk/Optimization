@@ -215,8 +215,6 @@ matrix ff3T(matrix x, matrix ud1, matrix ud2)
 	return result;
 }
 
-
-// Problem rzeczywisty
 matrix df3(double t, matrix Y, matrix ud1, matrix ud2) 
 {
 	double m = 0.6; // masa piłki w kg
@@ -334,3 +332,28 @@ matrix ff3R(matrix x, matrix ud1, matrix ud2)
 }
 
 
+// LAB4
+
+matrix ff4T(matrix x, matrix ud1, matrix ud2) // funkcja celu
+{
+	double x1 = x(0, 0);
+	double x2 = x(1, 0);
+	matrix y(1, 1);
+	
+	y = pow(x1 + (2 * x2) - 7, 2) + pow((2 * x1) + x2 - 5, 2);
+	return y;
+}
+
+matrix gf4T(matrix x, matrix ud1, matrix ud2) // gradient funkcji celu
+{
+	double x1 = x(0, 0);
+	double x2 = x(1, 0);
+	double u = x1 + 2 * x2 - 7;
+	double v = 2 * x1 + x2 - 5;
+
+	matrix grad(2, 1);
+	grad(0, 0) = 2 * u + 4 * v; // Pochodna po x1
+	grad(1, 0) = 4 * u + 2 * v; // Pochodna po x2
+
+	return grad;
+}

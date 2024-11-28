@@ -23,15 +23,13 @@ void lab3();
 void lab4();
 void lab5();
 void lab6();
-void validate_model();
 
 
 int main()
 {
 	try
 	{
-		lab3();
-		//validate_model();
+		lab4();
 	}
 	catch (string EX_INFO)
 	{
