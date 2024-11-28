@@ -95,9 +95,9 @@ void lab1()
 	double epsilon = 1e-5;
 	double gamma = 1e-180;
 
-	ofstream expToFile("./expansion.csv");
-	ofstream fibToFile("./fibonacci.csv");
-	ofstream lagToFile("./lagrange.csv");
+	ofstream expToFile("output/lab1/expansion.csv");
+	ofstream fibToFile("output/lab1/fibonacci.csv");
+	ofstream lagToFile("output/lab1/lagrange.csv");
 
 	// TABELA 1, 2
 	for (int i = 0; i < 100; i++)
@@ -161,8 +161,8 @@ void lab1()
 
 	// Symulacja
 	std::cout << "\n\nSymulacja\n\n";
-	ofstream simFib("Symulacja_fibonacci.csv");
-	ofstream simLag("Symulacja_lagrange.csv");
+	ofstream simFib("output/lab1Symulacja_fibonacci.csv");
+	ofstream simLag("output/lab1Symulacja_lagrange.csv");
 
 	matrix symFib = matrix(3, new double[3] {5, 1, 20});
 	matrix* solved1 = solve_ode(f1, 0, 1, 2000, symFib, NAN, fibEx2.x(0));
@@ -189,7 +189,7 @@ void lab2()
 	std::string delimiter = ",";
 
 	// Otwarcie dwóch osobnych plików CSV dla każdej z metod
-	std::ofstream fileHJ("lab2/Hooke-Jeeves.csv");
+	std::ofstream fileHJ("output/lab2/Hooke-Jeeves.csv");
 	std::ofstream fileRosen("lab2/Rosenbrock.csv");
 
 	if (!fileHJ.is_open() || !fileRosen.is_open())
@@ -242,9 +242,9 @@ void lab2()
 
 	// -------- Problem rzeczywisty (Tabela 3 i symulacja) --------- //
 	// Otwarcie plików CSV dla wyników problemu rzeczywistego
-	std::ofstream HookeSymulacja("lab2/HookeSymulacja.csv");
-	std::ofstream RosenbrockSymulacja("lab2/RosenbrockSymulacja.csv");
-	std::ofstream Symulacja("lab2/Symulacja.csv");
+	std::ofstream HookeSymulacja("output/lab2/HookeSymulacja.csv");
+	std::ofstream RosenbrockSymulacja("output/lab2/RosenbrockSymulacja.csv");
+	std::ofstream Symulacja("output/lab2/Symulacja.csv");
 
 	if (!HookeSymulacja.is_open() || !RosenbrockSymulacja.is_open() || !Symulacja.is_open())
 	{
@@ -304,56 +304,6 @@ void lab2()
 
 void lab3()
 {
-	/*
-	// Problem rzeczywisty
-	double epsilon = 1e-3;   // Dokładność
-	int Nmax = 1000;         // Maksymalna liczba iteracji
-	double c = 10.0;          // Współczynnik kary początkowej
-	double dc = 10.0;        // Współczynnik zwiększenia kary
-
-	// Ograniczenia dla v0x i omega
-	matrix x0(2, new double[2] {5.0, .0});     // x0 = 5.0 omega = 0.0
-
-	// Parametry do sympleksu przekazane przez ud1
-	// s = 1.0, alpha = 1.0, beta = 0.5, gamma = 2.0, delta = 0.5, epsilon = 1e-3, Nmax = 1000
-	matrix ud1(7, new double[7] {1.0, 1.0, 0.5, 2.0, 0.5, epsilon, static_cast<double>(Nmax)});
-
-	// Współczynnik kary dla funkcji celu
-	matrix ud2(1, 1, 100.0);
-
-	// Debugowanie inicjalizacji
-	//cout << "Debug: Initializing ud1 and ud2...\n";
-	//cout << "ud1: " << ud1 << "\n";
-	//cout << "ud2: " << ud2 << "\n";
-
-	// Rozwiązanie problemu optymalizacji
-	solution::clear_calls;
-	solution opt = pen(ff3R, x0, c, dc, epsilon, Nmax, ud1, ud2);
-
-	// Wyświetlenie wyników optymalizacji
-	cout << "Optymalne wyniki:\n";
-	cout << "v0x = " << opt.x(0) << " m/s, omega = " << opt.x(1) << " rad/s\n";
-	cout << "Wartość funkcji celu (negatywne x_end): " << opt.y << "\n";
-	cout << "Flaga zakończenia: " << opt.flag << "\n";
-	cout << "Liczba wywołan funkcji celu: " << solution::f_calls << "\n";
-
-	// Symulacja trajektorii dla optymalnych parametrów
-	matrix Y0(4, new double[4] {0, opt.x(0), 100, 0}); // Warunki początkowe
-	matrix* Y = solve_ode(df3, 0.0, 0.01, 7.0, Y0, matrix(), matrix(1, 1, opt.x(1)));
-
-	// Zapis trajektorii do pliku CSV
-	ofstream file("optimal_trajectory.csv");
-	file << hcat(Y[0], Y[1]); // Łączenie czasu i współrzędnych w jeden plik
-	file.close();
-
-	// Wyświetlenie trajektorii
-	//cout << "Trajektoria zapisana w pliku 'optimal_trajectory.csv'.\n";
-
-	// Zwolnienie pamięci
-	delete[] Y;
-	*/
-	// Parametry funkcji testowej
-	  // Parametry funkcji testowej
 	double epsilon = 1e-3;
 	int Nmax = 1000;
 	double s = 1.0;      // Rozmiar kroku
@@ -368,9 +318,10 @@ void lab3()
 	std::vector<double> a_values = { 4.0, 4.4934, 5.0 };
 
 	// Otwarcie pliku CSV
-	std::ofstream results_file("results_table_combined.csv");
+	std::ofstream results_file("output/lab3/results_table_combined.csv");
 
-	if (!results_file.is_open()) {
+	if (!results_file.is_open()) 
+	{
 		std::cerr << "Nie można otworzyć pliku do zapisu wyników!\n";
 		return;
 	}
@@ -438,12 +389,94 @@ void lab3()
 
 	results_file.close();
 	std::cout << "Wyniki zapisane w pliku results_table_combined.csv\n";
+
+	// Problem rzeczywisty
+	double epsilon = 1e-3;   // Dokładność
+	int Nmax = 1000;         // Maksymalna liczba iteracji
+	double c = 10.0;          // Współczynnik kary początkowej
+	double dc = 10.0;        // Współczynnik zwiększenia kary
+
+	// Ograniczenia dla v0x i omega
+	matrix x0(2, new double[2] {5.0, .0});     // x0 = 5.0 omega = 0.0
+
+	// Parametry do sympleksu przekazane przez ud1
+	// s = 1.0, alpha = 1.0, beta = 0.5, gamma = 2.0, delta = 0.5, epsilon = 1e-3, Nmax = 1000
+	matrix ud1(7, new double[7] {1.0, 1.0, 0.5, 2.0, 0.5, epsilon, static_cast<double>(Nmax)});
+
+	// Współczynnik kary dla funkcji celu
+	matrix ud2(1, 1, 100.0);
+
+	// Debugowanie inicjalizacji
+	//cout << "Debug: Initializing ud1 and ud2...\n";
+	//cout << "ud1: " << ud1 << "\n";
+	//cout << "ud2: " << ud2 << "\n";
+
+	// Rozwiązanie problemu optymalizacji
+	solution::clear_calls;
+	solution opt = pen(ff3R, x0, c, dc, epsilon, Nmax, ud1, ud2);
+
+	// Wyświetlenie wyników optymalizacji
+	cout << "Optymalne wyniki:\n";
+	cout << "v0x = " << opt.x(0) << " m/s, omega = " << opt.x(1) << " rad/s\n";
+	cout << "Wartość funkcji celu (negatywne x_end): " << opt.y << "\n";
+	cout << "Flaga zakończenia: " << opt.flag << "\n";
+	cout << "Liczba wywołan funkcji celu: " << solution::f_calls << "\n";
+
+	// Symulacja trajektorii dla optymalnych parametrów
+	matrix Y0(4, new double[4] {0, opt.x(0), 100, 0}); // Warunki początkowe
+	matrix* Y = solve_ode(df3, 0.0, 0.01, 7.0, Y0, matrix(), matrix(1, 1, opt.x(1)));
+
+	// Zapis trajektorii do pliku CSV
+	ofstream file("output/lab3/optimal_trajectory.csv");
+	file << hcat(Y[0], Y[1]); // Łączenie czasu i współrzędnych w jeden plik
+	file.close();
+
+	// Wyświetlenie trajektorii
+	//cout << "Trajektoria zapisana w pliku 'optimal_trajectory.csv'.\n";
+
+	// Zwolnienie pamięci
+	delete[] Y;
 }
 
 void lab4()
 {
+	// Parametry
+	double epsilon = 1e-6;
+	int Nmax = 1000;
+	std::vector<double> h_values = { 0.05, 0.12 };
+	std::string delimiter = ",";
 
+	// Otwórz plik do zapisu wyników
+	std::ofstream results_file("output/lab4/lab4_SD_results.csv");
+	results_file << "h0,x0(1),x0(2),x*(1),x*(2),y*,f_calls,g_calls,flag\n";
+
+	std::random_device rd;
+	std::mt19937 gen(rd());
+	std::uniform_real_distribution<> dis(-10.0, 10.0);
+
+	for (double h0 : h_values)
+	{
+		for (int i = 0; i < 100; i++)
+		{
+			matrix x0(2, 1);
+			x0(0, 0) = dis(gen);
+			x0(1, 0) = dis(gen);
+
+			solution::clear_calls();
+			solution sol = SD(ff4T, gf4T, x0, h0, epsilon, Nmax);
+
+			results_file << h0 << delimiter
+				<< x0(0, 0) << delimiter << x0(1, 0) << delimiter
+				<< sol.x(0, 0) << delimiter << sol.x(1, 0) << delimiter
+				<< m2d(sol.y) << delimiter
+				<< solution::f_calls << delimiter << solution::g_calls << delimiter
+				<< sol.flag << "\n";
+		}
+	}
+
+	results_file.close();
 }
+
 
 void lab5()
 {
