@@ -692,6 +692,11 @@ solution SD(matrix(*ff)(matrix, matrix, matrix), matrix(*gf)(matrix, matrix, mat
 				Xopt.flag = -1; // Przekroczono maksymalną liczbę wywołań funkcji celu
 				break;
 			}
+			if (solution::g_calls > Nmax)
+			{
+				Xopt.flag = -1; // Przekroczono maksymalną liczbę wywołań gradientu
+				break;
+			}
 		} while (true);
 
 		return Xopt;
@@ -776,6 +781,11 @@ solution CG(matrix(*ff)(matrix, matrix, matrix), matrix(*gf)(matrix, matrix, mat
 				Xopt.flag = -1; // Przekroczono maksymalną liczbę wywołań funkcji celu
 				break;
 			}
+			if (solution::g_calls > Nmax)
+			{
+				Xopt.flag = -1; // Przekroczono maksymalną liczbę wywołań gradientu
+				break;
+			}
 		} 
 		while (true);
 
@@ -836,6 +846,11 @@ solution Newton(matrix(*ff)(matrix, matrix, matrix), matrix(*gf)(matrix, matrix,
 			if (solution::f_calls > Nmax)
 			{
 				Xopt.flag = -1; // Przekroczono maksymalną liczbę wywołań funkcji celu
+				break;
+			}
+			if (solution::g_calls > Nmax)
+			{
+				Xopt.flag = -1; // Przekroczono maksymalną liczbę wywołań gradientu
 				break;
 			}
 		} while (true);
