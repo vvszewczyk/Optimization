@@ -357,3 +357,22 @@ matrix gf4T(matrix x, matrix ud1, matrix ud2) // gradient funkcji celu
 
 	return grad;
 }
+
+matrix hf4T(matrix x, matrix _ud1, matrix _ud2) // gradient funkcji celu
+{
+	// Hessian na podstawie funkcji ff4T
+	// Przez to, że ff4T jest funkcją kwadratową to hessian
+	// jest zawsze macierzą skalarów o tych samych wartościach.
+
+	//     | ∂²f / ∂x₁² = 10       ∂²f / ∂x₁∂x₂ = 8 |
+	// H = |                                        |
+	//     | ∂²f / ∂x₂∂x₁ = 8     ∂²f / ∂x₂² = 10   |
+
+	matrix hessian(2, 2);
+	hessian(0, 0) = 10.0;
+	hessian(0, 1) = 8.0;
+	hessian(1, 0) = 8.0;
+	hessian(1, 1) = 10.0;
+
+	return hessian;
+}

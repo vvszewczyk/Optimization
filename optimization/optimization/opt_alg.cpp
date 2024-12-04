@@ -793,7 +793,52 @@ solution Newton(matrix(*ff)(matrix, matrix, matrix), matrix(*gf)(matrix, matrix,
 	try
 	{
 		solution Xopt;
-		//Tu wpisz kod funkcji
+		int i = 0;
+		Xopt.x = x0;
+		Xopt.y = Xopt.fit_fun(ff, ud1, ud2); // Wartość funkcji celu w punkcie początkowym
+
+		matrix x_prev;
+		double norm_diff;
+
+		do
+		{
+			// Gradient w punkcie x
+			matrix grad = Xopt.grad(gf, ud1, ud2);
+			// Hessian 
+			matrix H_inv;
+			try {
+				matrix H = Xopt.hess(Hf, ud1, ud2);
+				H_inv = inv(H); // H^-1 (macierz odwrotna)
+			}
+			catch (const std::string& ex) {
+				std::cerr << "Error computing hessian or hessian inverse: " << ex << std::endl;
+				Xopt.flag = -1; // Nie można odwrócić macierzy
+				break;
+			}
+			// Kierunek d = -H^-1*grad
+			matrix d = -1 * H_inv * grad;
+			// Krok h = stały
+			double h = h0;
+			// Zapis poprzedniego punktu
+			x_prev = Xopt.x;
+			// Aktualizacja punktu w x
+			Xopt.x = Xopt.x + h * d;
+			// Obliczenie wartości funkcji celu w nowym punkcie
+			Xopt.y = Xopt.fit_fun(ff, ud1, ud2);
+			i++;
+			// Sprawdzenie warunku stopu
+			norm_diff = norm(Xopt.x - x_prev);
+			if (norm_diff < epsilon)
+			{
+				Xopt.flag = 0; // Sukces
+				break;
+			}
+			if (solution::f_calls > Nmax)
+			{
+				Xopt.flag = -1; // Przekroczono maksymalną liczbę wywołań funkcji celu
+				break;
+			}
+		} while (true);
 
 		return Xopt;
 	}

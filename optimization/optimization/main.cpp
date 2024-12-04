@@ -454,6 +454,10 @@ void lab4()
 	std::ofstream results_file_CG("output/lab4/lab4_CG_results.csv");
 	results_file_CG << "Method,h0,x0(1),x0(2),x*(1),x*(2),y*,f_calls,g_calls,flag\n";
 
+	// Otwórz plik do zapisu wyników dla CG
+	std::ofstream results_file_Newton("output/lab4/lab4_Newton_results.csv");
+	results_file_Newton << "Method,h0,x0(1),x0(2),x*(1),x*(2),y*,f_calls,g_calls,H_calls,flag\n";
+
 	// Generator liczb losowych
 	std::random_device rd;
 	std::mt19937 gen(rd());
@@ -496,13 +500,27 @@ void lab4()
 				<< m2d(sol_CG.y) << delimiter
 				<< solution::f_calls << delimiter << solution::g_calls << delimiter
 				<< sol_CG.flag << "\n";
+
+			// Metoda Newtona
+			solution::clear_calls();
+			solution sol_Newton = Newton(ff4T, gf4T, hf4T, x0, h0, epsilon, Nmax, ud1, ud2);
+
+			results_file_Newton << "Newton" << delimiter
+				<< h0 << delimiter
+				<< x0(0, 0) << delimiter << x0(1, 0) << delimiter
+				<< sol_Newton.x(0, 0) << delimiter << sol_Newton.x(1, 0) << delimiter
+				<< m2d(sol_Newton.y) << delimiter
+				<< solution::f_calls << delimiter << solution::g_calls << delimiter
+				<< solution::H_calls << delimiter << sol_Newton.flag << "\n";
 		}
 	}
 
 	// Zamknięcie plików
 	results_file_SD.close();
 	results_file_CG.close();
-	std::cout << "Wyniki zapisane do plików lab4_SD_results.csv i lab4_CG_results.csv\n";
+	results_file_Newton.close();
+
+	std::cout << "Wyniki zapisane do plików lab4_SD_results.csv, lab4_CG_results.csv i lab4_Newton_results.csv\n";
 }
 
 
