@@ -177,7 +177,6 @@ matrix ff2R(matrix x, matrix ud1, matrix ud2)
 }
 
 // LAB3
-
 matrix ff3T(matrix x, matrix ud1, matrix ud2)
 {
 	double x1 = x(0, 0);
@@ -333,12 +332,11 @@ matrix ff3R(matrix x, matrix ud1, matrix ud2)
 
 
 // LAB4
-
 matrix ff4T(matrix x, matrix ud1, matrix ud2) // funkcja celu
 {
 	double x1 = x(0, 0);
 	double x2 = x(1, 0);
-	matrix y(1, 1);
+	matrix y;
 	
 	y = pow(x1 + (2 * x2) - 7, 2) + pow((2 * x1) + x2 - 5, 2);
 	return y;
@@ -358,7 +356,7 @@ matrix gf4T(matrix x, matrix ud1, matrix ud2) // gradient funkcji celu
 	return grad;
 }
 
-matrix hf4T(matrix x, matrix _ud1, matrix _ud2) // gradient funkcji celu
+matrix hf4T(matrix _x, matrix _ud1, matrix _ud2) // hessian funkcji celu
 {
 	// Hessian na podstawie funkcji ff4T
 	// Przez to, że ff4T jest funkcją kwadratową to hessian

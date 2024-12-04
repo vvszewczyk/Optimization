@@ -445,18 +445,28 @@ void lab4()
 	int Nmax = 1000;
 	std::vector<double> h_values = { 0.05, 0.12 };
 	std::string delimiter = ",";
+	// Dla ekspancji
+	double* expansionResults = new double[2];
+	double d = 1.0; // Krok
+	//double alfa = 1.1;
+	double alfa = 2.0; // Współczynnik ekspansji
 
-	// Otwórz plik do zapisu wyników dla SD
+
+	// Otwórz plik do zapisu wyników dla metody SD
 	std::ofstream results_file_SD("output/lab4/lab4_SD_results.csv");
 	results_file_SD << "Method,h0,x0(1),x0(2),x*(1),x*(2),y*,f_calls,g_calls,flag\n";
 
-	// Otwórz plik do zapisu wyników dla CG
+	// Otwórz plik do zapisu wyników dla metody CG
 	std::ofstream results_file_CG("output/lab4/lab4_CG_results.csv");
 	results_file_CG << "Method,h0,x0(1),x0(2),x*(1),x*(2),y*,f_calls,g_calls,flag\n";
 
-	// Otwórz plik do zapisu wyników dla CG
+	// Otwórz plik do zapisu wyników dla metody Newtona
 	std::ofstream results_file_Newton("output/lab4/lab4_Newton_results.csv");
 	results_file_Newton << "Method,h0,x0(1),x0(2),x*(1),x*(2),y*,f_calls,g_calls,H_calls,flag\n";
+
+	// Otwórz plik do zapisu wyników dla metody Złotego podziału
+	std::ofstream results_file_Golden("output/lab4/lab4_Golden_results.csv");
+	results_file_Golden << "Method,x0 expansion,x*(1),x*(2),y*,f_calls,flag\n";
 
 	// Generator liczb losowych
 	std::random_device rd;
@@ -470,6 +480,7 @@ void lab4()
 			matrix x0(2, 1);
 			x0(0, 0) = dis(gen);
 			x0(1, 0) = dis(gen);
+			double x0_expansion = dis(gen);
 
 			// Inicjalizacja ud1 i ud2 jako macierze 1x1 z wartością 0.0
 			matrix ud1(1, 1);
@@ -512,6 +523,18 @@ void lab4()
 				<< m2d(sol_Newton.y) << delimiter
 				<< solution::f_calls << delimiter << solution::g_calls << delimiter
 				<< solution::H_calls << delimiter << sol_Newton.flag << "\n";
+
+			// Złoty podział
+			// Na początek za pomocą metody ekspacji obliczamy przedział na którym znajduję się minimum
+			// Przez to, że x1 i x2 mogą być w różnej odległości od siebie to wybieramy też losowe x0
+			//d = x0(1, 0) - x0(0, 0);
+			//expansionResults = expansion(ff4T, x0_expansion, d, alfa, Nmax, 0); // which x0?
+			//solution sol_Golden = golden(ff4T, expansionResults[0], expansionResults[1], epsilon, Nmax, ud1, ud2);
+
+			//results_file_Golden << "Golden" << delimiter
+			//	<< x0_expansion << delimiter << sol_Golden.x(0, 0) << delimiter << sol_Golden.x(1, 0)
+			//	<< delimiter << m2d(sol_Golden.y) << delimiter
+			//	<< solution::f_calls << delimiter << delimiter << sol_Golden.flag << "\n";
 		}
 	}
 
@@ -519,8 +542,9 @@ void lab4()
 	results_file_SD.close();
 	results_file_CG.close();
 	results_file_Newton.close();
+	results_file_Golden.close();
 
-	std::cout << "Wyniki zapisane do plików lab4_SD_results.csv, lab4_CG_results.csv i lab4_Newton_results.csv\n";
+	std::cout << "Wyniki zapisane w output/lab4/ do plików lab4_SD_results.csv, lab4_CG_results.csv, lab4_Newton_results.csv i lab4_Golden_results.csv\n";
 }
 
 
