@@ -863,59 +863,63 @@ solution Newton(matrix(*ff)(matrix, matrix, matrix), matrix(*gf)(matrix, matrix,
 	}
 }
 
-//solution golden(matrix(*ff)(matrix, matrix, matrix), double a, double b, double epsilon, int Nmax, matrix ud1, matrix ud2)
-//{
-//	try
-//	{
-//		solution Xopt;
-//
-//		// Inicjalizacja parametrów
-//		double alpha = (sqrt(5.0) - 1.0) / 2.0; // Stała złotego podziału
-//		double c = b - alpha * (b - a);
-//		double d = a + alpha * (b - a);
-//
-//		matrix fc = ff(matrix(c), ud1, ud2); // Obliczenie wartości funkcji celu w punkcie c
-//		matrix fd = ff(matrix(d), ud1, ud2); // Obliczenie wartości funkcji celu w punkcie d
-//
-//		int i = 0; // Licznik iteracji
-//
-//		// Pętla iteracyjna
-//		while ((b - a) > epsilon && i < Nmax)
-//		{
-//			if (m2d(fc) < m2d(fd))
-//			{
-//				// Zawężenie przedziału z prawej strony
-//				b = d;
-//				d = c;
-//				c = b - alpha * (b - a);
-//				fd = fc;
-//				fc = ff(matrix(c), ud1, ud2);
-//			}
-//			else
-//			{
-//				// Zawężenie przedziału z lewej strony
-//				a = c;
-//				c = d;
-//				d = a + alpha * (b - a);
-//				fc = fd;
-//				fd = ff(matrix(d), ud1, ud2);
-//			}
-//
-//			i++; // Zwiększenie licznika iteracji
-//		}
-//
-//		// Ustawienie optymalnego punktu w wyniku
-//		double x_opt = (a + b) / 2.0;
-//		Xopt.x = matrix(1, 1, x_opt);
-//		Xopt.y = ff(Xopt.x, ud1, ud2);
-//
-//		return Xopt;
-//	}
-//	catch (string ex_info)
-//	{
-//		throw ("solution golden(...):\n" + ex_info);
-//	}
-//}
+solution golden(matrix(*ff)(matrix, matrix, matrix), double a, double b, double epsilon, int Nmax, matrix ud1, matrix ud2)
+{
+	try
+	{
+		solution Xopt;
+
+		// Inicjalizacja parametrów
+		double alpha = (sqrt(5.0) - 1.0) / 2.0; // Stała złotego podziału
+		double c = b - alpha * (b - a);
+		double d = a + alpha * (b - a);
+
+		matrix fc = ff(matrix(c), ud1, ud2); // Obliczenie wartości funkcji celu w punkcie c
+		matrix fd = ff(matrix(d), ud1, ud2); // Obliczenie wartości funkcji celu w punkcie d
+
+		// Pętla iteracyjna
+		while ((b - a) > epsilon)
+		{
+			if (m2d(fc) < m2d(fd))
+			{
+				// Zawężenie przedziału z prawej strony
+				// a = a;
+				b = d;
+				d = c;
+				c = b - alpha * (b - a);
+				fd = fc; // Aktualizacja fd
+				fc = ff(matrix(c), ud1, ud2); // Aktualizacja fc
+			}
+			else
+			{
+				// Zawężenie przedziału z lewej strony
+				a = c;
+				// b = b;
+				c = d;
+				d = a + alpha * (b - a);
+				fc = fd; // Aktualizacja fc
+				fd = ff(matrix(d), ud1, ud2); // Aktualizacja fd
+			}
+      	if (solution::f_calls > Nmax)
+          {
+          	Xopt.flag = -1; // Przekroczono maksymalną liczbę wywołań funkcji celu
+              break;
+          }
+		Xopt.flag = 0;
+		}
+
+		// Ustawienie optymalnego punktu w wyniku
+		double x_opt = (a + b) / 2.0;
+		Xopt.x = matrix(1, 1, x_opt);
+		Xopt.y = ff(Xopt.x, ud1, ud2);
+
+		return Xopt;
+	}
+	catch (string ex_info)
+	{
+		throw ("solution golden(...):\n" + ex_info);
+	}
+}
 
 
 solution Powell(matrix(*ff)(matrix, matrix, matrix), matrix x0, double epsilon, int Nmax, matrix ud1, matrix ud2)

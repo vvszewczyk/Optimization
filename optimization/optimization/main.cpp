@@ -466,7 +466,7 @@ void lab4()
 
 	// Otwórz plik do zapisu wyników dla metody Złotego podziału
 	std::ofstream results_file_Golden("output/lab4/lab4_Golden_results.csv");
-	results_file_Golden << "Method,x0 expansion,x*(1),x*(2),y*,f_calls,flag\n";
+	results_file_Golden << "Method,x0,x*(0),y*,f_calls,flag\n";
 
 	// Generator liczb losowych
 	std::random_device rd;
@@ -519,7 +519,6 @@ void lab4()
 				<< solution::H_calls << delimiter << sol_Newton.flag << "\n";
 
 			// Złoty podział
-
 			// Inicjalizacja ud1 i ud2
 			matrix ud1;
 			ud1(0, 0) = NAN;
@@ -539,12 +538,12 @@ void lab4()
 			d = x0(1, 0) - x0(0, 0);
 			expansionResults = expansion(ff4T, x0_expansion, d, alfa, Nmax, ud1, ud2); // which x0?
 
-			//solution sol_Golden = golden(ff4T, expansionResults[0], expansionResults[1], epsilon, Nmax, ud1, ud2);
+			solution sol_Golden = golden(ff4T, expansionResults[0], expansionResults[1], epsilon, Nmax, ud1, ud2);
 
-			//results_file_Golden << "Golden" << delimiter
-			//	<< x0_expansion << delimiter << sol_Golden.x(0, 0) << delimiter << sol_Golden.x(1, 0)
-			//	<< delimiter << m2d(sol_Golden.y) << delimiter
-			//	<< solution::f_calls << delimiter << delimiter << sol_Golden.flag << "\n";
+			results_file_Golden << "Golden" << delimiter
+				<< x0_expansion << delimiter << sol_Golden.x(0, 0)
+				<< delimiter << m2d(sol_Golden.y) << delimiter
+				<< solution::f_calls << delimiter << sol_Golden.flag << "\n";
 		}
 	}
 
