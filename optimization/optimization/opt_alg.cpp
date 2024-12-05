@@ -863,20 +863,59 @@ solution Newton(matrix(*ff)(matrix, matrix, matrix), matrix(*gf)(matrix, matrix,
 	}
 }
 
-solution golden(matrix(*ff)(matrix, matrix, matrix), double a, double b, double epsilon, int Nmax, matrix ud1, matrix ud2)
-{
-	try
-	{
-		solution Xopt;
-		//Tu wpisz kod funkcji
+//solution golden(matrix(*ff)(matrix, matrix, matrix), double a, double b, double epsilon, int Nmax, matrix ud1, matrix ud2) {
+//	try {
+//		solution Xopt;
+//
+//		// Stała złotego podziału
+//		const double alpha = (sqrt(5) - 1) / 2;
+//
+//		// Inicjalizacja
+//		double ai = a, bi = b;
+//		double ci = bi - alpha * (bi - ai);
+//		double di = ai + alpha * (bi - ai);
+//
+//		// Wywołanie funkcji celu
+//		matrix f_ci = Xopt.fit_fun(ff, ci, ud1, ud2);
+//		matrix f_di = Xopt.fit_fun(ff, di, ud1, ud2);
+//
+//		// Pętla złotego podziału
+//		while (bi - ai > epsilon)
+//		{
+//			if (f_ci < f_di) {
+//				// Aktualizuj granice
+//				bi = di;
+//				di = ci;
+//				f_di = f_ci;
+//				ci = bi - alpha * (bi - ai);
+//				f_ci = Xopt.fit_fun(ff, ci, ud1, ud2);
+//			}
+//			else {
+//				ai = ci;
+//				ci = di;
+//				f_ci = f_di;
+//				di = ai + alpha * (bi - ai);
+//				f_di = Xopt.fit_fun(ff, di, ud1, ud2);
+//			}
+//			if (solution::f_calls >= Nmax) {
+//				Xopt.flag = -1; // Przekroczono maksymalną liczbę wywołań funkcji celu
+//				break;
+//			}
+//		}
+//
+//		// Zwróć rozwiązanie
+//		double x_star = (ai + bi) / 2;
+//		Xopt.x = matrix(1, 1, x_star);
+//		Xopt.y = Xopt.fit_fun(ff, x_star, ud1, ud2);
+//		Xopt.flag = 0; // Sukces
+//		return Xopt;
+//
+//	}
+//	catch (const std::string& ex_info) {
+//		throw ("solution golden(...):\n" + ex_info);
+//	}
+//}
 
-		return Xopt;
-	}
-	catch (string ex_info)
-	{
-		throw ("solution golden(...):\n" + ex_info);
-	}
-}
 
 solution Powell(matrix(*ff)(matrix, matrix, matrix), matrix x0, double epsilon, int Nmax, matrix ud1, matrix ud2)
 {

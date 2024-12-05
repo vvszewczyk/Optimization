@@ -447,7 +447,7 @@ void lab4()
 	std::string delimiter = ",";
 	// Dla ekspancji
 	double* expansionResults = new double[2];
-	double d = 1.0; // Krok
+	double d = 1.0; // Kierunek
 	//double alfa = 1.1;
 	double alfa = 2.0; // Współczynnik ekspansji
 
@@ -482,15 +482,9 @@ void lab4()
 			x0(1, 0) = dis(gen);
 			double x0_expansion = dis(gen);
 
-			// Inicjalizacja ud1 i ud2 jako macierze 1x1 z wartością 0.0
-			matrix ud1(1, 1);
-			ud1(0, 0) = 0.0;
-			matrix ud2(1, 1);
-			ud2(0, 0) = 0.0;
-
 			// Metoda Gradientu Prostego (SD)
 			solution::clear_calls();
-			solution sol_SD = SD(ff4T, gf4T, x0, h0, epsilon, Nmax, ud1, ud2);
+			solution sol_SD = SD(ff4T, gf4T, x0, h0, epsilon, Nmax);
 
 			results_file_SD << "SD" << delimiter
 				<< h0 << delimiter
@@ -502,7 +496,7 @@ void lab4()
 
 			// Metoda Gradientów Sprzężonych (CG)
 			solution::clear_calls();
-			solution sol_CG = CG(ff4T, gf4T, x0, h0, epsilon, Nmax, ud1, ud2);
+			solution sol_CG = CG(ff4T, gf4T, x0, h0, epsilon, Nmax);
 
 			results_file_CG << "CG" << delimiter
 				<< h0 << delimiter
@@ -514,7 +508,7 @@ void lab4()
 
 			// Metoda Newtona
 			solution::clear_calls();
-			solution sol_Newton = Newton(ff4T, gf4T, hf4T, x0, h0, epsilon, Nmax, ud1, ud2);
+			solution sol_Newton = Newton(ff4T, gf4T, hf4T, x0, h0, epsilon, Nmax);
 
 			results_file_Newton << "Newton" << delimiter
 				<< h0 << delimiter
@@ -525,10 +519,26 @@ void lab4()
 				<< solution::H_calls << delimiter << sol_Newton.flag << "\n";
 
 			// Złoty podział
+
+			// Inicjalizacja ud1 i ud2
+			matrix ud1;
+			ud1(0, 0) = NAN;
+
+			//       | x0(0)   d0(0) |
+			// ud2 = |               |
+			//       | x0(1)   d0(1) |
+
+			matrix ud2(2, 2);
+			ud2(0, 0) = x0(0);
+			ud2(1, 0) = x0(1);
+			ud2(0, 1) = 0.0;
+			ud2(1, 1) = 0.0;
+
 			// Na początek za pomocą metody ekspacji obliczamy przedział na którym znajduję się minimum
 			// Przez to, że x1 i x2 mogą być w różnej odległości od siebie to wybieramy też losowe x0
 			//d = x0(1, 0) - x0(0, 0);
-			//expansionResults = expansion(ff4T, x0_expansion, d, alfa, Nmax, 0); // which x0?
+			//expansionResults = expansion(ff4T, x0_expansion, d, alfa, Nmax); // which x0?
+
 			//solution sol_Golden = golden(ff4T, expansionResults[0], expansionResults[1], epsilon, Nmax, ud1, ud2);
 
 			//results_file_Golden << "Golden" << delimiter

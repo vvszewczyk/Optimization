@@ -334,11 +334,24 @@ matrix ff3R(matrix x, matrix ud1, matrix ud2)
 // LAB4
 matrix ff4T(matrix x, matrix ud1, matrix ud2) // funkcja celu
 {
-	double x1 = x(0, 0);
-	double x2 = x(1, 0);
 	matrix y;
-	
-	y = pow(x1 + (2 * x2) - 7, 2) + pow((2 * x1) + x2 - 5, 2);
+	if (isnan(ud2(0,0)))
+	{
+		double x1 = x(0, 0);
+		double x2 = x(1, 0);
+
+		y = pow(x1 + (2 * x2) - 7, 2) + pow((2 * x1) + x2 - 5, 2);
+	}
+	else
+	{
+		//       | x0(0)   d0(0) |
+		// ud2 = |               |
+		//       | x0(1)   d0(1) |
+		//
+		//           x0 + h * d
+		y = ff4T(ud2[0] + x * ud2[1], NAN, NAN);
+	}
+
 	return y;
 }
 
