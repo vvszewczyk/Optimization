@@ -518,32 +518,6 @@ void lab4()
 				<< solution::f_calls << delimiter << solution::g_calls << delimiter
 				<< solution::H_calls << delimiter << sol_Newton.flag << "\n";
 
-			// Złoty podział
-			// Inicjalizacja ud1 i ud2
-			matrix ud1;
-			ud1(0, 0) = NAN;
-
-			//       | x0(0)   d0(0) |
-			// ud2 = |               |
-			//       | x0(1)   d0(1) |
-
-			matrix ud2(2, 2);
-			ud2(0, 0) = x0(0);
-			ud2(1, 0) = x0(1);
-			ud2(0, 1) = 0.0;
-			ud2(1, 1) = 0.0;
-
-			// Na początek za pomocą metody ekspacji obliczamy przedział na którym znajduję się minimum
-			// Przez to, że x1 i x2 mogą być w różnej odległości od siebie to wybieramy też losowe x0
-			d = x0(1, 0) - x0(0, 0);
-			expansionResults = expansion(ff4T, x0_expansion, d, alfa, Nmax, ud1, ud2); // which x0?
-
-			solution sol_Golden = golden(ff4T, expansionResults[0], expansionResults[1], epsilon, Nmax, ud1, ud2);
-
-			results_file_Golden << "Golden" << delimiter
-				<< x0_expansion << delimiter << sol_Golden.x(0, 0)
-				<< delimiter << m2d(sol_Golden.y) << delimiter
-				<< solution::f_calls << delimiter << sol_Golden.flag << "\n";
 		}
 	}
 

@@ -669,15 +669,34 @@ solution SD(matrix(*ff)(matrix, matrix, matrix), matrix(*gf)(matrix, matrix, mat
 		{
 			// Gradient w punkcie x
 			matrix grad = Xopt.grad(gf, ud1, ud2);
+
+			if (norm(grad) < epsilon)
+			{
+				Xopt.flag = -2; // Gradient bliski zeru
+				break;
+			}
 			// Kierunek d = -gradient
 			matrix d = -grad;
 			// Krok h = stały
-			double h = h0;
+
+			//       | x0(0)   d0(0) |
+			// ud2 = |               |
+			//       | x0(1)   d0(1) |
+
+			matrix ud2(2, 2);
+			ud2(0, 0) = Xopt.x(0);
+			ud2(1, 0) = Xopt.x(1);
+			ud2(0, 1) = d(0);
+			ud2(1, 1) = d(1);
+			double* expansionResults = expansion(ff, 0.0, h0, 1.2, Nmax, ud1, ud2);
+			solution sol_Golden = golden(ff4T, expansionResults[0], expansionResults[1], epsilon, Nmax, ud1, ud2);
+			double h = m2d(sol_Golden.x);
 			// Zapis poprzedniego punktu
 			x_prev = Xopt.x;
 			// Aktualizacja punktu w x
 			Xopt.x = Xopt.x + h * d;
 			// Obliczenie wartości funkcji celu w nowym punkcie
+			ud2 = NAN;
 			Xopt.y = Xopt.fit_fun(ff, ud1, ud2);
 			i++;
 			// Sprawdzenie warunku stopu
@@ -849,6 +868,11 @@ solution Newton(matrix(*ff)(matrix, matrix, matrix), matrix(*gf)(matrix, matrix,
 				break;
 			}
 			if (solution::g_calls > Nmax)
+			{
+				Xopt.flag = -1; // Przekroczono maksymalną liczbę wywołań gradientu
+				break;
+			}
+			if (solution::H_calls > Nmax)
 			{
 				Xopt.flag = -1; // Przekroczono maksymalną liczbę wywołań gradientu
 				break;
