@@ -536,8 +536,8 @@ void lab4()
 
 			// Na początek za pomocą metody ekspacji obliczamy przedział na którym znajduję się minimum
 			// Przez to, że x1 i x2 mogą być w różnej odległości od siebie to wybieramy też losowe x0
-			//d = x0(1, 0) - x0(0, 0);
-			//expansionResults = expansion(ff4T, x0_expansion, d, alfa, Nmax); // which x0?
+			d = x0(1, 0) - x0(0, 0);
+			expansionResults = expansion(ff4T, x0_expansion, d, alfa, Nmax, ud1, ud2); // which x0?
 
 			//solution sol_Golden = golden(ff4T, expansionResults[0], expansionResults[1], epsilon, Nmax, ud1, ud2);
 
