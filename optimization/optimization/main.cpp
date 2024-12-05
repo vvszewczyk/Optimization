@@ -444,12 +444,9 @@ void lab4()
 	double epsilon = 1e-6;
 	int Nmax = 1000;
 	std::vector<double> h_values = { 0.05, 0.12 };
+	// std::vector<double> h_values = { -1.0 }; // for testing golden separetion 
 	std::string delimiter = ",";
-	// Dla ekspancji
-	double* expansionResults = new double[2];
-	double d = 1.0; // Kierunek
-	//double alfa = 1.1;
-	double alfa = 2.0; // Współczynnik ekspansji
+
 
 
 	// Otwórz plik do zapisu wyników dla metody SD
@@ -463,10 +460,6 @@ void lab4()
 	// Otwórz plik do zapisu wyników dla metody Newtona
 	std::ofstream results_file_Newton("output/lab4/lab4_Newton_results.csv");
 	results_file_Newton << "Method,h0,x0(1),x0(2),x*(1),x*(2),y*,f_calls,g_calls,H_calls,flag\n";
-
-	// Otwórz plik do zapisu wyników dla metody Złotego podziału
-	std::ofstream results_file_Golden("output/lab4/lab4_Golden_results.csv");
-	results_file_Golden << "Method,x0,x*(0),y*,f_calls,flag\n";
 
 	// Generator liczb losowych
 	std::random_device rd;
@@ -525,9 +518,8 @@ void lab4()
 	results_file_SD.close();
 	results_file_CG.close();
 	results_file_Newton.close();
-	results_file_Golden.close();
 
-	std::cout << "Wyniki zapisane w output/lab4/ do plików lab4_SD_results.csv, lab4_CG_results.csv, lab4_Newton_results.csv i lab4_Golden_results.csv\n";
+	std::cout << "Wyniki zapisane w output/lab4/ do plików lab4_SD_results.csv, lab4_CG_results.csv i lab4_Newton_results.csv\n";
 }
 
 

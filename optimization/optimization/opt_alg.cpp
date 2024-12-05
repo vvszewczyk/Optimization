@@ -658,7 +658,6 @@ solution SD(matrix(*ff)(matrix, matrix, matrix), matrix(*gf)(matrix, matrix, mat
 	try
 	{
 		solution Xopt;
-		int i = 0;
 		Xopt.x = x0;
 		Xopt.y = Xopt.fit_fun(ff, ud1, ud2); // Wartość funkcji celu w punkcie początkowym
 
@@ -669,51 +668,40 @@ solution SD(matrix(*ff)(matrix, matrix, matrix), matrix(*gf)(matrix, matrix, mat
 		{
 			// Gradient w punkcie x
 			matrix grad = Xopt.grad(gf, ud1, ud2);
-
-			if (norm(grad) < epsilon)
-			{
-				Xopt.flag = -2; // Gradient bliski zeru
-				break;
-			}
 			// Kierunek d = -gradient
 			matrix d = -grad;
-			// Krok h = stały
+			// Wersja stałokrokowa
+			double h = h0;
 
-			//       | x0(0)   d0(0) |
-			// ud2 = |               |
-			//       | x0(1)   d0(1) |
+			// Wersja zmiennokrokowa
+			if (h0 < 0)
+			{
+				//       | x0(0)   d0(0) |
+				// ud2 = |               |
+				//       | x0(1)   d0(1) |
 
-			matrix ud2(2, 2);
-			ud2(0, 0) = Xopt.x(0);
-			ud2(1, 0) = Xopt.x(1);
-			ud2(0, 1) = d(0);
-			ud2(1, 1) = d(1);
-			double* expansionResults = expansion(ff, 0.0, h0, 1.2, Nmax, ud1, ud2);
-			solution sol_Golden = golden(ff4T, expansionResults[0], expansionResults[1], epsilon, Nmax, ud1, ud2);
-			double h = m2d(sol_Golden.x);
+				matrix ud2_temp(2, 2);
+				ud2_temp(0, 0) = Xopt.x(0);
+				ud2_temp(1, 0) = Xopt.x(1);
+				ud2_temp(0, 1) = d(0);
+				ud2_temp(1, 1) = d(1);
+				double* expansionResults = expansion(ff, 0.0, 0.05, 1.2, Nmax, ud1, ud2_temp);
+				solution sol_Golden = golden(ff4T, expansionResults[0], expansionResults[1], epsilon, Nmax, ud1, ud2_temp);
+			    h = m2d(sol_Golden.x);
+			}
+
 			// Zapis poprzedniego punktu
 			x_prev = Xopt.x;
 			// Aktualizacja punktu w x
 			Xopt.x = Xopt.x + h * d;
 			// Obliczenie wartości funkcji celu w nowym punkcie
-			ud2 = NAN;
 			Xopt.y = Xopt.fit_fun(ff, ud1, ud2);
-			i++;
 			// Sprawdzenie warunku stopu
 			norm_diff = norm(Xopt.x - x_prev);
-			if (norm_diff < epsilon)
+			// Wyniki
+			if (norm_diff < epsilon || solution::f_calls > Nmax || solution::g_calls > Nmax)
 			{
-				Xopt.flag = 0; // Sukces
-				break;
-			}
-			if (solution::f_calls > Nmax)
-			{
-				Xopt.flag = -1; // Przekroczono maksymalną liczbę wywołań funkcji celu
-				break;
-			}
-			if (solution::g_calls > Nmax)
-			{
-				Xopt.flag = -1; // Przekroczono maksymalną liczbę wywołań gradientu
+				Xopt.flag = (norm_diff < epsilon) ? 0 : -1;
 				break;
 			}
 		} while (true);
@@ -735,27 +723,36 @@ solution CG(matrix(*ff)(matrix, matrix, matrix), matrix(*gf)(matrix, matrix, mat
 		int i = 0;
 		Xopt.x = x0;
 		Xopt.y = Xopt.fit_fun(ff, ud1, ud2); // Wartość funkcji celu w punkcie początkowym
-		// Początkowy gradient
-		matrix g_prev = Xopt.grad(gf, ud1, ud2);
-		//Początkowy kierunek przeciwny do gradientu
-		matrix d_prev = -g_prev;
-
+		matrix g_prev = Xopt.grad(gf, ud1, ud2); // Gradient początkowy
+		matrix d_prev = -g_prev; // Kierunek początkowy przeciwny do gradientu
 		matrix x_prev;
 		double norm_diff;
 
 		do
 		{
-			// Aktualizacja punktu
 			x_prev = Xopt.x;
+			// Metoda stałokrokowa
+			double h = h0;
+			// Metoda zmiennokrokowa (złoty podział)
+			if (h0 < 0)
+			{
+				matrix ud2_temp(2, 2);
+				ud2_temp(0, 0) = Xopt.x(0);
+				ud2_temp(1, 0) = Xopt.x(1);
+				ud2_temp(0, 1) = d_prev(0);
+				ud2_temp(1, 1) = d_prev(1);
+				double* expansionResults = expansion(ff, 0.0, 0.05, 1.2, Nmax, ud1, ud2_temp);
+				solution sol_Golden = golden(ff, expansionResults[0], expansionResults[1], epsilon, Nmax, ud1, ud2_temp);
+				h = m2d(sol_Golden.x);
+			}
+
 			matrix scale_h0(1, 1);
-			scale_h0(0, 0) = h0;
+			scale_h0(0, 0) = h;
 			Xopt.x = Xopt.x + (scale_h0 * d_prev);
 
-			// Obliczenie wartości funkcji celu w nowym punkcie
 			Xopt.y = Xopt.fit_fun(ff, ud1, ud2);
 			i++;
 
-			// Obliczenie nowego gradientu
 			matrix g_new = Xopt.grad(gf, ud1, ud2);
 
 			// Obliczenie współczynnika beta
@@ -767,7 +764,6 @@ solution CG(matrix(*ff)(matrix, matrix, matrix), matrix(*gf)(matrix, matrix, mat
 			matrix scale_beta(1, 1);
 			scale_beta(0, 0) = beta;
 			matrix d_new = (-g_new) + (scale_beta * d_prev);
-
 
 			// Obliczenie normy różnicy punktów
 			norm_diff = norm(Xopt.x - x_prev);
@@ -784,37 +780,24 @@ solution CG(matrix(*ff)(matrix, matrix, matrix), matrix(*gf)(matrix, matrix, mat
 					<< ", flag: " << Xopt.flag
 					<< std::endl;
 			}
-
-			// Przypisanie nowego gradientu i kierunku do poprzednich
 			g_prev = g_new;
 			d_prev = d_new;
 
-			// Sprawdzenie warunków stopu
-			if (norm_diff < epsilon)
+			if (norm_diff < epsilon || solution::f_calls > Nmax || solution::g_calls > Nmax)
 			{
-				Xopt.flag = 0; // Sukces
+				Xopt.flag = (norm_diff < epsilon) ? 0 : -1;
 				break;
 			}
-			if (solution::f_calls > Nmax)
-			{
-				Xopt.flag = -1; // Przekroczono maksymalną liczbę wywołań funkcji celu
-				break;
-			}
-			if (solution::g_calls > Nmax)
-			{
-				Xopt.flag = -1; // Przekroczono maksymalną liczbę wywołań gradientu
-				break;
-			}
-		} 
-		while (true);
+		} while (true);
 
 		return Xopt;
 	}
-	catch (string ex_info)
+	catch (std::string ex_info)
 	{
 		throw ("solution CG(...):\n" + ex_info);
 	}
 }
+
 
 solution Newton(matrix(*ff)(matrix, matrix, matrix), matrix(*gf)(matrix, matrix, matrix),
 	matrix(*Hf)(matrix, matrix, matrix), matrix x0, double h0, double epsilon, int Nmax, matrix ud1, matrix ud2)
@@ -822,7 +805,6 @@ solution Newton(matrix(*ff)(matrix, matrix, matrix), matrix(*gf)(matrix, matrix,
 	try
 	{
 		solution Xopt;
-		int i = 0;
 		Xopt.x = x0;
 		Xopt.y = Xopt.fit_fun(ff, ud1, ud2); // Wartość funkcji celu w punkcie początkowym
 
@@ -846,35 +828,34 @@ solution Newton(matrix(*ff)(matrix, matrix, matrix), matrix(*gf)(matrix, matrix,
 			}
 			// Kierunek d = -H^-1*grad
 			matrix d = -1 * H_inv * grad;
-			// Krok h = stały
+			// Metoda stałokrokowa
 			double h = h0;
+
+			// Metoda zmiennokrokowa (złoty podział)
+			if (h0 < 0)
+			{
+				matrix ud2_temp(2, 2);
+				ud2_temp(0, 0) = Xopt.x(0);
+				ud2_temp(1, 0) = Xopt.x(1);
+				ud2_temp(0, 1) = d(0);
+				ud2_temp(1, 1) = d(1);
+				double* expansionResults = expansion(ff, 0.0, 0.05, 1.2, Nmax, ud1, ud2_temp);
+				solution sol_Golden = golden(ff, expansionResults[0], expansionResults[1], epsilon, Nmax, ud1, ud2_temp);
+				h = m2d(sol_Golden.x);
+			}
 			// Zapis poprzedniego punktu
 			x_prev = Xopt.x;
 			// Aktualizacja punktu w x
 			Xopt.x = Xopt.x + h * d;
 			// Obliczenie wartości funkcji celu w nowym punkcie
 			Xopt.y = Xopt.fit_fun(ff, ud1, ud2);
-			i++;
+
 			// Sprawdzenie warunku stopu
 			norm_diff = norm(Xopt.x - x_prev);
-			if (norm_diff < epsilon)
+
+			if (norm_diff < epsilon || solution::f_calls > Nmax || solution::g_calls > Nmax || solution::H_calls > Nmax)
 			{
-				Xopt.flag = 0; // Sukces
-				break;
-			}
-			if (solution::f_calls > Nmax)
-			{
-				Xopt.flag = -1; // Przekroczono maksymalną liczbę wywołań funkcji celu
-				break;
-			}
-			if (solution::g_calls > Nmax)
-			{
-				Xopt.flag = -1; // Przekroczono maksymalną liczbę wywołań gradientu
-				break;
-			}
-			if (solution::H_calls > Nmax)
-			{
-				Xopt.flag = -1; // Przekroczono maksymalną liczbę wywołań gradientu
+				Xopt.flag = (norm_diff < epsilon) ? 0 : -1;
 				break;
 			}
 		} while (true);
