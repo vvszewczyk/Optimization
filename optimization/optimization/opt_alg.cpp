@@ -660,7 +660,7 @@ solution SD(matrix(*ff)(matrix, matrix, matrix), matrix(*gf)(matrix, matrix, mat
 		solution Xopt;
 		Xopt.x = x0;
 		Xopt.y = Xopt.fit_fun(ff, ud1, ud2); // Wartość funkcji celu w punkcie początkowym
-		cout << "Xopt.y check 1" << endl;
+		//cout << "Xopt.y check 1" << endl;
 		matrix x_prev;
 		double norm_diff;
 
@@ -668,11 +668,13 @@ solution SD(matrix(*ff)(matrix, matrix, matrix), matrix(*gf)(matrix, matrix, mat
 		{
 			// Gradient w punkcie x
 			matrix grad = Xopt.grad(gf, ud1, ud2);
-			cout << "grad check" << endl;
+			std::cout << "\nDEBUG: GRAD "<< grad << std::endl;
 			// Kierunek d = -gradient
 			matrix d = -grad;
+			std::cout << "\nDEBUG: d " << d << std::endl;
 			// Wersja stałokrokowa
 			double h = h0;
+			std::cout << "\nDEBUG: h " << h << std::endl;
 
 			// Wersja zmiennokrokowa
 			if (h0 < 0)
@@ -692,12 +694,16 @@ solution SD(matrix(*ff)(matrix, matrix, matrix), matrix(*gf)(matrix, matrix, mat
 			}
 			// Zapis poprzedniego punktu
 			x_prev = Xopt.x;
+			std::cout << "\nDEBUG: Xopt.x \n" << Xopt.x << std::endl;
 			// Aktualizacja punktu w x
+
+			matrix hd = h * d;
+			std::cout << "\nDEBUG: hd \n" << hd << std::endl;
 			Xopt.x = Xopt.x + h * d;
-			cout << "check" << endl;
+			cout << "Xopt.x: "<< Xopt.x << endl;
 			// Obliczenie wartości funkcji celu w nowym punkcie
 			Xopt.y = Xopt.fit_fun(ff, ud1, ud2);
-			cout << "Xopt.y check 2" << endl;
+			//cout << "Xopt.y check 2" << endl;
 			// Sprawdzenie warunku stopu
 			norm_diff = norm(Xopt.x - x_prev);
 			// Wyniki

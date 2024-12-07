@@ -475,13 +475,6 @@ matrix computeGradient(matrix theta, matrix X, matrix Y) {
 	return grad;
 }
 
-
-
-
-
-
-
-
 double computeAccuracy(matrix X, matrix Y, matrix theta) {
 	int correct = 0;
 	int* size_X = get_size(X);  // Pobierz rozmiary X
@@ -504,9 +497,3 @@ double computeAccuracy(matrix X, matrix Y, matrix theta) {
 
 	return (double)correct / m * 100;  // Procent poprawnie sklasyfikowanych przypadków
 }
-
-
-
-
-
-

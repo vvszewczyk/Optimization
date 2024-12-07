@@ -647,7 +647,7 @@ void lab4()
 	vector<double> step_sizes = { 0.01, 0.001, 0.0001 };  // Długości kroków
 
 	// Tworzymy macierz początkowych wartości (theta = [0, 0, 0])
-	matrix x0(n, 1, 0.0);
+	matrix x0(m, 1, 0.0);
 
 	vector<vector<double>> results;  // Wyniki do zapisania w pliku CSV
 
