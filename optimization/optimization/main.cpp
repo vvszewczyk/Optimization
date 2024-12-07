@@ -10,6 +10,8 @@ Data ostatniej modyfikacji: 19.09.2023
 
 #include"opt_alg.h"
 #include <random>
+#include <vector>
+
 
 #ifndef M_PI
 #define M_PI 3.14159265358979323846
@@ -24,6 +26,115 @@ void lab4();
 void lab5();
 void lab6();
 
+void writeResultsToCSV(const string& filename, const vector<vector<double>>& results) {
+	ofstream outFile(filename);
+
+	// Nagłówki kolumn
+	outFile << "Długość kroku,θ0*,θ1*,θ2*,J(θ*),P(θ*),g_calls" << endl;
+
+	// Zapis wyników
+	for (const auto& result : results) {
+		outFile << result[0] << ","      // Długość kroku
+			<< result[1] << ","      // θ0
+			<< result[2] << ","      // θ1
+			<< result[3] << ","      // θ2
+			<< result[4] << ","      // J(θ*)
+			<< result[5] << ","      // P(θ*)
+			<< result[6] << endl;    // g_calls
+	}
+
+	outFile.close();
+	cout << "Wyniki zapisane do pliku: " << filename << endl;
+}
+
+
+string trim(const string& value) {
+	size_t start = value.find_first_not_of(" \t\n\r");
+	size_t end = value.find_last_not_of(" \t\n\r");
+	return (start == string::npos) ? "" : value.substr(start, end - start + 1);
+}
+
+matrix loadDataToMatrix(const string& filename, int rows, int cols) {
+	matrix m(rows, cols, 0.0);  // Tworzymy macierz o wymiarach rows x cols
+	ifstream file(filename);
+
+	if (!file.is_open()) {
+		cerr << "Nie mozna otworzyc pliku: " << filename << endl;
+		return m;  // Zwraca pustą macierz, jeśli nie udało się otworzyć pliku
+	}
+
+	string line;
+	int row = 0;
+
+	while (getline(file, line) && row < rows) {
+		stringstream ss(line);
+		string value;
+		int col = 0;
+		while (getline(ss, value, ';') && col < cols) {
+			value = trim(value);  // Usuwamy ewentualne białe znaki
+			try {
+				if (!value.empty()) {
+					m(row, col) = stod(value);  // Konwertujemy na double i zapisujemy w macierzy
+					col++;
+				}
+			}
+			catch (const std::invalid_argument& e) {
+				cerr << "Niepoprawna liczba: " << value << endl;
+			}
+			catch (const std::out_of_range& e) {
+				cerr << "Liczba poza zakresem: " << value << endl;
+			}
+		}
+		row++;
+	}
+
+	file.close();
+	return m;
+}
+std::string trim1(const std::string& str) {
+	size_t first = str.find_first_not_of(" \t\n\r\f\v");
+	size_t last = str.find_last_not_of(" \t\n\r\f\v");
+	return (first == std::string::npos || last == std::string::npos) ? "" : str.substr(first, last - first + 1);
+}
+matrix loadDataToMatrix1(const std::string& filename, int rows) {
+	matrix m(rows, 1, 0.0);  // Tworzymy macierz o wymiarach rows x 1
+	std::ifstream file(filename);
+
+	if (!file.is_open()) {
+		std::cerr << "Nie mozna otworzyc pliku: " << filename << std::endl;
+		return m;  // Zwraca pustą macierz, jeśli nie udało się otworzyć pliku
+	}
+
+	std::string line;
+	int row = 0;
+
+	// Pętla po liniach w pliku
+	while (getline(file, line) && row < rows) {
+		std::stringstream ss(line);
+		std::string value;
+
+		// Pętla po wszystkich wartościach w jednej linii
+		while (getline(ss, value, ';')) {  // Rozdzielamy po średnikach
+			value = trim(value);  // Usuwamy ewentualne białe znaki
+
+			try {
+				if (!value.empty()) {
+					m(row, 0) = std::stod(value);  // Konwertujemy na double i zapisujemy w macierzy
+					row++;  // Zwiększamy numer wiersza
+				}
+			}
+			catch (const std::invalid_argument& e) {
+				std::cerr << "Niepoprawna liczba: " << value << std::endl;
+			}
+			catch (const std::out_of_range& e) {
+				std::cerr << "Liczba poza zakresem: " << value << std::endl;
+			}
+		}
+	}
+
+	file.close();
+	return m;
+}
 
 int main()
 {
@@ -440,6 +551,7 @@ void lab3()
 
 void lab4()
 {
+	/*
 	// Parametry
 	double epsilon = 1e-6;
 	int Nmax = 1000;
@@ -520,11 +632,63 @@ void lab4()
 	results_file_Newton.close();
 
 	std::cout << "Wyniki zapisane w output/lab4/ do plików lab4_SD_results.csv, lab4_CG_results.csv i lab4_Newton_results.csv\n";
+	*/
+	//PROBLEM RZECZYWISTU
+	int m = 3;  // Liczba przykładów
+	int n = 100; // Liczba cech w X (zakładając 80 cech)
+
+	// Wczytujemy dane
+	matrix X = loadDataToMatrix("XData.txt", m, n);
+	matrix Y = loadDataToMatrix1("YData.txt", n);  // Tylko 1 kolumna dla Y
+
+	// Parametry optymalizacji
+	double epsilon = 1e-6;  // Tolerancja
+	int Nmax = 1000;        // Maksymalna liczba iteracji
+	vector<double> step_sizes = { 0.01, 0.001, 0.0001 };  // Długości kroków
+
+	// Tworzymy macierz początkowych wartości (theta = [0, 0, 0])
+	matrix x0(n, 1, 0.0);
+
+	vector<vector<double>> results;  // Wyniki do zapisania w pliku CSV
+
+	double J_theta = m2d(logisticCostFunction(x0, X, Y));
+	cout << "J(theta) = " << J_theta << endl;
+
+	matrix grad = computeGradient(x0, X, Y);
+	cout << "Gradient J(theta):" << endl;
+	for (int i = 0; i < get_size(grad)[0]; ++i) {
+		cout << "grad(" << i << ") = " << grad(i) << endl;
+	}
+
+	// Uruchamiamy optymalizację dla każdej długości kroku
+	for (double h0 : step_sizes) {
+		// Spadek gradientu (SD)
+		solution CG_result = SD(logisticCostFunction, computeGradient, x0, h0, epsilon, Nmax, X, Y);
+		double accuracy_SD = computeAccuracy(X, Y, CG_result.x);  // Obliczanie dokładności
+
+		// Zapisujemy wyniki do tabeli
+		vector<double> row;  // Tworzymy pusty wektor typu std::vector<double>
+
+		// Dodajemy elementy do wektora
+		row.push_back(h0);  // Długość kroku
+		row.push_back(m2d(CG_result.x(0, 0)));  // θ0
+		row.push_back(m2d(CG_result.x(1, 0)));  // θ1
+		row.push_back(m2d(CG_result.x(2, 0)));  // θ2
+		row.push_back(m2d(logisticCostFunction(CG_result.x, X, Y)));  // J(θ*)
+		row.push_back(accuracy_SD);  // P(θ*)
+		row.push_back(static_cast<double>(solution::g_calls));  // g_calls jako double
+		// Dodajemy row (std::vector<double>) do results
+		results.push_back(row);
+
+
+
+	}
+
+	// Zapisujemy wyniki do pliku CSV
+	writeResultsToCSV("optimization_results.csv", results);
+	cout << "Wyniki zapisane do pliku optimization_results.csv" << endl;
 }
-
-
-
-
+	
 void lab5()
 {
 

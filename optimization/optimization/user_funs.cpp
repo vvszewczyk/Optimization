@@ -387,3 +387,126 @@ matrix hf4T(matrix _x, matrix _ud1, matrix _ud2) // hessian funkcji celu
 
 	return hessian;
 }
+
+double sigmoid(matrix X, matrix theta)
+{
+	double z = 0.0;
+	int* size = get_size(X);  // Pobierz rozmiar macierzy X
+	int n = size[1];  // Liczba kolumn w macierzy X (liczba cech)
+
+	// Obliczamy iloczyn skalarny X * theta
+	for (int i = 0; i < n; ++i)
+	{
+		z += X(0, i) * theta(i, 0);  // Iloczyn skalarny
+	}
+
+	// Zwracamy wynik funkcji sigmoidalnej
+	return 1.0 / (1.0 + std::exp(-z));  // Sigmoid
+}
+
+matrix logisticCostFunction(matrix x, matrix ud1, matrix ud2)
+{
+	// Używamy get_size() do pobrania rozmiarów macierzy
+	int* size = get_size(ud1);
+	int m = size[0];  // Liczba wierszy (przykładów)
+	int n = size[1];  // Liczba kolumn (cech)
+
+	matrix cost(1, 1, 0.0);  // Zainicjalizuj koszt na 0.0
+
+	// Iteracja po wszystkich przykładach
+	for (int i = 0; i < m; ++i)
+	{
+		// Wektor cech (1 x n) - i-ty wiersz z macierzy ud1
+		matrix xi(1, n);
+		for (int j = 0; j < n; ++j) {
+			xi(0, j) = ud1(i, j);  // Pobierz i-ty wiersz z X (wektor cech)
+		}
+
+		// Wektor etykiety (1 x 1) - i-ty wiersz z macierzy ud2
+		matrix yi(1, 1);
+		yi(0, 0) = ud2(i, 0);  // Pobierz i-ty wiersz z Y (etykieta)
+
+		// Obliczamy wartość funkcji sigmoidalnej
+		double h = sigmoid(xi, x);  // Wartość funkcji sigmoidalnej
+
+		// Oblicz koszt dla tego przykładu
+		double cost_value = -yi(0, 0) * std::log(h) - (1 - yi(0, 0)) * std::log(1 - h);
+		cost(0, 0) += cost_value;  // Dodaj koszt dla tego przykładu
+	}
+
+	cost = cost / m;  // Podziel przez liczbę przykładów (średni koszt)
+	return cost;
+}
+
+matrix computeGradient(matrix theta, matrix X, matrix Y) {
+	matrix grad(3, 1, 0.0);  // Inicjalizacja gradientu (3 x 1)
+	int m = 100;  // Liczba przykładów (100)
+
+	// Iteracja po wszystkich próbkach (po wierszach w X)
+	for (int i = 0; i < m; ++i) {
+		matrix xi(3, 1, 0.0);  // Wektor cech i-tego przykładu (3 x 1)
+
+		// Pobranie cech i-tego przykładu (wiersz z X)
+		for (int j = 0; j < 3; ++j) {  // j - indeks cechy
+			xi(j, 0) = X(j, i);  // Wypełniamy xi cechami z i-tego wiersza X (X(j, i))
+		}
+
+		// Obliczanie wartości funkcji sigmoidalnej dla tej próbki
+		double z = 0.0;
+		for (int j = 0; j < 3; ++j) {  // j - indeks cechy
+			z += xi(j, 0) * theta(j, 0);  // Iloczyn skalarny (z = theta^T * X)
+		}
+
+		// Obliczanie funkcji sigmoidalnej (hipotezy) h(x_i)
+		double sigm = 1.0 / (1.0 + std::exp(-z));  // Sigmoid (hipoteza h(x_i))
+
+		// Prawdziwa etykieta y_i z Y
+		double yi = Y(i, 0);
+
+		// Dodajemy składnik do gradientu dla każdej cechy
+		for (int j = 0; j < 3; ++j) {  // j - indeks cechy
+			double sklad = sigm - yi;  // Różnica między hipotezą a etykietą
+			grad(j) += sklad * xi(j, 0);  // Gradient dla każdej cechy
+		}
+	}
+
+	// Dzielenie przez liczbę przykładów (średni gradient)
+	grad = grad / m;
+	return grad;
+}
+
+
+
+
+
+
+
+
+double computeAccuracy(matrix X, matrix Y, matrix theta) {
+	int correct = 0;
+	int* size_X = get_size(X);  // Pobierz rozmiary X
+	int m = size_X[0];  // Liczba przykładów (wierszy w X)
+
+	// Iteracja po wszystkich przykładach
+	for (int i = 0; i < m; ++i) {
+		matrix xi = get_row(X, i);  // Wektor cech i-tego przykładu
+		double h = sigmoid(xi, theta);  // Obliczamy hipotezę h(x_i)
+
+		// Przewidywana etykieta (1, jeśli h >= 0.5, inaczej 0)
+		int predicted = (h >= 0.5) ? 1 : 0;
+		int actual = Y(i, 0);  // Rzeczywista etykieta y_i
+
+		// Jeśli przewidywanie jest poprawne, zwiększamy licznik
+		if (predicted == actual) {
+			correct++;
+		}
+	}
+
+	return (double)correct / m * 100;  // Procent poprawnie sklasyfikowanych przypadków
+}
+
+
+
+
+
+

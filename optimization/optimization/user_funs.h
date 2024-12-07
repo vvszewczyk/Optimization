@@ -19,3 +19,8 @@ matrix f2(matrix, matrix = NAN, matrix = NAN);
 matrix ff4T(matrix x, matrix, matrix);
 matrix gf4T(matrix x, matrix, matrix);
 matrix hf4T(matrix = NAN, matrix = NAN, matrix = NAN);
+double sigmoid(matrix X, matrix theta);
+matrix logisticCostFunction(matrix x, matrix ud1, matrix ud2);
+matrix computeGradient(matrix X, matrix Y, matrix theta);
+matrix computeHessian(matrix X, matrix Y, matrix theta);
+double computeAccuracy(matrix X, matrix Y, matrix theta);
