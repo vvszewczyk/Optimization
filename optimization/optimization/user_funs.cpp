@@ -407,34 +407,29 @@ double sigmoid(matrix X, matrix theta)
 matrix logisticCostFunction(matrix x, matrix ud1, matrix ud2)
 {
 	// Używamy get_size() do pobrania rozmiarów macierzy
-	int* size = get_size(ud1);
-	int m = size[0];  // Liczba wierszy (przykładów)
-	int n = size[1];  // Liczba kolumn (cech)
-
 	matrix cost(1, 1, 0.0);  // Zainicjalizuj koszt na 0.0
 
-	// Iteracja po wszystkich przykładach
-	for (int i = 0; i < m; ++i)
+	for (int i = 0; i < 100; ++i)
 	{
-		// Wektor cech (1 x n) - i-ty wiersz z macierzy ud1
-		matrix xi(1, n);
-		for (int j = 0; j < n; ++j) {
-			xi(0, j) = ud1(i, j);  // Pobierz i-ty wiersz z X (wektor cech)
+		matrix xi(3, 1);
+		for (int j = 0; j < 3; ++j) {
+			xi(j, 0) = ud1(j, i); 
+		}
+		matrix yi(1, 1, 0.0);
+		yi(0, 0) = ud2(i, 0);  
+
+		double z = 0.0;
+		for (int j = 0; j < 3; ++j) {  
+			z += xi(j, 0) * x(j, 0);  
 		}
 
-		// Wektor etykiety (1 x 1) - i-ty wiersz z macierzy ud2
-		matrix yi(1, 1);
-		yi(0, 0) = ud2(i, 0);  // Pobierz i-ty wiersz z Y (etykieta)
+		double sigm = 1.0 / (1.0 + std::exp(-z));  
 
-		// Obliczamy wartość funkcji sigmoidalnej
-		double h = sigmoid(xi, x);  // Wartość funkcji sigmoidalnej
-
-		// Oblicz koszt dla tego przykładu
-		double cost_value = -yi(0, 0) * std::log(h) - (1 - yi(0, 0)) * std::log(1 - h);
-		cost(0, 0) += cost_value;  // Dodaj koszt dla tego przykładu
+		double cost_value = -yi(0, 0) * std::log(sigm) - (1 - yi(0, 0)) * std::log(1 - sigm);
+		cost(0, 0) += cost_value;  
 	}
 
-	cost = cost / m;  // Podziel przez liczbę przykładów (średni koszt)
+	cost = cost / 100;  
 	return cost;
 }
 

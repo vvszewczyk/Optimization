@@ -647,7 +647,7 @@ void lab4()
 	vector<double> step_sizes = { 0.01, 0.001, 0.0001 };  // Długości kroków
 
 	// Tworzymy macierz początkowych wartości (theta = [0, 0, 0])
-	matrix x0(m, 1, 0.0);
+	matrix x0(3, 1, 0.0);
 
 	vector<vector<double>> results;  // Wyniki do zapisania w pliku CSV
 
@@ -664,6 +664,7 @@ void lab4()
 	for (double h0 : step_sizes) {
 		// Spadek gradientu (SD)
 		solution CG_result = SD(logisticCostFunction, computeGradient, x0, h0, epsilon, Nmax, X, Y);
+		cout << "xpp1" << endl;
 		double accuracy_SD = computeAccuracy(X, Y, CG_result.x);  // Obliczanie dokładności
 
 		// Zapisujemy wyniki do tabeli

@@ -657,6 +657,7 @@ solution SD(matrix(*ff)(matrix, matrix, matrix), matrix(*gf)(matrix, matrix, mat
 {
 	try
 	{
+		cout << "xpp1" << endl;
 		solution Xopt;
 		Xopt.x = x0;
 		Xopt.y = Xopt.fit_fun(ff, ud1, ud2); // Wartość funkcji celu w punkcie początkowym
