@@ -408,6 +408,7 @@ matrix logisticCostFunction(matrix x, matrix ud1, matrix ud2)
 {
 	// Używamy get_size() do pobrania rozmiarów macierzy
 	matrix cost(1, 1, 0.0);  // Zainicjalizuj koszt na 0.0
+	//std::cout << "DEBUG: cost " << cost << std::endl;
 
 	for (int i = 0; i < 100; ++i)
 	{
@@ -422,14 +423,29 @@ matrix logisticCostFunction(matrix x, matrix ud1, matrix ud2)
 		for (int j = 0; j < 3; ++j) {  
 			z += xi(j, 0) * x(j, 0);  
 		}
+		//std::cout << "DEBUG: z \n" << z << std::endl;
 
 		double sigm = 1.0 / (1.0 + std::exp(-z));  
 
-		double cost_value = -yi(0, 0) * std::log(sigm) - (1 - yi(0, 0)) * std::log(1 - sigm);
-		cost(0, 0) += cost_value;  
+		if (sigm < 1e-15) {
+			sigm = 1e-15;
+		}
+		else if (sigm > 1 - 1e-15) {
+			sigm = 1 - 1e-15;
+		}
+		//std::cout << "DEBUG: yi \n" << yi(0,0) << std::endl;
+		/*std::cout << "DEBUG: std::log(sigm) \n" << std::log(sigm) << std::endl;
+		std::cout << "DEBUG: 1 - yi(0, 0) \n" << 1 - yi(0, 0) << std::endl;
+		std::cout << "DEBUG: std::log(1 - sigm) \n" << std::log(1 - sigm) << std::endl;*/
+		double cost_value = (yi(0, 0) * std::log(sigm)) + ((1 - yi(0, 0)) * std::log(1 - sigm));
+		//std::cout << "DEBUG: cost_value \n" << cost_value << std::endl;
+		cost(0, 0) += cost_value;
+		
 	}
 
-	cost = cost / 100;  
+	
+	cost = -cost / 100.0;  
+	
 	return cost;
 }
 

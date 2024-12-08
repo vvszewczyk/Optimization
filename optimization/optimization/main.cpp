@@ -551,11 +551,10 @@ void lab3()
 
 void lab4()
 {
-	/*
 	// Parametry
 	double epsilon = 1e-6;
 	int Nmax = 1000;
-	std::vector<double> h_values = { 0.05, 0.12 };
+	std::vector<double> h_values = { 0.05, 0.12, -1};
 	// std::vector<double> h_values = { -1.0 }; // for testing golden separetion 
 	std::string delimiter = ",";
 
@@ -632,63 +631,66 @@ void lab4()
 	results_file_Newton.close();
 
 	std::cout << "Wyniki zapisane w output/lab4/ do plików lab4_SD_results.csv, lab4_CG_results.csv i lab4_Newton_results.csv\n";
-	*/
-	//PROBLEM RZECZYWISTU
-	int m = 3;  // Liczba przykładów
-	int n = 100; // Liczba cech w X (zakładając 80 cech)
+	
+	////PROBLEM RZECZYWISTU
+	//int m = 3;  // Liczba przykładów
+	//int n = 100; // Liczba cech w X (zakładając 80 cech)
 
-	// Wczytujemy dane
-	matrix X = loadDataToMatrix("XData.txt", m, n);
-	matrix Y = loadDataToMatrix1("YData.txt", n);  // Tylko 1 kolumna dla Y
+	//// Wczytujemy dane
+	//matrix X = loadDataToMatrix("XData.txt", m, n);
+	//matrix Y = loadDataToMatrix1("YData.txt", n);  // Tylko 1 kolumna dla Y
 
-	// Parametry optymalizacji
-	double epsilon = 1e-6;  // Tolerancja
-	int Nmax = 1000;        // Maksymalna liczba iteracji
-	vector<double> step_sizes = { 0.01, 0.001, 0.0001 };  // Długości kroków
+	//// Parametry optymalizacji
+	//double epsilon = 1e-6;  // Tolerancja
+	//int Nmax = 1000;        // Maksymalna liczba iteracji
+	//vector<double> step_sizes = { 0.01, 0.001, 0.0001 };  // Długości kroków
 
-	// Tworzymy macierz początkowych wartości (theta = [0, 0, 0])
+	//// Tworzymy macierz początkowych wartości (theta = [0, 0, 0])
 
-	matrix x0(3, 1, 0.0);
+	//matrix x0(3, 1, 0.0);
 
-	vector<vector<double>> results;  // Wyniki do zapisania w pliku CSV
+	//vector<vector<double>> results;  // Wyniki do zapisania w pliku CSV
 
-	double J_theta = m2d(logisticCostFunction(x0, X, Y));
-	cout << "J(theta) = " << J_theta << endl;
+	///*double J_theta = m2d(logisticCostFunction(x0, X, Y));
+	//cout << "J(theta) = " << J_theta << endl;
 
-	matrix grad = computeGradient(x0, X, Y);
-	cout << "Gradient J(theta):" << endl;
-	for (int i = 0; i < get_size(grad)[0]; ++i) {
-		cout << "grad(" << i << ") = " << grad(i) << endl;
-	}
+	//matrix grad = computeGradient(x0, X, Y);
+	//cout << "Gradient J(theta):" << endl;
+	//for (int i = 0; i < get_size(grad)[0]; ++i) {
+	//	cout << "grad(" << i << ") = " << grad(i) << endl;
+	//}*/
 
-	// Uruchamiamy optymalizację dla każdej długości kroku
-	for (double h0 : step_sizes) {
-		// Spadek gradientu (SD)
-		solution CG_result = SD(logisticCostFunction, computeGradient, x0, h0, epsilon, Nmax, X, Y);
-		double accuracy_SD = computeAccuracy(X, Y, CG_result.x);  // Obliczanie dokładności
+	//// Uruchamiamy optymalizację dla każdej długości kroku
+	//for (double h0 : step_sizes) {
+	//	// Spadek gradientu (SD)
+	//	std::cout << "DEBUG: x0 " << x0 << std::endl;
+	//	solution CG_result = CG(logisticCostFunction, computeGradient, x0, h0, epsilon, Nmax, X, Y);
+	//	std::cout << "DEBUG: CG_result " << CG_result << std::endl;
+	//	//std::cout << "DEBUG: CG_result: " << CG_result << std::endl;
+	//	double accuracy_SD = computeAccuracy(X, Y, CG_result.x);  // Obliczanie dokładności
 
-		// Zapisujemy wyniki do tabeli
-		vector<double> row;  // Tworzymy pusty wektor typu std::vector<double>
+	//	// Zapisujemy wyniki do tabeli
+	//	vector<double> row;  // Tworzymy pusty wektor typu std::vector<double>
 
-		// Dodajemy elementy do wektora
-		row.push_back(h0);  // Długość kroku
-		row.push_back(m2d(CG_result.x(0, 0)));  // θ0
-		row.push_back(m2d(CG_result.x(1, 0)));  // θ1
-		row.push_back(m2d(CG_result.x(2, 0)));  // θ2
-		row.push_back(m2d(logisticCostFunction(CG_result.x, X, Y)));  // J(θ*)
-		row.push_back(accuracy_SD);  // P(θ*)
-		row.push_back(static_cast<double>(solution::g_calls));  // g_calls jako double
-		solution::clear_calls;
-		// Dodajemy row (std::vector<double>) do results
-		results.push_back(row);
+	//	// Dodajemy elementy do wektora
+	//	row.push_back(h0);  // Długość kroku
+	//	row.push_back(m2d(CG_result.x(0, 0)));  // θ0
+	//	row.push_back(m2d(CG_result.x(1, 0)));  // θ1
+	//	row.push_back(m2d(CG_result.x(2, 0)));  // θ2
+	//	row.push_back(m2d(logisticCostFunction(CG_result.x, X, Y)));  // J(θ*)
+	//	row.push_back(accuracy_SD);  // P(θ*)
+	//	row.push_back(static_cast<double>(solution::g_calls));  // g_calls jako double
+	//	solution::clear_calls();
+	//	// Dodajemy row (std::vector<double>) do results
+	//	results.push_back(row);
 
 
 
-	}
+	//}
 
-	// Zapisujemy wyniki do pliku CSV
-	writeResultsToCSV("optimization_results.csv", results);
-	cout << "Wyniki zapisane do pliku optimization_results.csv" << endl;
+	//// Zapisujemy wyniki do pliku CSV
+	//writeResultsToCSV("optimization_results.csv", results);
+	//cout << "Wyniki zapisane do pliku optimization_results.csv" << endl;
 }
 	
 void lab5()

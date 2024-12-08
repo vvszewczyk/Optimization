@@ -657,7 +657,7 @@ solution SD(matrix(*ff)(matrix, matrix, matrix), matrix(*gf)(matrix, matrix, mat
 {
 	try
 	{
-		cout << "xpp1" << endl;
+		//cout << "xpp1" << endl;
 		solution Xopt;
 		Xopt.x = x0;
 		Xopt.y = Xopt.fit_fun(ff, ud1, ud2); // Wartość funkcji celu w punkcie początkowym
@@ -669,13 +669,13 @@ solution SD(matrix(*ff)(matrix, matrix, matrix), matrix(*gf)(matrix, matrix, mat
 		{
 			// Gradient w punkcie x
 			matrix grad = Xopt.grad(gf, ud1, ud2);
-			std::cout << "\nDEBUG: GRAD "<< grad << std::endl;
+			//std::cout << "\nDEBUG: GRAD "<< grad << std::endl;
 			// Kierunek d = -gradient
 			matrix d = -grad;
-			std::cout << "\nDEBUG: d " << d << std::endl;
+			//std::cout << "\nDEBUG: d " << d << std::endl;
 			// Wersja stałokrokowa
 			double h = h0;
-			std::cout << "\nDEBUG: h " << h << std::endl;
+			//std::cout << "\nDEBUG: h " << h << std::endl;
 
 			// Wersja zmiennokrokowa
 			if (h0 < 0)
@@ -692,16 +692,17 @@ solution SD(matrix(*ff)(matrix, matrix, matrix), matrix(*gf)(matrix, matrix, mat
 				double* expansionResults = expansion(ff, 0.0, 0.05, 1.2, Nmax, ud1, ud2_temp);
 				solution sol_Golden = golden(ff4T, expansionResults[0], expansionResults[1], epsilon, Nmax, ud1, ud2_temp);
 			    h = m2d(sol_Golden.x);
+				std::cout << "Aktualny krok h: " << h << std::endl;
 			}
 			// Zapis poprzedniego punktu
 			x_prev = Xopt.x;
-			std::cout << "\nDEBUG: Xopt.x \n" << Xopt.x << std::endl;
+			//std::cout << "\nDEBUG: Xopt.x \n" << Xopt.x << std::endl;
 			// Aktualizacja punktu w x
 
 			matrix hd = h * d;
-			std::cout << "\nDEBUG: hd \n" << hd << std::endl;
+			//std::cout << "\nDEBUG: hd \n" << hd << std::endl;
 			Xopt.x = Xopt.x + h * d;
-			cout << "Xopt.x: "<< Xopt.x << endl;
+			//cout << "Xopt.x: "<< Xopt.x << endl;
 			// Obliczenie wartości funkcji celu w nowym punkcie
 			Xopt.y = Xopt.fit_fun(ff, ud1, ud2);
 			//cout << "Xopt.y check 2" << endl;
@@ -732,16 +733,28 @@ solution CG(matrix(*ff)(matrix, matrix, matrix), matrix(*gf)(matrix, matrix, mat
 		int i = 0;
 		Xopt.x = x0;
 		Xopt.y = Xopt.fit_fun(ff, ud1, ud2); // Wartość funkcji celu w punkcie początkowym
+		Xopt.flag = 0;
 		matrix g_prev = Xopt.grad(gf, ud1, ud2); // Gradient początkowy
 		matrix d_prev = -g_prev; // Kierunek początkowy przeciwny do gradientu
 		matrix x_prev;
 		double norm_diff;
 
+		/*std::cout << "DEBUG BEFORE LOOP: " << i
+			<< ", x: (" << Xopt.x(0, 0) << ", " << Xopt.x(1, 0) << ", " << Xopt.x(2,0)<<"), "
+			<< ", f(x): " << m2d(Xopt.y)
+			<< ", f_calls: " << solution::f_calls
+			<< ", g_calls: " << solution::g_calls
+			<< ", flag: " << Xopt.flag
+			<< std::endl;*/
+
 		do
 		{
 			x_prev = Xopt.x;
+			//std::cout << "DEBUG: x_prev: " << x_prev << std::endl;
+			
 			// Metoda stałokrokowa
 			double h = h0;
+			//std::cout << "DEBUG: h: " << h << std::endl;
 			// Metoda zmiennokrokowa (złoty podział)
 			if (h0 < 0)
 			{
@@ -760,14 +773,22 @@ solution CG(matrix(*ff)(matrix, matrix, matrix), matrix(*gf)(matrix, matrix, mat
 			Xopt.x = Xopt.x + (scale_h0 * d_prev);
 
 			Xopt.y = Xopt.fit_fun(ff, ud1, ud2);
+			/*std::cout << "DEBUG: Xopt.y: " << Xopt.y << std::endl;
+			std::cout << "DEBUG: i = " << i << std::endl;*/
 			i++;
 
 			matrix g_new = Xopt.grad(gf, ud1, ud2);
 
 			// Obliczenie współczynnika beta
-			double numerator = m2d(trans(g_new) * g_new); // g_new^T * g_new
-			double denominator = m2d(trans(g_prev) * g_prev); // g_prev^T * g_prev
+			double numerator = norm(g_new) * norm(g_new);
+			//std::cout << "DEBUG: numerator: " << numerator << std::endl;
+			double denominator = norm(g_prev) * norm(g_prev);
+			//std::cout << "DEBUG: denominator: " << denominator << std::endl;
 			double beta = numerator / denominator;
+			/*if(denominator != 0)
+			{
+				beta = numerator / denominator;
+			}*/
 
 			// Aktualizacja kierunku
 			matrix scale_beta(1, 1);
@@ -778,17 +799,17 @@ solution CG(matrix(*ff)(matrix, matrix, matrix), matrix(*gf)(matrix, matrix, mat
 			norm_diff = norm(Xopt.x - x_prev);
 
 			// Debug Print
-			if (i % 100 == 0 || norm_diff < epsilon) 
-			{ // Print co 100 iteracji lub na koniec
-				std::cout << "CG Iteracja: " << i
-					<< ", x: (" << Xopt.x(0, 0) << ", " << Xopt.x(1, 0) << ")"
-					<< ", f(x): " << m2d(Xopt.y)
-					<< ", norm_diff: " << norm_diff
-					<< ", f_calls: " << solution::f_calls
-					<< ", g_calls: " << solution::g_calls
-					<< ", flag: " << Xopt.flag
-					<< std::endl;
-			}
+			//if (i % 100 == 0 || norm_diff < epsilon) 
+			//{ // Print co 100 iteracji lub na koniec
+			//	std::cout << "CG Iteracja: " << i
+			//		<< ", x: (" << Xopt.x(0, 0) << ", " << Xopt.x(1, 0) << ", " << Xopt.x(2, 0) << "), "
+			//		<< ", f(x): " << m2d(Xopt.y)
+			//		<< ", norm_diff: " << norm_diff
+			//		<< ", f_calls: " << solution::f_calls
+			//		<< ", g_calls: " << solution::g_calls
+			//		<< ", flag: " << Xopt.flag
+			//		<< std::endl;
+			//}
 			g_prev = g_new;
 			d_prev = d_new;
 
