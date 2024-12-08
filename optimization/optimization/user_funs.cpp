@@ -472,16 +472,17 @@ matrix computeGradient(matrix theta, matrix X, matrix Y) {
 
 double computeAccuracy(matrix X, matrix Y, matrix theta) {
 	int correct = 0;
-	int* size_X = get_size(X);  // Pobierz rozmiary X
-	int m = size_X[0];  // Liczba przykładów (wierszy w X)
 
 	// Iteracja po wszystkich przykładach
-	for (int i = 0; i < m; ++i) {
-		matrix xi = get_row(X, i);  // Wektor cech i-tego przykładu
-		double h = sigmoid(xi, theta);  // Obliczamy hipotezę h(x_i)
-
-		// Przewidywana etykieta (1, jeśli h >= 0.5, inaczej 0)
-		int predicted = (h >= 0.5) ? 1 : 0;
+	for (int i = 0; i < 100; ++i) {
+		matrix xi(3, 1, 0.0);
+		double z = 0.0;
+		for (int j = 0; j < 3; ++j) {  // j - indeks cechy
+			z += xi(j, 0) * theta(j, 0);  // Iloczyn skalarny (z = theta^T * X)
+		}
+		double sigm = 1.0 / (1.0 + std::exp(-z));  // Sigmoid (hipoteza h(x_i))
+		
+		int predicted = (sigm >= 0.5) ? 1 : 0;
 		int actual = Y(i, 0);  // Rzeczywista etykieta y_i
 
 		// Jeśli przewidywanie jest poprawne, zwiększamy licznik
@@ -490,5 +491,5 @@ double computeAccuracy(matrix X, matrix Y, matrix theta) {
 		}
 	}
 
-	return (double)correct / m * 100;  // Procent poprawnie sklasyfikowanych przypadków
+	return (double)correct / 100 * 100;  // Procent poprawnie sklasyfikowanych przypadków
 }
