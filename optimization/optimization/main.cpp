@@ -91,56 +91,12 @@ matrix loadDataToMatrix(const string& filename, int rows, int cols) {
 	file.close();
 	return m;
 }
-std::string trim1(const std::string& str) {
-	size_t first = str.find_first_not_of(" \t\n\r\f\v");
-	size_t last = str.find_last_not_of(" \t\n\r\f\v");
-	return (first == std::string::npos || last == std::string::npos) ? "" : str.substr(first, last - first + 1);
-}
-matrix loadDataToMatrix1(const std::string& filename, int rows) {
-	matrix m(rows, 1, 0.0);  // Tworzymy macierz o wymiarach rows x 1
-	std::ifstream file(filename);
-
-	if (!file.is_open()) {
-		std::cerr << "Nie mozna otworzyc pliku: " << filename << std::endl;
-		return m;  // Zwraca pustą macierz, jeśli nie udało się otworzyć pliku
-	}
-
-	std::string line;
-	int row = 0;
-
-	// Pętla po liniach w pliku
-	while (getline(file, line) && row < rows) {
-		std::stringstream ss(line);
-		std::string value;
-
-		// Pętla po wszystkich wartościach w jednej linii
-		while (getline(ss, value, ';')) {  // Rozdzielamy po średnikach
-			value = trim(value);  // Usuwamy ewentualne białe znaki
-
-			try {
-				if (!value.empty()) {
-					m(row, 0) = std::stod(value);  // Konwertujemy na double i zapisujemy w macierzy
-					row++;  // Zwiększamy numer wiersza
-				}
-			}
-			catch (const std::invalid_argument& e) {
-				std::cerr << "Niepoprawna liczba: " << value << std::endl;
-			}
-			catch (const std::out_of_range& e) {
-				std::cerr << "Liczba poza zakresem: " << value << std::endl;
-			}
-		}
-	}
-
-	file.close();
-	return m;
-}
 
 int main()
 {
 	try
 	{
-		lab4();
+		lab5();
 	}
 	catch (string EX_INFO)
 	{
@@ -695,7 +651,72 @@ void lab4()
 	
 void lab5()
 {
+	// Parametry
+	double epsilon = 1e-6;
+	int Nmax = 10000;  // Maksymalna liczba wywołań funkcji celu
+	// Wagi (w) od 0 do 1 z krokiem 0.01
+	// Parametry a = {1,10,100}
 
+	std::vector<double> a_values = { 1.0, 10.0, 100.0 };
+
+	// Przygotowanie pliku do zapisu wyników
+	std::ofstream results_file("output/lab5/results_powell_test.csv");
+	results_file << "a,w,x1_opt,x2_opt,f1,f2,f_calls,flag\n";
+
+	// Generator liczb losowych dla punktu startowego
+	std::random_device rd;
+	std::mt19937 gen(rd());
+	std::uniform_real_distribution<> dis(-10.0, 10.0);
+
+	// Pętla po wartościach a
+	for (auto a_val : a_values) {
+		// Pętla po wagach w
+		for (int i = 0; i <= 100; i++) {
+			double w = i * 0.01;
+
+			// Losowy punkt startowy x0
+			matrix x0(2, 1);
+			x0(0, 0) = dis(gen);
+			x0(1, 0) = dis(gen);
+
+			// Ud1: tu przechowamy wagę w (ud1(0)) i parametr a (ud1(1))
+			// Zgodnie z założeniami z transkryptu:
+			// ud1(0) = waga, ud1(1) = a
+			matrix ud1(2, 1);
+			ud1(0) = w;
+			ud1(1) = a_val;
+
+			// ud2 pusty: ud2 będzie ustawiany w trakcie line search przez algorytm
+			matrix ud2;
+
+			// Czyścimy liczniki wywołań funkcji celu itp.
+			solution::clear_calls();
+
+			// Wywołujemy metodę Powella
+			solution sol = Powell(ff5T, x0, epsilon, Nmax, ud1, ud2);
+
+			// sol.x - optymalny punkt
+			// Sol.y - wartość funkcji celu (jedna liczba, bo w przypadku line search ff zwraca scalar)
+			// Ale my chcemy wypisać osobno f1 i f2. 
+			// Aby je otrzymać, wywołamy ff5T bez ud2 z aktualnym punktem oraz ud1.
+			// Wtedy ff5T zwraca wektor 2x1: [f1; f2].
+			matrix y_val = ff5T(sol.x, ud1, matrix());
+			double f1_val = y_val(0);
+			double f2_val = y_val(1);
+
+			results_file << a_val << ","
+				<< w << ","
+				<< sol.x(0, 0) << ","
+				<< sol.x(1, 0) << ","
+				<< f1_val << ","
+				<< f2_val << ","
+				<< solution::f_calls << ","
+				<< sol.flag << "\n";
+		}
+	}
+
+	results_file.close();
+	std::cout << "Wyniki zapisane w pliku results_powell_test.csv\n";
 }
   
 void lab6()

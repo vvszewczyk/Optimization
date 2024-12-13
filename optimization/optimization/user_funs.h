@@ -24,3 +24,4 @@ matrix logisticCostFunction(matrix x, matrix ud1, matrix ud2);
 matrix computeGradient(matrix X, matrix Y, matrix theta);
 matrix computeHessian(matrix X, matrix Y, matrix theta);
 double computeAccuracy(matrix X, matrix Y, matrix theta);
+matrix ff5T(matrix x, matrix = NAN, matrix = NAN);

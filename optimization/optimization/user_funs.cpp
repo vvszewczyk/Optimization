@@ -509,3 +509,56 @@ double computeAccuracy(matrix X, matrix Y, matrix theta) {
 
 	return (double)correct / 100 * 100;  // Procent poprawnie sklasyfikowanych przypadków
 }
+
+//LAB5
+//                    ud1 = [a]   ud2 = [x1, d1]
+//							[w]			[x2, d2]
+matrix ff5T(matrix x, matrix ud1, matrix ud2)
+{
+	matrix y;
+	// Sprawdzamy scenariusz:
+	if (isnan(ud2(0, 0)))
+	{
+		// Tutaj ud2 może być 1x1, więc nie odwołujemy się do ud2(0,1) ani ud2(1,0).
+		// Obliczamy normalnie f1, f2 w punkcie x.
+		double a = ud1(1);
+		double f1 = a * (pow(x(0) - 2, 2) + pow(x(1) - 2, 2));
+		double f2 = (1.0 / a) * (pow(x(0) + 2, 2) + pow(x(1) + 2, 2));
+		y = matrix(2, 1);
+		y(0, 0) = f1;
+		y(1, 0) = f2;
+	}
+	else
+	{
+		// Jesteśmy w line search, ud2 jest 2x2, możemy bezpiecznie odczytywać:
+		double w = ud1(0);
+		double a = ud1(1);
+		double step = x(0);
+
+		// Odczytujemy p_start i d
+		// Zakładamy, że ud2 jest 2x2: 
+		// wiersz 0: p_start, wiersz 1: d
+		// ud2(0,0), ud2(0,1) -> p_start x0, x1
+		// ud2(1,0), ud2(1,1) -> d0, d1
+		matrix p_start(2, 1), d(2, 1);
+		p_start(0, 0) = ud2(0, 0);
+		p_start(1, 0) = ud2(0, 1);
+
+		d(0, 0) = ud2(1, 0);
+		d(1, 0) = ud2(1, 1);
+
+		matrix new_point = p_start + d * step;
+
+		// Wywołujemy ff5T ponownie, ale teraz z ud2 = NaN (by nie wchodzić w line search)
+		matrix ud2_empty(2, 2, NAN);
+		matrix yt = ff5T(new_point, ud1, ud2_empty);
+
+		double f1 = yt(0);
+		double f2 = yt(1);
+		double F = w * f1 + (1.0 - w) * f2;
+
+		y = matrix(1, 1, F);
+	}
+	return y;
+}
+
