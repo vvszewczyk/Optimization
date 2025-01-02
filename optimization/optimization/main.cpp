@@ -695,14 +695,12 @@ void lab5()
 			// Wywołujemy metodę Powella
 			solution sol = Powell(ff5T, x0, epsilon, Nmax, ud1, ud2);
 
-			// sol.x - optymalny punkt
-			// Sol.y - wartość funkcji celu (jedna liczba, bo w przypadku line search ff zwraca scalar)
-			// Ale my chcemy wypisać osobno f1 i f2. 
-			// Aby je otrzymać, wywołamy ff5T bez ud2 z aktualnym punktem oraz ud1.
-			// Wtedy ff5T zwraca wektor 2x1: [f1; f2].
-			matrix y_val = ff5T(sol.x, ud1, matrix());
-			double f1_val = y_val(0);
-			double f2_val = y_val(1);
+			// Utwórz macierz 1x1 wypełnioną NaN, aby uzyskać f1 i f2
+			matrix ud2_empty(1, 1, std::numeric_limits<double>::quiet_NaN());
+			matrix y_val = ff5T(sol.x, ud1, ud2_empty);
+
+			double f1_val = y_val(0, 0);
+			double f2_val = y_val(1, 0);
 
 			results_file << a_val << ","
 				<< w << ","
