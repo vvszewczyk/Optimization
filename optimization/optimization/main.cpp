@@ -808,26 +808,21 @@ void lab5()
 		solution::f_calls = 0;
 		// Wywołujemy metodę Powella
 		solution sol = Powell(ff5R, x0, epsilon, Nmax, ud1, ud2NaN);
-		cout << "iter" << endl;
+
+		std::cout << sol << std::endl;
 		// Odczytujemy rozwiązanie
 		double l_star = sol.x(0, 0);
 		double d_star = sol.x(1, 0);
-		std::cout << sol << std::endl;
-		// Aby uzyskać (masa, ugięcie, naprężenie), ponownie wywołujemy ff5R(...) z ud2=NaN
-
-		double mass = sol.y(0, 0); // Masa już obliczona przez Powell
-		double deflection = sol.y(1, 0); // Masa już obliczona 
+		double mass = sol.y(0, 0);
+		double deflection = sol.y(1, 0);
 		double stress = sol.y(2, 0);
-
-		// Skalarna wartość funkcji celu
-		double f_val = sol.y(0, 0);
 		long calls = solution::f_calls;
 
-		l0 = l0 * 1000;
-		d0 = d0 * 1000;
-		l_star = l_star * 1000;
-		d_star = d_star * 1000;
-		deflection = deflection * 1000;
+		l0 *=  1000;
+		d0 *= 1000;
+		l_star *= 1000;
+		d_star *= 1000;
+		deflection *= 1000;
 
 		// Zapis do CSV
 		csv << l0 << ","   // l(0)

@@ -958,149 +958,80 @@ solution golden(matrix(*ff)(matrix, matrix, matrix), double a, double b, double 
 
 solution Powell(matrix(*ff)(matrix, matrix, matrix), matrix x0, double epsilon, int Nmax, matrix ud1, matrix ud2)
 {
-	try
-	{
+	try {
 		solution Xopt;
 		int n = get_len(x0);
 
-		// Baza kierunków: d1 = [1,0]^T, d2 = [0,1]^T
-		std::vector<matrix> d;
+		// Walidacja wymiarów
+		if (get_size(ud1)[0] != 1 || get_size(ud1)[1] != 1)
+			throw std::string("Powell: ud1 musi być macierzą 1x1.");
+		if (get_size(ud2)[0] != 1 || get_size(ud2)[1] != 1)
+			throw std::string("Powell: ud2 musi być macierzą 1x1.");
 
-		for (int i = 0; i < n; i++)
-		{
+		// Inicjalizacja bazy kierunków
+		std::vector<matrix> d;
+		for (int i = 0; i < n; i++) {
 			matrix direction(n, 1, 0.0);
 			direction(i, 0) = 1.0;
 			d.push_back(direction);
 		}
 
-		matrix x = x0;   // Punkt aktualny
-		int i = 0; // Licznik iteracji
+		matrix x = x0; // Punkt aktualny
+		int i = 0;     // Licznik iteracji
 
-		while (i < Nmax) 
-		{
+		while (i < Nmax) {
+			matrix p0 = x; // Aktualny punkt
 
-			matrix p0 = x; // p0(i) = x(i)
-
-			// Krok 4-8 z pseudokodu: przejście po kierunkach
-			for (int j = 0; j < n; j++) 
-			{
+			for (int j = 0; j < n; j++) {
 				// Przygotowanie ud2 dla line search:
-				// ud2 2x2: wiersz 0: punkt startowy, wiersz 1: kierunek
 				matrix ud2_line(2, n);
-				
-				for (int k = 0; k < n; k++)
-				{
+				for (int k = 0; k < n; k++) {
 					ud2_line(0, k) = x(k, 0);
 					ud2_line(1, k) = d[j](k, 0);
 				}
 
-				// Ekspansja, aby wyznaczyć przedział
+				// Sprawdzenie ud2_line
+				if (get_size(ud2_line)[0] != 2 || get_size(ud2_line)[1] != n)
+					throw std::string("Powell: ud2_line ma nieprawidłowe wymiary.");
+
+				// Ekspansja i złoty podział
 				double h0 = 0.0;
 				double step = 1.0;
 				double alpha = 1.2;
 				std::unique_ptr<double[]> interval(expansion(ff, h0, step, alpha, Nmax, ud1, ud2_line));
 				double a = interval[0];
 				double b = interval[1];
-
-				// Złoty podział
 				solution sol_line = golden(ff, a, b, epsilon, Nmax, ud1, ud2_line);
-				double h = m2d(sol_line.x);
 
 				// Aktualizacja punktu
-				for (int k = 0; k < n; k++)
-				{
+				double h = m2d(sol_line.x);
+				for (int k = 0; k < n; k++) {
 					x(k, 0) += d[j](k, 0) * h;
 				}
-				//x(0, 0) = std::max(0.2, std::min(1.0, x(0, 0)));
-				//x(1, 0) = std::max(0.01, std::min(0.05, x(1, 0)));
 			}
 
-			matrix pn = x; // pn(i) po przejściu wszystkich kierunków
-
-			// Sprawdzenie warunku stopu
+			// Warunek stopu
 			double norm_diff = 0.0;
-
-			for (int k = 0; k < n; k++)
-			{
-				norm_diff += std::pow(pn(k, 0) - p0(k, 0), 2);
+			for (int k = 0; k < n; k++) {
+				norm_diff += std::pow(x(k, 0) - p0(k, 0), 2);
 			}
-
-			norm_diff = std::sqrt(norm_diff);
-
-			if (norm_diff < epsilon) 
-			{
+			if (std::sqrt(norm_diff) < epsilon) {
 				Xopt.x = x;
-				// Wywołujemy ff z ud2 = NaN, aby otrzymać f1 i f2
-				matrix ud2_empty(1, 1, std::numeric_limits<double>::quiet_NaN());
-				Xopt.y = ff(x, ud1, ud2_empty);
+				matrix ud2_nan(1, 1, std::numeric_limits<double>::quiet_NaN());
+				Xopt.y = ff(x, ud1, ud2_nan);
 				Xopt.flag = 0;
 				return Xopt;
 			}
-
-			if (solution::f_calls > Nmax) 
-			{
-				Xopt.x = x;
-				matrix ud2_empty(1, 1, std::numeric_limits<double>::quiet_NaN());
-				Xopt.y = ff(x, ud1, ud2_empty);
-				Xopt.flag = -1;
-				return Xopt;
-			}
-
-			// Aktualizacja bazy kierunków
-			if (n > 1) 
-			{
-				for (int j = 0; j < n - 1; ++j) 
-				{
-					d[j] = d[j + 1];
-				}
-			}
-			matrix d_new(n, 1);
-			for (int k = 0; k < n; ++k) 
-			{
-				d_new(k, 0) = pn(k, 0) - p0(k, 0);
-			}
-			d[n - 1] = d_new;
-
-			// Wyznaczanie h_{n+1} wzdłuż nowego kierunku d_n
-			matrix ud2_new_line(2, n);
-			for (int k = 0; k < n; ++k) 
-			{
-				ud2_new_line(0, k) = pn(k, 0);
-				ud2_new_line(1, k) = d[n - 1](k, 0);
-			}
-
-
-			double h0_2 = 0.0;
-			double step_2 = 1.0;
-			double alpha_2 = 2.0;
-			std::unique_ptr<double[]> interval2(expansion(ff, h0_2, step_2, alpha_2, Nmax, ud1, ud2_new_line));
-			double a2 = interval2[0];
-			double b2 = interval2[1];
-
-			solution sol_line2 = golden(ff, a2, b2, epsilon, Nmax, ud1, ud2_new_line);
-			double h2 = m2d(sol_line2.x);
-
-			// Aktualizacja punktu
-			for (int k = 0; k < n; ++k) 
-			{
-				x(k, 0) += d[n - 1](k, 0) * h2;
-			}
-
 			i++;
 		}
-
-		// Teoretycznie nigdy tu nie dojdziemy, ale jakby co:
-		Xopt.x = x;
-		matrix ud2_empty(1, 1, std::numeric_limits<double>::quiet_NaN());
-		Xopt.y = ff(x, ud1, ud2_empty);
 		Xopt.flag = -1;
 		return Xopt;
 	}
-	catch (string ex_info) 
-	{
-		throw ("solution Powell(...):\n" + ex_info);
+	catch (std::string& ex_info) {
+		throw "Powell: " + ex_info;
 	}
 }
+
 
 
 solution EA(matrix(*ff)(matrix, matrix, matrix), int N, matrix lb, matrix ub, int mi, int lambda, matrix sigma0, double epsilon, int Nmax, matrix ud1, matrix ud2)

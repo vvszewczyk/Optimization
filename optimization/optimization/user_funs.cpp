@@ -597,100 +597,101 @@ void test_ff5T()
 }
 
 
-matrix ff5R(matrix x, matrix ud1, matrix ud2)
+matrix ff5R_impl(matrix x, matrix ud1, matrix ud2)
 {
-    // Rozróżniamy dwa przypadki:
+	matrix y;
+	// 1) Gdy ud2(0,0) jest NaN => zwracamy [masa; ugiecie; naprezenie]
+	if (std::isnan(ud2(0, 0)))
+	{
+		// Tutaj x ma wymiar (2x1): x(0,0) = l, x(1,0) = d
+		y = matrix(3, 1);
 
-    // 1) Gdy ud2(0,0) jest NaN => zwracamy [masa; ugiecie; naprezenie]
-    if (std::isnan(ud2(0, 0))) 
-    {
-        // Tutaj x ma wymiar (2x1): x(0,0) = l, x(1,0) = d
-        matrix y(3, 1);
+		double ro = 7800.0;   // kg/m^3
+		double P = 1e3;       // N
+		double E = 207e9;     // Pa
 
-        double ro = 7800.0;   // kg/m^3
-        double P = 1e3;       // N
-        double E = 207e9;     // Pa
+		double l = x(0, 0);   // [m]
+		double d = x(1, 0);   // [m]
 
-        double l = x(0, 0);   // [m]
-        double d = x(1, 0);   // [m]
+		// Masa:
+		double masa = ro * l * M_PI * std::pow(d, 2) / 4.0;
 
-        // Masa:
-        double masa = ro * l * M_PI * std::pow(d, 2) / 4.0;
+		// Ugięcie:
+		double ugiecie = 64.0 * P * std::pow(l, 3) / (3.0 * E * M_PI * std::pow(d, 4));
 
-        // Ugięcie:
-        double ugiecie = 64.0 * P * std::pow(l, 3) / (3.0 * E * M_PI * std::pow(d, 4));
+		// Naprężenie:
+		double sigma = 32.0 * P * l / (M_PI * std::pow(d, 3));
 
-        // Naprężenie:
-        double sigma = 32.0 * P * l / (M_PI * std::pow(d, 3));
+		y(0, 0) = masa;
+		y(1, 0) = ugiecie;
+		y(2, 0) = sigma;
+	}
+	else
+	{
+		// Poprawne wywołanie rekurencyjne z ud2 ustawionym na NaN
+		// Zakładamy, że ud2 jest 2x2: pierwszy wiersz to p_start, drugi to direction
+		// Obliczamy xt = p_start + h * direction
+		// Tutaj h jest przekazywane jako x(0,0)
+		double h = x(0, 0); // Krok h
+		double p_start_l = ud2(0, 0);
+		double p_start_d = ud2(0, 1);
+		double dir_l = ud2(1, 0);
+		double dir_d = ud2(1, 1);
 
-        y(0, 0) = masa;
-        y(1, 0) = ugiecie;
-        y(2, 0) = sigma;
+		double l = p_start_l + h * dir_l;
+		double d = p_start_d + h * dir_d;
 
-        return y;
-    }
-    else
-    {
-        // 2) Gdy ud2(0,0) != NaN => obliczamy skalar funkcji celu (1x1) 
-        //    do zminimalizowania w line search.
+		matrix xt(2, 1);
+		xt(0, 0) = l;
+		xt(1, 0) = d;
 
-        // Uwaga: w line search x(0,0) to krok h
-        //        w ud2 mamy p_start i direction
+		// Tworzymy ud2_nan do wywołania rekurencyjnego
+		matrix ud2_nan(1, 1, std::numeric_limits<double>::quiet_NaN());
 
-        // Odczytujemy wage w:
-        double w = ud1(0, 0);
+		// Rekurencyjne wywołanie z xt i ud2_nan, aby osiągnąć warunek stopu
+		matrix yt = ff5R_impl(xt, ud1, ud2_nan);
 
-        // Odczytujemy h = x(0,0)
-        double h = x(0, 0);
+		// Zakładamy, że ud1 jest 1x1 i zawiera wartość w
+		double w = ud1(0, 0);
 
-        // Odczytujemy p_start i direction z ud2 (2x2)
-        // wiersz 0 => p_start = (p_start_l, p_start_d)
-        // wiersz 1 => direction = (dir_l, dir_d)
-        double p0_l = ud2(0, 0);
-        double p0_d = ud2(0, 1);
+		// Obliczenie funkcji celu f(x)
+		double f_val = w * (yt(0, 0) - 0.12) / (3.06 - 0.12)
+			+ (1.0 - w) * (yt(1, 0) - 4.2e-5) / (0.026 - 4.2e-5);
 
-        double dir_l = ud2(1, 0);
-        double dir_d = ud2(1, 1);
+		double c = 1e10; // Duża kara
 
-        // Wyliczamy aktualny punkt xt:
-        double l = p0_l + h * dir_l;
-        double d = p0_d + h * dir_d;
+		// Dodawanie kar za naruszenie ograniczeń
+		if (l < 0.2) {
+			f_val += c * std::pow(0.2 - l, 2);
+		}
+		if (l > 1.0) {
+			f_val += c * std::pow(l - 1.0, 2);
+		}
+		if (d < 0.01) {
+			f_val += c * std::pow(0.01 - d, 2);
+		}
+		if (d > 0.05) {
+			f_val += c * std::pow(d - 0.05, 2);
+		}
+		if (yt(1, 0) > 0.005) { // ugiecie > 0.005
+			f_val += c * std::pow(yt(1, 0) - 0.005, 2);
+		}
+		if (yt(2, 0) > 300e6) { // sigma > 300e6
+			f_val += c * std::pow(yt(2, 0) - 300e6, 2);
+		}
 
-        // Teraz obliczamy masę i ugięcie jak w objective function:
-        double ro = 7800.0;
-        double P = 1e3;
-        double E = 207e9;
+		// Przypisanie wartości do macierzy y jako 1x1
+		y = matrix(1, 1);
+		y(0, 0) = f_val;
 
-        double masa = ro * l * M_PI * std::pow(d, 2) / 4.0;
-        double ugiecie = 64.0 * P * std::pow(l, 3) / (3.0 * E * M_PI * std::pow(d, 4));
-        double sigma = 32.0 * P * l / (M_PI * std::pow(d, 3));
-
-        // Funkcja celu = w*masa + (1-w)*ugiecie
-        double f = w * masa + (1.0 - w) * ugiecie;
-
-        // Dodajemy kary:
-        double c = 1e20; // duza kara
-
-        // Ograniczenia:
-        if (l < 0.2) f += c * std::pow(0.2 - l, 2);
-        if (l > 1.0) f += c * std::pow(l - 1.0, 2);
-
-        if (d < 0.01) f += c * std::pow(0.01 - d, 2);
-        if (d > 0.05) f += c * std::pow(d - 0.05, 2);
-
-        if (ugiecie > 0.005) {
-            f += c * std::pow(ugiecie - 0.005, 2);
-        }
-        if (sigma > 300e6) {
-            f += c * std::pow(sigma - 300e6, 2);
-        }
-
-        // Zwracamy (1x1) macierz z f
-        matrix f_mat(1, 1);
-        f_mat(0, 0) = f;
-
-        return f_mat;
-    }
+		std::cout << "f(x) = " << y(0, 0) << std::endl;
+	}
+	return y;
 }
 
 
+matrix ff5R(matrix x, matrix ud1, matrix ud2)
+{
+	return ff5R_impl(x, ud1, ud2);
+
+}
