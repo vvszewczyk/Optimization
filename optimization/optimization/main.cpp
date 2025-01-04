@@ -753,17 +753,16 @@ void lab5()
 	std::mt19937 gen(rd());
 	std::uniform_real_distribution<> dis(-10.0, 10.0);
 
-	// Pętla po wartościach a
-	for (auto a_val : a_values) {
-		// Pętla po wagach w
-		for (int i = 0; i <= 100; i++) {
-			double w = i * 0.01;
+	// Pętla po wagach w
+	for (int i = 0; i <= 100; i++) {
+		double w = i * 0.01;
 
-			// Losowy punkt startowy x0
-			matrix x0(2, 1);
-			x0(0, 0) = dis(gen);
-			x0(1, 0) = dis(gen);
-
+		// Losowy punkt startowy x0
+		matrix x0(2, 1);
+		x0(0, 0) = dis(gen);
+		x0(1, 0) = dis(gen);
+		// Pętla po wartościach a
+		for (auto a_val : a_values){
 			// Ud1: tu przechowamy wagę w (ud1(0)) i parametr a (ud1(1))
 			// Zgodnie z założeniami z transkryptu:
 			// ud1(0) = waga, ud1(1) = a
@@ -789,6 +788,8 @@ void lab5()
 
 			results_file << a_val << ","
 				<< w << ","
+				<< x0(0, 0) << ","
+				<< x0(1, 0) << ","
 				<< sol.x(0, 0) << ","
 				<< sol.x(1, 0) << ","
 				<< f1_val << ","
@@ -796,6 +797,7 @@ void lab5()
 				<< solution::f_calls << ","
 				<< sol.flag << "\n";
 		}
+
 	}
 
 	results_file.close();

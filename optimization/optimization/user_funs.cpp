@@ -576,7 +576,7 @@ matrix ff5R(matrix x, matrix ud1, matrix ud2)
 		matrix yt, xt = ud2[0] + x * ud2[1];
 		yt = ff5R(xt, ud1);
 		y = ud1 * (yt(0) - 0.12) / (3.06 - 0.12) + (1 - ud1) * (yt(1) - 4.2e-5) / (0.026 - 4.2e-5);
-		double c = 1e200;
+		double c = 1e20;
 		if (xt(0) < 0.2) {
 			y = y + c * (pow(0.2 - xt(0), 2));
 		}
