@@ -561,4 +561,43 @@ matrix ff5T(matrix x, matrix ud1, matrix ud2)
 	}
 	return y;
 }
+matrix ff5R(matrix x, matrix ud1, matrix ud2)
+{
+	matrix y;
+	if (isnan(ud2(0, 0))) {
+		y = matrix(3, 1);
+		double ro = 7800, P = 1e3, E = 207e9;
+		y(0) = ro * x(0) * 3.14 * pow(x(1), 2) / 4;
+		y(1) = 64 * P * pow(x(0), 3) / (3 * E * 3.14 * pow(x(1), 4));
+		y(2) = 32 * P * x(0) / (3.14 * pow(x(1), 3));
+	}
+	else
+	{
+		matrix yt, xt = ud2[0] + x * ud2[1];
+		yt = ff5R(xt, ud1);
+		y = ud1 * (yt(0) - 0.12) / (3.06 - 0.12) + (1 - ud1) * (yt(1) - 4.2e-5) / (0.026 - 4.2e-5);
+		double c = 1e200;
+		if (xt(0) < 0.2) {
+			y = y + c * (pow(0.2 - xt(0), 2));
+		}
+		if (xt(0) > 1) {
+			y = y + c * (pow(xt(0) - 1, 2));
+		}
+		if (xt(1) < 0.01) {
+			y = y + c * (pow(0.01 - xt(1), 2));
+		}
+		if (xt(1) > 0.05) {
+			y = y + c * (pow(xt(1) - 0.05, 2));
+		}
+		if (yt(1) > 0.005) {
+			y = y + c * pow(yt(1) - 0.005, 2);
+		}
+		if (yt(2) > 300e6) {
+			y = y + c * pow(yt(2) - 300e6, 2);
+		}
+
+	}
+	return y;
+}
+
 

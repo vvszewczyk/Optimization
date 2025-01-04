@@ -648,9 +648,94 @@ void lab4()
 	//writeResultsToCSV("optimization_results.csv", results);
 	//cout << "Wyniki zapisane do pliku optimization_results.csv" << endl;
 }
-	
+
+matrix objective(matrix x, matrix ud1, matrix ud2)
+{
+	// 1. Odczytujemy zmienne decyzyjne:
+	//    x = [l; d]
+	double l = x(0, 0);  // długość belki (mm)
+	double d = x(1, 0);  // średnica belki (mm)
+
+	// 2. Odczytujemy parametry z ud1:
+	//    załóżmy, że kolejno mamy:
+	//      ud1(0,0) = w (waga w metodzie ważonej),
+	//      ud1(1,0) = P (kN),
+	//      ud1(2,0) = E (GPa),
+	//      ud1(3,0) = rho (kg/m^3).
+	double w = ud1(0, 0);
+	double P = ud1(1, 0);
+	double E = ud1(2, 0);
+	double rho = ud1(3, 0);
+
+	// Duży współczynnik kary
+	const double M = 1e8;
+
+	// 3. Obliczamy f1 (masa) i f2 (ugięcie):
+	//    f1 = masa = rho * (pole przekroju) * (długość)
+	//      (l i d w [mm], rho w [kg/m^3] => przeliczamy na metry)
+	double l_m = l * 1e-3;       // [m]
+	double d_m = d * 1e-3;       // [m]
+	double area = M_PI * (d_m * d_m) / 4.0;
+	double volume = area * l_m;
+	double mass = rho * volume;  // kg
+
+	double f1 = mass;
+
+	// ugięcie (f2):
+	//   u = (64 * P_N * l^3) / (3 * E_MPa * pi * d^4)
+	//   P_N = P * 1000 (bo 1 kN = 1000 N)
+	//   E_MPa = E * 1000 (1 GPa = 1000 MPa)
+	//   l, d w [mm]
+	double P_N = P * 1000.0;
+	double E_MPa = E * 1000.0;
+	double u = (64.0 * P_N * std::pow(l, 3))
+		/ (3.0 * E_MPa * M_PI * std::pow(d, 4));
+	double f2 = u;
+
+	// 4. Metoda kryterium ważonego: f = w*f1 + (1-w)*f2
+	double f_obj = w * f1 + (1.0 - w) * f2;
+
+	// 5. Ograniczenia z karą:
+	//   - 200 <= l <= 1000
+	//   - 10 <= d <= 50
+	//   - u <= 5
+	//   - sigma <= 300 MPa, gdzie
+	//       sigma = (32 * P_N * l) / (pi * d^3)
+	double sigma = (32.0 * P_N * l) / (M_PI * std::pow(d, 3));
+
+	// Liczymy naruszenia (zsumowane kwadraty):
+	double penalty = 0.0;
+
+	// l w [200, 1000]
+	if (l < 200.0)    penalty += std::pow(200.0 - l, 2);
+	if (l > 1000.0)   penalty += std::pow(l - 1000.0, 2);
+
+	// d w [10, 50]
+	if (d < 10.0)     penalty += std::pow(10.0 - d, 2);
+	if (d > 50.0)     penalty += std::pow(d - 50.0, 2);
+
+	// u <= 5
+	if (u > 5.0)      penalty += std::pow(u - 5.0, 2);
+
+	// sigma <= 300
+	if (sigma > 300.0) penalty += std::pow(sigma - 300.0, 2);
+
+	// dodajemy do f_obj:
+	double f = f_obj + M * penalty;
+
+	// 6. Zwracamy wynik w postaci 1x1
+	matrix out(1, 1);
+	out(0, 0) = f;
+
+	// Zliczamy wywołanie funkcji celu, jeśli tak w solution::f_calls
+	solution::f_calls++;
+
+	return out;
+}
+
 void lab5()
 {
+	/*
 	// Parametry
 	double epsilon = 1e-6;
 	int Nmax = 10000;  // Maksymalna liczba wywołań funkcji celu
@@ -715,8 +800,88 @@ void lab5()
 
 	results_file.close();
 	std::cout << "Wyniki zapisane w pliku results_powell_test.csv\n";
+	*/
+	//PROBLEM RZECZYWISTY
+	// Tworzymy generator:
+	std::random_device rd;
+	std::mt19937 gen(rd());
+
+	// Rozkłady jednostajne (uniform) w określonych przedziałach:
+	//   - l ~ U(0.2, 1.0)
+	//   - d ~ U(0.01, 0.05)
+	std::uniform_real_distribution<double> dist_l(0.2, 1.0);
+	std::uniform_real_distribution<double> dist_d(0.01, 0.05);
+
+	// Otwieramy plik CSV, żeby zapisywać wyniki
+	std::ofstream csv("wyniki_ff5R.csv");
+	if (!csv.is_open())
+	{
+		std::cerr << "Nie udalo sie otworzyc pliku wyniki_ff5R.csv\n";
+	}
+	// Nagłówek:
+	csv << "l(0) [mm],d(0) [mm],l* [mm],d* [mm],masa* [kg],ugiecie* [mm],Liczba wywolan funkcji celu\n";
+
+	// Parametry metody Powella
+	double epsilon = 1e-3;
+	int Nmax = 1000;
+
+	// Pętla po w = 0..1 (krok 0.01 => 101 punktów)
+	for (int i = 0; i <= 100; i++)
+	{
+		double w = i / 100.0;
+
+		// Tworzymy ud1 = [w], 1x1:
+		matrix ud1(1, 1);
+		ud1(0, 0) = w;
+
+		// Ud2 = [NaN], 1x1, by w ff5R(...) zwracać wektor (masa, ugięcie, naprężenie) przy wywołaniu z NaN
+		matrix ud2NaN(1, 1, std::numeric_limits<double>::quiet_NaN());
+
+		// Generujemy punkt startowy x0: (l0, d0)
+		double l0 = dist_l(gen);
+		double d0 = dist_d(gen);
+
+		matrix x0(2, 1);
+		x0(0, 0) = l0;
+		x0(1, 0) = d0;
+
+		// Zerujemy licznik wywołań funkcji celu
+		solution::f_calls = 0;
+
+		// Wywołujemy metodę Powella
+		solution sol = Powell(ff5R, x0, epsilon, Nmax, ud1, ud2NaN);
+		cout << "iter" << endl;
+
+		// Odczytujemy rozwiązanie
+		double l_star = sol.x(0, 0);
+		double d_star = sol.x(1, 0);
+
+		// Aby uzyskać (masa, ugięcie, naprężenie), ponownie wywołujemy ff5R(...) z ud2=NaN
+		matrix y3 = ff5R(sol.x, ud1, ud2NaN);
+		double mass = y3(0, 0);
+		double deflection = y3(1, 0);
+		double stress = y3(2, 0);
+
+		// Skalarna wartość funkcji celu
+		double f_val = sol.y(0, 0);
+
+		long calls = solution::f_calls;
+
+		// Zapis do CSV
+		csv << l0 << ","   // l(0)
+			<< d0 << ","   // d(0)
+			<< l_star << ","
+			<< d_star << ","
+			<< mass << ","
+			<< deflection << ","
+			<< calls << "\n";
+
+		// Możesz też coś wypisać na ekran
+	}
+
+	csv.close();
+	std::cout << "\nZakonczono iteracje. Wyniki w pliku: wyniki_ff5R.csv\n";
 }
-  
 void lab6()
 {
 

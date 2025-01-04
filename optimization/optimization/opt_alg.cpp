@@ -978,6 +978,7 @@ solution Powell(matrix(*ff)(matrix, matrix, matrix), matrix x0, double epsilon, 
 
 		while (i < Nmax) 
 		{
+
 			matrix p0 = x; // p0(i) = x(i)
 
 			// Krok 4-8 z pseudokodu: przejście po kierunkach
@@ -995,8 +996,8 @@ solution Powell(matrix(*ff)(matrix, matrix, matrix), matrix x0, double epsilon, 
 
 				// Ekspansja, aby wyznaczyć przedział
 				double h0 = 0.0;
-				double step = 1.0;
-				double alpha = 2.0;
+				double step = 10.0;
+				double alpha = 1.2;
 				std::unique_ptr<double[]> interval(expansion(ff, h0, step, alpha, Nmax, ud1, ud2_line));
 				double a = interval[0];
 				double b = interval[1];
