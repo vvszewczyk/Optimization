@@ -1011,6 +1011,8 @@ solution Powell(matrix(*ff)(matrix, matrix, matrix), matrix x0, double epsilon, 
 				{
 					x(k, 0) += d[j](k, 0) * h;
 				}
+				x(0, 0) = std::max(0.2, std::min(1.0, x(0, 0)));
+				x(1, 0) = std::max(0.01, std::min(0.05, x(1, 0)));
 			}
 
 			matrix pn = x; // pn(i) po przejściu wszystkich kierunków
