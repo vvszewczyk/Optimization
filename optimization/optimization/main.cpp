@@ -785,7 +785,7 @@ void lab5()
 		std::cerr << "Nie udalo sie otworzyc pliku wyniki_ff5R.csv\n";
 	}
 	// Nagłówek:
-	csv << "l(0) [mm],d(0) [mm],l* [mm],d* [mm],masa* [kg],ugiecie* [mm],naprężenie* [MPa],Liczba wywolan funkcji celu\n";
+	csv << "l(0) [mm],d(0) [mm],l* [mm],d* [mm],masa* [kg],ugiecie* [mm],naprężenie* [Pa],Liczba wywolan funkcji celu\n";
 	// Parametry metody Powella
 	double epsilon = 1e-6;
 	int Nmax = 10000;
