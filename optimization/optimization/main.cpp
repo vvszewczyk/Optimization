@@ -660,27 +660,31 @@ void lab5()
 	std::vector<double> a_values = { 1.0, 10.0, 100.0 };
 
 	// Przygotowanie pliku do zapisu wyników
-	std::ofstream results_file("output/lab5/results_powell_test.csv");
-	results_file << "a,w,x1_opt,x2_opt,sol_x1,sol_x2,f1,f2,f_calls,flag\n";
+	std::ofstream results_file_a1("output/lab5/results_powell_test_a1.csv");
+	std::ofstream results_file_a10("output/lab5/results_powell_test_a10.csv");
+	std::ofstream results_file_a100("output/lab5/results_powell_test_a100.csv");
+	results_file_a1 << "a,w,x1_0,x2_0,sol_x1,sol_x2,f1,f2,f_calls,flag\n";
+	results_file_a10 << "a,w,x1_0,x2_0,sol_x1,sol_x2,f1,f2,f_calls,flag\n";
+	results_file_a100 << "a,w,x1_0,x2_0,sol_x1,sol_x2,f1,f2,f_calls,flag\n";
 
 	// Generator liczb losowych dla punktu startowego
 	std::random_device rd;
 	std::mt19937 gen(rd());
 	std::uniform_real_distribution<> dis(-10.0, 10.0);
 
-	// Pętla po wartościach a
-	for (auto a_val : a_values) 
+	// Pętla po wagach w
+	for (int i = 0; i <= 100; i++)
 	{
-		// Pętla po wagach w
-		for (int i = 0; i <= 100; i++)
-		{
-			double w = i * 0.01;
+		double w = i * 0.01;
 
-			// Losowy punkt startowy x0
-			matrix x0(2, 1);
-			x0(0, 0) = dis(gen);
-			x0(1, 0) = dis(gen);
-			
+		// Losowy punkt startowy x0
+		matrix x0(2, 1);
+		x0(0, 0) = dis(gen);
+		x0(1, 0) = dis(gen);
+
+		// Pętla po wartościach a
+		for (auto a_val : a_values)
+		{
 			// Ud1: tu przechowamy wagę w (ud1(0)) i parametr a (ud1(1))
 			// Zgodnie z założeniami z transkryptu:
 			// ud1(0) = waga, ud1(1) = a
@@ -714,22 +718,55 @@ void lab5()
 			std::cout << "fcals\t" << solution::f_calls << std::endl;
 			std::cout << "flag\t" << sol.flag << std::endl<< std::endl;*/
 
-			results_file 
-				<< a_val << ","
-				<< w << ","
-				<< x0(0, 0) << ","
-				<< x0(1, 0) << ","
-				<< sol.x(0, 0) << ","
-				<< sol.x(1, 0) << ","
-				<< f1_val << ","
-				<< f2_val << ","
-				<< solution::f_calls << ","
-				<< sol.flag << "\n";
-		}
+			if (a_val == 1)
+			{
+				results_file_a1
+					<< a_val << ","
+					<< w << ","
+					<< x0(0, 0) << ","
+					<< x0(1, 0) << ","
+					<< sol.x(0, 0) << ","
+					<< sol.x(1, 0) << ","
+					<< f1_val << ","
+					<< f2_val << ","
+					<< solution::f_calls << ","
+					<< sol.flag << "\n";
+			}
+			else if (a_val == 10)
+			{
+				results_file_a10
+					<< a_val << ","
+					<< w << ","
+					<< x0(0, 0) << ","
+					<< x0(1, 0) << ","
+					<< sol.x(0, 0) << ","
+					<< sol.x(1, 0) << ","
+					<< f1_val << ","
+					<< f2_val << ","
+					<< solution::f_calls << ","
+					<< sol.flag << "\n";
+			}
+			else if (a_val == 100)
+			{
+				results_file_a100
+					<< a_val << ","
+					<< w << ","
+					<< x0(0, 0) << ","
+					<< x0(1, 0) << ","
+					<< sol.x(0, 0) << ","
+					<< sol.x(1, 0) << ","
+					<< f1_val << ","
+					<< f2_val << ","
+					<< solution::f_calls << ","
+					<< sol.flag << "\n";
+			}
 
+		}
 	}
 
-	results_file.close();
+	results_file_a1.close();
+	results_file_a10.close();
+	results_file_a100.close();
 	std::cout << "Wyniki zapisane w pliku results_powell_test.csv\n";
 
 	//PROBLEM RZECZYWISTY
