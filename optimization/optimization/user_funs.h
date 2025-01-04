@@ -26,3 +26,4 @@ matrix computeHessian(matrix X, matrix Y, matrix theta);
 double computeAccuracy(matrix X, matrix Y, matrix theta);
 matrix ff5T(matrix x, matrix = NAN, matrix = NAN);
 matrix ff5R(matrix x, matrix = NAN, matrix = NAN);
+void test_ff5T();

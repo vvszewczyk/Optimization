@@ -1,5 +1,7 @@
 ﻿#include"user_funs.h"
 #include <cmath>
+#include <cassert>
+
 
 #ifndef M_PI
 #define M_PI 3.14159265358979323846
@@ -517,29 +519,29 @@ matrix ff5T(matrix x, matrix ud1, matrix ud2)
 {
 	matrix y;
 	// Sprawdzamy scenariusz:
-	if (isnan(ud2(0, 0)))
+	if (std::isnan(ud2(0, 0)))
 	{
-		// Tutaj ud2 może być 1x1, więc nie odwołujemy się do ud2(0,1) ani ud2(1,0).
-		// Obliczamy normalnie f1, f2 w punkcie x.
-		double a = ud1(1);
-		double f1 = a * (pow(x(0) - 2, 2) + pow(x(1) - 2, 2));
-		double f2 = (1.0 / a) * (pow(x(0) + 2, 2) + pow(x(1) + 2, 2));
+		// Poprawny odczyt a z macierzy ud1 (2x1)
+		double a = ud1(1, 0);  // Upewnij się, że to prawidłowy indeks
+
+		double x1 = x(0, 0);
+		double x2 = x(1, 0);
+
+		double f1 = a * (pow(x1 - 2, 2) + pow(x2 - 2, 2));
+		double f2 = (1.0 / a) * (pow(x1 + 2, 2) + pow(x2 + 2, 2));
+
 		y = matrix(2, 1);
 		y(0, 0) = f1;
 		y(1, 0) = f2;
 	}
 	else
 	{
-		// Jesteśmy w line search, ud2 jest 2x2, możemy bezpiecznie odczytywać:
-		double w = ud1(0);
-		double a = ud1(1);
-		double step = x(0);
+		// Przypadek przeszukiwania linii
+		double w = ud1(0, 0);  // Upewnij się, że to prawidłowy indeks
+		double a = ud1(1, 0);  // Upewnij się, że to prawidłowy indeks
+		double step = x(0, 0);
 
-		// Odczytujemy p_start i d
-		// Zakładamy, że ud2 jest 2x2: 
-		// wiersz 0: p_start, wiersz 1: d
-		// ud2(0,0), ud2(0,1) -> p_start x0, x1
-		// ud2(1,0), ud2(1,1) -> d0, d1
+		// Odczytujemy p_start i d z ud2 (2x2)
 		matrix p_start(2, 1), d(2, 1);
 		p_start(0, 0) = ud2(0, 0);
 		p_start(1, 0) = ud2(0, 1);
@@ -550,17 +552,51 @@ matrix ff5T(matrix x, matrix ud1, matrix ud2)
 		matrix new_point = p_start + d * step;
 
 		// Wywołujemy ff5T ponownie, ale teraz z ud2 = NaN (by nie wchodzić w line search)
-		matrix ud2_empty(2, 2, NAN);
+		matrix ud2_empty(2, 1, std::numeric_limits<double>::quiet_NaN());
 		matrix yt = ff5T(new_point, ud1, ud2_empty);
 
-		double f1 = yt(0);
-		double f2 = yt(1);
+		double f1 = yt(0, 0);
+		double f2 = yt(1, 0);
 		double F = w * f1 + (1.0 - w) * f2;
 
 		y = matrix(1, 1, F);
 	}
 	return y;
 }
+
+void test_ff5T()
+{
+	const double epsilon = 1e-6;  // Tolerancja dla porównań
+
+	matrix ud1(2, 1);
+	ud1(0, 0) = 0.5;    // w = 0.5
+	ud1(1, 0) = 1.0;    // a = 1
+	matrix ud2_empty(2, 1, std::numeric_limits<double>::quiet_NaN());
+
+	// Test punktu (0, 0) dla w = 0.5
+	matrix x(2, 1);
+	x(0, 0) = 0.0;
+	x(1, 0) = 0.0;
+	matrix y = ff5T(x, ud1, ud2_empty);
+
+	// Oczekujemy f1 = 8, f2 = 8
+	bool f1_correct = std::abs(y(0, 0) - 8.0) < epsilon;
+	bool f2_correct = std::abs(y(1, 0) - 8.0) < epsilon;
+
+	if (!f1_correct || !f2_correct)
+	{
+		std::cerr << "Test failed:\n";
+		std::cerr << "Expected f1 = 8, got " << y(0, 0) << "\n";
+		std::cerr << "Expected f2 = 8, got " << y(1, 0) << "\n";
+	}
+
+	assert(f1_correct);
+	assert(f2_correct);
+
+	std::cout << "All ff5T() tests passed successfully." << std::endl;
+}
+
+
 matrix ff5R(matrix x, matrix ud1, matrix ud2)
 {
 	matrix y;
