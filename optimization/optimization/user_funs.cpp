@@ -599,41 +599,98 @@ void test_ff5T()
 
 matrix ff5R(matrix x, matrix ud1, matrix ud2)
 {
-	matrix y;
-	if (isnan(ud2(0, 0))) {
-		y = matrix(3, 1);
-		double ro = 7800, P = 1e3, E = 207e9;
-		y(0) = ro * x(0) * 3.14 * pow(x(1), 2) / 4;
-		y(1) = 64 * P * pow(x(0), 3) / (3 * E * 3.14 * pow(x(1), 4));
-		y(2) = 32 * P * x(0) / (3.14 * pow(x(1), 3));
-	}
-	else
-	{
-		matrix yt, xt = ud2[0] + x * ud2[1];
-		yt = ff5R(xt, ud1);
-		y = ud1 * (yt(0) - 0.12) / (3.06 - 0.12) + (1 - ud1) * (yt(1) - 4.2e-5) / (0.026 - 4.2e-5);
-		double c = 1e20;
-		if (xt(0) < 0.2) {
-			y = y + c * (pow(0.2 - xt(0), 2));
-		}
-		if (xt(0) > 1) {
-			y = y + c * (pow(xt(0) - 1, 2));
-		}
-		if (xt(1) < 0.01) {
-			y = y + c * (pow(0.01 - xt(1), 2));
-		}
-		if (xt(1) > 0.05) {
-			y = y + c * (pow(xt(1) - 0.05, 2));
-		}
-		if (yt(1) > 0.005) {
-			y = y + c * pow(yt(1) - 0.005, 2);
-		}
-		if (yt(2) > 300e6) {
-			y = y + c * pow(yt(2) - 300e6, 2);
-		}
+    // Rozróżniamy dwa przypadki:
 
-	}
-	return y;
+    // 1) Gdy ud2(0,0) jest NaN => zwracamy [masa; ugiecie; naprezenie]
+    if (std::isnan(ud2(0, 0))) 
+    {
+        // Tutaj x ma wymiar (2x1): x(0,0) = l, x(1,0) = d
+        matrix y(3, 1);
+
+        double ro = 7800.0;   // kg/m^3
+        double P = 1e3;       // N
+        double E = 207e9;     // Pa
+
+        double l = x(0, 0);   // [m]
+        double d = x(1, 0);   // [m]
+
+        // Masa:
+        double masa = ro * l * M_PI * std::pow(d, 2) / 4.0;
+
+        // Ugięcie:
+        double ugiecie = 64.0 * P * std::pow(l, 3) / (3.0 * E * M_PI * std::pow(d, 4));
+
+        // Naprężenie:
+        double sigma = 32.0 * P * l / (M_PI * std::pow(d, 3));
+
+        y(0, 0) = masa;
+        y(1, 0) = ugiecie;
+        y(2, 0) = sigma;
+
+        return y;
+    }
+    else
+    {
+        // 2) Gdy ud2(0,0) != NaN => obliczamy skalar funkcji celu (1x1) 
+        //    do zminimalizowania w line search.
+
+        // Uwaga: w line search x(0,0) to krok h
+        //        w ud2 mamy p_start i direction
+
+        // Odczytujemy wage w:
+        double w = ud1(0, 0);
+
+        // Odczytujemy h = x(0,0)
+        double h = x(0, 0);
+
+        // Odczytujemy p_start i direction z ud2 (2x2)
+        // wiersz 0 => p_start = (p_start_l, p_start_d)
+        // wiersz 1 => direction = (dir_l, dir_d)
+        double p0_l = ud2(0, 0);
+        double p0_d = ud2(0, 1);
+
+        double dir_l = ud2(1, 0);
+        double dir_d = ud2(1, 1);
+
+        // Wyliczamy aktualny punkt xt:
+        double l = p0_l + h * dir_l;
+        double d = p0_d + h * dir_d;
+
+        // Teraz obliczamy masę i ugięcie jak w objective function:
+        double ro = 7800.0;
+        double P = 1e3;
+        double E = 207e9;
+
+        double masa = ro * l * M_PI * std::pow(d, 2) / 4.0;
+        double ugiecie = 64.0 * P * std::pow(l, 3) / (3.0 * E * M_PI * std::pow(d, 4));
+        double sigma = 32.0 * P * l / (M_PI * std::pow(d, 3));
+
+        // Funkcja celu = w*masa + (1-w)*ugiecie
+        double f = w * masa + (1.0 - w) * ugiecie;
+
+        // Dodajemy kary:
+        double c = 1e20; // duza kara
+
+        // Ograniczenia:
+        if (l < 0.2) f += c * std::pow(0.2 - l, 2);
+        if (l > 1.0) f += c * std::pow(l - 1.0, 2);
+
+        if (d < 0.01) f += c * std::pow(0.01 - d, 2);
+        if (d > 0.05) f += c * std::pow(d - 0.05, 2);
+
+        if (ugiecie > 0.005) {
+            f += c * std::pow(ugiecie - 0.005, 2);
+        }
+        if (sigma > 300e6) {
+            f += c * std::pow(sigma - 300e6, 2);
+        }
+
+        // Zwracamy (1x1) macierz z f
+        matrix f_mat(1, 1);
+        f_mat(0, 0) = f;
+
+        return f_mat;
+    }
 }
 
 
