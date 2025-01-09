@@ -974,17 +974,16 @@ solution Powell(matrix(*ff)(matrix, matrix, matrix), matrix x0, double epsilon, 
 		}
 
 		matrix x = x0;   // Punkt aktualny
-		int i = 0; // Licznik iteracji
+		int i = 0; // Licznik
 
 		while (i < Nmax) 
 		{
 
 			matrix p0 = x; // p0(i) = x(i)
 
-			// Krok 4-8 z pseudokodu: przejście po kierunkach
+			// Przejście po kierunkach
 			for (int j = 0; j < n; j++) 
 			{
-				// Przygotowanie ud2 dla line search:
 				// ud2 2x2: wiersz 0: punkt startowy, wiersz 1: kierunek
 				matrix ud2_line(2, n);
 				
@@ -1011,13 +1010,10 @@ solution Powell(matrix(*ff)(matrix, matrix, matrix), matrix x0, double epsilon, 
 				{
 					x(k, 0) += d[j](k, 0) * h;
 				}
-				//x(0, 0) = std::max(0.2, std::min(1.0, x(0, 0)));
-				//x(1, 0) = std::max(0.01, std::min(0.05, x(1, 0)));
 			}
 
 			matrix pn = x; // pn(i) po przejściu wszystkich kierunków
 
-			// Sprawdzenie warunku stopu
 			double norm_diff = 0.0;
 
 			for (int k = 0; k < n; k++)
