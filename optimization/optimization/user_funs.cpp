@@ -693,4 +693,13 @@ matrix ff5R(matrix x, matrix ud1, matrix ud2)
     }
 }
 
+matrix ff6T(matrix x, matrix ud2, matrix ud1)
+{
+	double x1 = x(0, 0);
+	double x2 = x(1, 0);
+	matrix result(1, 1);
+	result(0, 0) = pow(x1, 2) + pow(x2, 2) - cos(2.5 * M_PI * x1) - cos(2.5 * M_PI * x2) + 2;
+	return result;
+}
+
 

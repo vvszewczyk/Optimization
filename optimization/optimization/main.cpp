@@ -96,7 +96,7 @@ int main()
 {
 	try
 	{
-		lab5();
+		lab6();
 	}
 	catch (string EX_INFO)
 	{
@@ -845,5 +845,43 @@ void lab5()
 }
 void lab6()
 {
+	int N = 5;               // wymiar problemu (np. 5)
+	matrix lb(N, 1), ub(N, 1); // wektory dolnych i górnych ograniczeń
+	matrix s0(N, 1);          // początkowe wartości sigma
+	for (int i = 0; i < N; i++)
+	{
+		lb(i, 0) = -5.0;     // np. -10
+		ub(i, 0) = 5.0;     // np.  10
+		s0(i, 0) = 1.0;      // np. sigma0 = 1
+	}
 
+	int mi = 20;        // rozmiar populacji
+	int lambda = 40;        // liczba potomków
+	double eps = 1e-6;      // epsilon (dokładność)
+	int Nmax = 10000;     // maks. liczba wywołań funkcji celu
+	matrix ud1;              // domyślnie 1x1 = NAN (jeśli nie używasz, wystarczy pusty)
+	matrix ud2;              // j.w.
+
+	// Wywołanie algorytmu ewolucyjnego
+	// EA(ff6T, N, lb, ub, mi, lambda, s0, eps, Nmax, ud1, ud2)
+	solution bestSol = EA(
+		ff6T,       // nasza funkcja celu
+		N,          // wymiar
+		lb,         // dolne ograniczenia
+		ub,         // górne ograniczenia
+		mi,         // rozmiar populacji
+		lambda,     // liczba potomków
+		s0,         // sigma początkowe
+		eps,        // próg stopu
+		Nmax,       // limit wywołań
+		ud1,        // dane dodatkowe 1
+		ud2         // dane dodatkowe 2
+	);
+
+	// Wypisujemy wynik
+	cout << "Najlepszy znaleziony punkt (x):" << endl;
+	cout << bestSol.x << endl;
+	cout << "Wartosc funkcji celu w tym punkcie: " << bestSol.y << endl;
+	cout << "Liczba wywolan fit_fun = " << solution::f_calls << endl;
+	cout << "Exit flag = " << bestSol.flag << endl;
 }
