@@ -843,45 +843,141 @@ void lab5()
 	csv.close();
 	std::cout << "\nZakonczono iteracje. Wyniki w pliku: wyniki_ff5R.csv\n";
 }
+bool isGlobalMinimum(const solution& sol, double tol = 1e-6)
+{
+	double x1 = sol.x(0, 0);
+	double x2 = sol.x(1, 0);
+	// Oczekiwane min: (3, -2) => y=0
+	// Tu sprawdzamy, czy y < tol
+	double yVal = sol.y(0, 0);
+	return (yVal <= tol);
+}
+
 void lab6()
 {
-	int N = 5;               // wymiar problemu (np. 5)
-	matrix lb(N, 1), ub(N, 1); // wektory dolnych i górnych ograniczeń
-	matrix s0(N, 1);          // początkowe wartości sigma
+	int N = 2;
+	matrix lb(N, 1), ub(N, 1);
 	for (int i = 0; i < N; i++)
 	{
-		lb(i, 0) = -5.0;     // np. -10
-		ub(i, 0) = 5.0;     // np.  10
-		s0(i, 0) = 1.0;      // np. sigma0 = 1
+		lb(i, 0) = -10.0;
+		ub(i, 0) = 10.0;
+	}
+	// Parametry algorytmu
+	int mi = 20;
+	int lambda = 40;
+	double eps = 1e-9;   // do warunku stopu
+	int Nmax = 10000;
+
+	// --------------------------------------
+	// Różne wartości sigma0
+	// --------------------------------------
+	vector<double> sigmaValues = { 0.01, 0.1, 1.0, 10.0, 100.0 };
+	matrix ud1, ud2; // puste w tym przykładzie
+	const int NUM_RUNS = 100;
+
+	// Tabela do zbierania wyników do statystyk
+	// stats[i] będzie przechowywać 100 rozwiązań dla danej sigma.
+	// Można też od razu uśredniać, ale tu zbieramy wszystkie, by ewentualnie przejrzeć.
+	vector< vector<solution> > stats(sigmaValues.size());
+
+	// --------------------------------------
+	// Główna pętla po wartościach sigma
+	// --------------------------------------
+	for (size_t sIdx = 0; sIdx < sigmaValues.size(); sIdx++)
+	{
+		double sVal = sigmaValues[sIdx];
+
+		// Wyświetlamy nagłówek Tabeli 1 dla tej sigma
+		cout << "\nPoczatkowa wartosc zakresu mutacji: " << sVal << "\n";
+		cout << "Lp., x1*, x2*, y*, Liczba wywolan funkcji celu, Minimum globalne[tak/nie]\n";
+
+		for (int run = 1; run <= NUM_RUNS; run++)
+		{
+			// Ustawiamy poczatkowe sigma (2x1)
+			matrix sigma0(N, 1);
+			for (int d = 0; d < N; d++)
+			{
+				sigma0(d, 0) = sVal;
+			}
+
+			// Zerujemy liczniki
+			solution::clear_calls();
+
+			// Uruchamiamy EA
+			solution bestSol = EA(ff6T, N, lb, ub,
+				mi, lambda,
+				sigma0,
+				eps,
+				Nmax,
+				ud1, ud2);
+
+			// Wypełniamy wiersz w Tabeli 1:
+			double x1 = bestSol.x(0, 0);
+			double x2 = bestSol.x(1, 0);
+			double fVal = bestSol.y(0, 0);
+			int calls = solution::f_calls;
+			bool isMinGlobal = isGlobalMinimum(bestSol, 1e-6);
+			// Wypis:
+			cout << run << ", " << x1 << ", " << x2 << ", " << fVal
+				<< ", " << calls << ", "
+				<< (isMinGlobal ? "tak" : "nie") << "\n";
+
+			// Zachowujemy do stats
+			stats[sIdx].push_back(bestSol);
+		}
 	}
 
-	int mi = 20;        // rozmiar populacji
-	int lambda = 40;        // liczba potomków
-	double eps = 1e-6;      // epsilon (dokładność)
-	int Nmax = 10000;     // maks. liczba wywołań funkcji celu
-	matrix ud1;              // domyślnie 1x1 = NAN (jeśli nie używasz, wystarczy pusty)
-	matrix ud2;              // j.w.
+	// --------------------------------------
+	// TABELA 2: Wartości uśrednione
+	// --------------------------------------
+	cout << "\n*** PODSUMOWANIE (Tabela 2) ***\n";
+	cout << "Poczatkowa wartosc zakresu mutacji, x1*, x2*, y*, Liczba wywolan funkcji celu, Liczba minimow globalnych\n";
 
-	// Wywołanie algorytmu ewolucyjnego
-	// EA(ff6T, N, lb, ub, mi, lambda, s0, eps, Nmax, ud1, ud2)
-	solution bestSol = EA(
-		ff6T,       // nasza funkcja celu
-		N,          // wymiar
-		lb,         // dolne ograniczenia
-		ub,         // górne ograniczenia
-		mi,         // rozmiar populacji
-		lambda,     // liczba potomków
-		s0,         // sigma początkowe
-		eps,        // próg stopu
-		Nmax,       // limit wywołań
-		ud1,        // dane dodatkowe 1
-		ud2         // dane dodatkowe 2
-	);
+	// Teraz dla każdej sigma obliczamy średnie po 100 uruchomieniach
+	for (size_t sIdx = 0; sIdx < sigmaValues.size(); sIdx++)
+	{
+		double sVal = sigmaValues[sIdx];
+		double sumX1 = 0.0, sumX2 = 0.0, sumF = 0.0, sumCalls = 0.0;
+		int countGlobal = 0;
+		int totalRuns = (int)stats[sIdx].size();  // 100
 
-	// Wypisujemy wynik
-	cout << "Najlepszy znaleziony punkt (x):" << endl;
-	cout << bestSol.x << endl;
-	cout << "Wartosc funkcji celu w tym punkcie: " << bestSol.y << endl;
-	cout << "Liczba wywolan fit_fun = " << solution::f_calls << endl;
-	cout << "Exit flag = " << bestSol.flag << endl;
+		// Liczymy tylko te, które uznamy za "globalne" (lub wszystkie – zależy od zadania)
+		// W zadaniu jest mowa: "Wartości średnie (tylko dla optymalizacji zakończonych znalezieniem min globalnego)" 
+		// => bierzemy do średniej TYLKO te z isMinGlobal == true.
+		int used = 0;
+		for (int r = 0; r < totalRuns; r++)
+		{
+			const solution& sol = stats[sIdx][r];
+			bool isMin = isGlobalMinimum(sol, 1e-6);
+			if (isMin)
+			{
+				sumX1 += sol.x(0, 0);
+				sumX2 += sol.x(1, 0);
+				sumF += sol.y(0, 0);
+				sumCalls += solution::f_calls; // Uwaga: tu by trzeba zapisać calls dla każdego runu przed resetem 
+				used++;
+			}
+		}
+
+		// Druga kwestia: "Liczba minimów globalnych"
+		// Zliczamy ile razy wektor spełnił warunek globalnego minimum
+		for (int r = 0; r < totalRuns; r++)
+		{
+			if (isGlobalMinimum(stats[sIdx][r], 1e-6))
+				countGlobal++;
+		}
+
+		// Policzmy średnie, ale tylko z "used" wartości
+		double meanX1 = (used > 0 ? sumX1 / (double)used : 0.0);
+		double meanX2 = (used > 0 ? sumX2 / (double)used : 0.0);
+		double meanF = (used > 0 ? sumF / (double)used : 0.0);
+		double meanCalls = (used > 0 ? sumCalls / (double)used : 0.0);
+
+		// Wypis do "Tabeli 2"
+		cout << sVal << ", "
+			<< meanX1 << ", " << meanX2 << ", "
+			<< meanF << ", "
+			<< meanCalls << ", "
+			<< countGlobal << "\n";
+	}
 }
