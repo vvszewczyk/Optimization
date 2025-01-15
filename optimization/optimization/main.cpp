@@ -11,6 +11,7 @@ Data ostatniej modyfikacji: 19.09.2023
 #include "opt_alg.h"
 #include <random>
 #include <vector>
+#include <iostream>
 
 #ifndef M_PI
 #define M_PI 3.14159265358979323846
@@ -24,77 +25,29 @@ void lab4();
 void lab5();
 void lab6();
 
-<<<<<<< Updated upstream
-=======
-
-
-void writeResultsToCSV(const string& filename, const vector<vector<double>>& results) {
-	ofstream outFile(filename);
-
-	// Nagłówki kolumn
-	outFile << "Długość kroku,θ0*,θ1*,θ2*,J(θ*),P(θ*),g_calls" << endl;
-
-	// Zapis wyników
-	for (const auto& result : results) {
-		outFile << result[0] << ","      // Długość kroku
-			<< result[1] << ","      // θ0
-			<< result[2] << ","      // θ1
-			<< result[3] << ","      // θ2
-			<< result[4] << ","      // J(θ*)
-			<< result[5] << ","      // P(θ*)
-			<< result[6] << endl;    // g_calls
-	}
-
-	outFile.close();
-	cout << "Wyniki zapisane do pliku: " << filename << endl;
+bool isGlobalMinimum(const solution& sol, double tol)
+{
+    double x1 = sol.x(0, 0);
+    double x2 = sol.x(1, 0);
+    // Oczekiwane min: (3, -2) => y=0
+    // Tu sprawdzamy, czy y < tol
+    double yVal = sol.y(0, 0);
+    return (yVal <= tol);
 }
 
-
-string trim(const string& value) {
-	size_t start = value.find_first_not_of(" \t\n\r");
-	size_t end = value.find_last_not_of(" \t\n\r");
-	return (start == string::npos) ? "" : value.substr(start, end - start + 1);
+void save_to_file_lab_5(std::ofstream& file, double a_val, double w, const matrix& x0, const solution& sol, double f1_val, double f2_val, long f_calls) {
+    file << a_val << ","   // wartość a
+        << w << ","   // waga w
+        << x0(0, 0) << ","   // początkowy x1
+        << x0(1, 0) << ","   // początkowy x2
+        << sol.x(0, 0) << ","   // rozwiązanie x1
+        << sol.x(1, 0) << ","   // rozwiązanie x2
+        << f1_val << ","   // wartość f1
+        << f2_val << ","   // wartość f2
+        << f_calls << ","   // liczba wywołań funkcji celu
+        << sol.flag << "\n";   // flaga statusu
 }
 
-matrix loadDataToMatrix(const string& filename, int rows, int cols) {
-	matrix m(rows, cols, 0.0);  // Tworzymy macierz o wymiarach rows x cols
-	ifstream file(filename);
-
-	if (!file.is_open()) {
-		cerr << "Nie mozna otworzyc pliku: " << filename << endl;
-		return m;  // Zwraca pustą macierz, jeśli nie udało się otworzyć pliku
-	}
-
-	string line;
-	int row = 0;
-
-	while (getline(file, line) && row < rows) {
-		stringstream ss(line);
-		string value;
-		int col = 0;
-		while (getline(ss, value, ';') && col < cols) {
-			value = trim(value);  // Usuwamy ewentualne białe znaki
-			try {
-				if (!value.empty()) {
-					m(row, col) = stod(value);  // Konwertujemy na double i zapisujemy w macierzy
-					col++;
-				}
-			}
-			catch (const std::invalid_argument& e) {
-				cerr << "Niepoprawna liczba: " << value << endl;
-			}
-			catch (const std::out_of_range& e) {
-				cerr << "Liczba poza zakresem: " << value << endl;
-			}
-		}
-		row++;
-	}
-
-	file.close();
-	return m;
-}
-
->>>>>>> Stashed changes
 int main()
 {
     try
@@ -647,22 +600,9 @@ void lab4()
     // cout << "Wyniki zapisane do pliku optimization_results.csv" << endl;
 }
 
-void save_to_file_lab_5(std::ofstream& file, double a_val,double w, const matrix& x0, const solution& sol, double f1_val, double f2_val, long f_calls) {
-	file << a_val << ","   // wartość a
-		<< w << ","   // waga w
-		<< x0(0, 0) << ","   // początkowy x1
-		<< x0(1, 0) << ","   // początkowy x2
-		<< sol.x(0, 0) << ","   // rozwiązanie x1
-		<< sol.x(1, 0) << ","   // rozwiązanie x2
-		<< f1_val << ","   // wartość f1
-		<< f2_val << ","   // wartość f2
-		<< f_calls << ","   // liczba wywołań funkcji celu
-		<< sol.flag << "\n";   // flaga statusu
-}
 
 void lab5()
 {
-<<<<<<< Updated upstream
     //// Parametry
     // double epsilon = 1e-8;
     // int Nmax = 20000;  // Maksymalna liczba wywołań funkcji celu
@@ -850,17 +790,8 @@ void lab5()
     }
     csv.close();
     std::cout << "\nZakonczono iteracje. Wyniki w pliku: wyniki_ff5R.csv\n";
-}
-bool isGlobalMinimum(const solution &sol, double tol)
-{
-    double x1 = sol.x(0, 0);
-    double x2 = sol.x(1, 0);
-    // Oczekiwane min: (3, -2) => y=0
-    // Tu sprawdzamy, czy y < tol
-    double yVal = sol.y(0, 0);
-    return (yVal <= tol);
-}
-=======
+
+
 	// Przygotowanie pliku do zapisu wyników
 	std::ofstream results_file_a1("output/lab5/results_powell_test_a1.csv");
 	std::ofstream results_file_a10("output/lab5/results_powell_test_a10.csv");
@@ -870,13 +801,13 @@ bool isGlobalMinimum(const solution &sol, double tol)
 	results_file_a100 << "a,w,x1_0,x2_0,sol_x1,sol_x2,f1,f2,f_calls,flag\n";
 
 	// Generator liczb losowych dla punktu startowego
-	std::random_device rd;
-	std::mt19937 gen(rd());
+	//std::random_device rd;
+	//std::mt19937 gen(rd());
 	std::uniform_real_distribution<> dis(-10.0, 10.0);
 
 	// Parametry
-	double epsilon = 1e-8;
-	int Nmax = 20000;
+	epsilon = 1e-8;
+	Nmax = 20000;
 	std::vector<double> a_values = { 1.0, 10.0, 100.0 };
 
 	// Pętla po wagach w
@@ -1002,7 +933,6 @@ bool isGlobalMinimum(const solution &sol, double tol)
 	//csv.close();
 	//std::cout << "\nZakonczono iteracje. Wyniki w pliku: wyniki_ff5R.csv\n";
 }
->>>>>>> Stashed changes
 
 void lab6()
 {
