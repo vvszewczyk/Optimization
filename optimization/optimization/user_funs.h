@@ -33,4 +33,5 @@ matrix ff5T(matrix x, matrix = NAN, matrix = NAN);
 matrix ff5R(matrix x, matrix = NAN, matrix = NAN);
 void test_ff5T();
 matrix ff6T(matrix, matrix = NAN, matrix = NAN);
+matrix ff6R(matrix, matrix = NAN, matrix = NAN);
 

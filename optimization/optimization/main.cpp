@@ -600,7 +600,6 @@ void lab4()
     // cout << "Wyniki zapisane do pliku optimization_results.csv" << endl;
 }
 
-
 void lab5()
 {
     //// Parametry
@@ -934,6 +933,96 @@ void lab5()
 	//std::cout << "\nZakonczono iteracje. Wyniki w pliku: wyniki_ff5R.csv\n";
 }
 
+// Funkcja do wczytania danych z pliku
+vector<pair<double, double>> loadExperimentalData(const string& filename) {
+    vector<pair<double, double>> data;
+    ifstream file(filename);
+    if (!file.is_open()) {
+        cerr << "Nie można otworzyć pliku: " << filename << endl;
+        return data;
+    }
+
+    double x1, x2;
+    char sep;
+    while (file >> x1 >> sep >> x2 >> sep) {
+        data.emplace_back(x1, x2);
+    }
+
+    file.close();
+    return data;
+}
+
+// Funkcja symulacji ruchu ciężarków
+vector<pair<double, double>> simulateMovement(double b1, double b2, double dt, double T) {
+    const double m1 = 5.0, m2 = 5.0;
+    const double k1 = 1.0, k2 = 1.0;
+    const double F = 1.0;
+    int steps = static_cast<int>(T / dt) + 1;
+
+    vector<double> x1(steps, 0.0), x2(steps, 0.0);
+    vector<double> v1(steps, 0.0), v2(steps, 0.0);
+
+    for (int t = 1; t < steps; ++t) {
+        double a1 = (-b1 * v1[t - 1] - k1 * x1[t - 1] - k2 * (x1[t - 1] - x2[t - 1])) / m1;
+        double a2 = (F - b2 * v2[t - 1] - k2 * (x2[t - 1] - x1[t - 1])) / m2;
+
+        v1[t] = v1[t - 1] + a1 * dt;
+        v2[t] = v2[t - 1] + a2 * dt;
+
+        x1[t] = x1[t - 1] + v1[t] * dt;
+        x2[t] = x2[t - 1] + v2[t] * dt;
+    }
+
+    vector<pair<double, double>> result;
+    for (int t = 0; t < steps; ++t) {
+        result.emplace_back(x1[t], x2[t]);
+    }
+
+    return result;
+}
+
+// Funkcja porównania i zapisu wyników do pliku
+void compareAndSaveResults(const vector<pair<double, double>>& experimental,
+    const vector<pair<double, double>>& simulated,
+    const string& filename) {
+    ofstream file(filename);
+    if (!file.is_open()) {
+        cerr << "Nie można otworzyć pliku: " << filename << endl;
+        return;
+    }
+
+    file << "Time,X1_Experimental,X2_Experimental,X1_Simulated,X2_Simulated\n";
+
+    // Znajdź minimalny rozmiar pomiędzy wektorami
+    size_t minSize = std::min(experimental.size(), simulated.size());
+
+    for (size_t i = 0; i < minSize; ++i) {
+        file << i * 0.1 << ","
+            << experimental[i].first << "," << experimental[i].second << ","
+            << simulated[i].first << "," << simulated[i].second << "\n";
+    }
+
+    file.close();
+    cout << "Wyniki zapisane do pliku: " << filename << endl;
+}
+
+// Główna funkcja symulacji
+void simulateRealProblem(double b1, double b2) {
+    const string filename = "polozenia.txt";
+    auto experimentalData = loadExperimentalData(filename);
+
+    if (experimentalData.empty()) {
+        cerr << "Brak danych eksperymentalnych!" << endl;
+        return;
+    }
+
+    double dt = 0.1, T = 100.0;
+
+    auto simulatedData = simulateMovement(b1, b2, dt, T);
+
+    compareAndSaveResults(experimentalData, simulatedData, "output/lab6/wyniki_symulacji_p6.csv");
+}
+
 void lab6()
 {
     int N = 2;
@@ -946,7 +1035,7 @@ void lab6()
     // Parametry algorytmu
     int mi = 20;
     int lambda = 40;
-    double eps = 1e-9; // do warunku stopu
+    double eps = 1e-9;
     int Nmax = 10000;
 
     vector<double> sigmaValues = {0.01, 0.1, 1.0, 10.0, 100.0};
@@ -958,36 +1047,76 @@ void lab6()
     // Można też od razu uśredniać, ale tu zbieramy wszystkie, by ewentualnie przejrzeć.
     vector<vector<solution>> stats(sigmaValues.size());
 
-    for (size_t sIdx = 0; sIdx < sigmaValues.size(); sIdx++)
-    {
-        double sVal = sigmaValues[sIdx];
+    //for (size_t sIdx = 0; sIdx < sigmaValues.size(); sIdx++)
+    //{
+    //    double sVal = sigmaValues[sIdx];
 
-        cout << "\nPoczatkowa wartosc zakresu mutacji: " << sVal << "\n";
-        cout << "Lp., x1*, x2*, y*, Liczba wywolan funkcji celu, Minimum globalne[tak/nie]\n";
+    //    cout << "\nPoczatkowa wartosc zakresu mutacji: " << sVal << "\n";
+    //    cout << "Lp., x1*, x2*, y*, Liczba wywolan funkcji celu, Minimum globalne[tak/nie]\n";
 
-        for (int run = 1; run <= NUM_RUNS; run++)
-        {
-            // Ustawiamy poczatkowe sigma (2x1)
-            matrix sigma0(N, 1);
-            for (int d = 0; d < N; d++)
-            {
-                sigma0(d, 0) = sVal;
-            }
+    //    for (int run = 1; run <= NUM_RUNS; run++)
+    //    {
+    //        // Ustawiamy poczatkowe sigma (2x1)
+    //        matrix sigma0(N, 1);
+    //        for (int d = 0; d < N; d++)
+    //        {
+    //            sigma0(d, 0) = sVal;
+    //        }
 
-            solution::clear_calls();
+    //        solution::clear_calls();
 
-            solution bestSol = EA(ff6T, N, lb, ub, mi, lambda, sigma0, eps, Nmax, ud1, ud2);
+    //        solution bestSol = EA(ff6T, N, lb, ub, mi, lambda, sigma0, eps, Nmax, ud1, ud2);
 
-            double x1 = bestSol.x(0, 0);
-            double x2 = bestSol.x(1, 0);
-            double fVal = bestSol.y(0, 0);
-            int calls = solution::f_calls;
-            bool isMinGlobal = isGlobalMinimum(bestSol, 1e-6);
+    //        double x1 = bestSol.x(0, 0);
+    //        double x2 = bestSol.x(1, 0);
+    //        double fVal = bestSol.y(0, 0);
+    //        int calls = solution::f_calls;
+    //        bool isMinGlobal = isGlobalMinimum(bestSol, 1e-6);
 
-            cout << run << ", " << x1 << ", " << x2 << ", " << fVal << ", " << calls << ", "
-                 << (isMinGlobal ? "tak" : "nie") << "\n";
+    //        cout << run << ", " << x1 << ", " << x2 << ", " << fVal << ", " << calls << ", "
+    //             << (isMinGlobal ? "tak" : "nie") << "\n";
 
-            stats[sIdx].push_back(bestSol);
-        }
-    }
+    //        stats[sIdx].push_back(bestSol);
+    //    }
+    //}
+
+    // ///////////////////////////////////////////////// //
+    // -------------- PROBLEM RZECZYWISTY -------------- //
+    // ///////////////////////////////////////////////// //
+  
+
+    N = 2; // Liczba zmiennych decyzyjnych: b1 i b2
+    matrix lb_real(N, 1), ub_real(N, 1);
+    lb_real(0, 0) = 0.1;  // Dolna granica dla b1
+    lb_real(1, 0) = 0.1;  // Dolna granica dla b2
+    ub_real(0, 0) = 3.0;  // Górna granica dla b1
+    ub_real(1, 0) = 3.0;  // Górna granica dla b2
+
+    // Parametry algorytmu
+    mi = 20;
+    lambda = 40;
+    sigmaValues = { 0.1 };
+    eps = 1e-6;
+    Nmax = 10000;
+
+    matrix ud1_real, ud2_real; // Dodatkowe dane, jeśli potrzebne (puste w tym przykładzie)
+
+    cout << "\nOptymalizacja problemu rzeczywistego:\n";
+    cout << "b1*, b2*, J(b*), Liczba wywolan funkcji celu\n";
+
+    // OPTYMALIZACJA
+    matrix sigma0_real(N, 1, sigmaValues[0]);
+
+    solution::clear_calls();
+
+    solution bestSolReal = EA(ff6R, N, lb_real, ub_real, mi, lambda, sigma0_real, eps, Nmax, ud1_real, ud2_real);
+
+    double b1 = bestSolReal.x(0, 0);
+    double b2 = bestSolReal.x(1, 0);
+    double J = bestSolReal.y(0, 0);
+    int calls = solution::f_calls;
+
+    cout << b1 << ", " << b2 << ", " << J << ", " << calls << "\n";
+
+    simulateRealProblem(b1, b2);
 }
