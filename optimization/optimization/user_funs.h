@@ -1,6 +1,7 @@
 #pragma once
 
-#include"ode_solver.h"
+#include "ode_solver.h"
+#include "solution.h"
 
 matrix ff0T(matrix, matrix = NAN, matrix = NAN);
 matrix ff0R(matrix, matrix = NAN, matrix = NAN);
@@ -24,7 +25,12 @@ matrix logisticCostFunction(matrix x, matrix ud1, matrix ud2);
 matrix computeGradient(matrix X, matrix Y, matrix theta);
 matrix computeHessian(matrix X, matrix Y, matrix theta);
 double computeAccuracy(matrix X, matrix Y, matrix theta);
+void writeResultsToCSV(const string &filename, const vector<vector<double>> &results);
+string trim(const string &value);
+matrix loadDataToMatrix(const string &filename, int rows, int cols);
+
 matrix ff5T(matrix x, matrix = NAN, matrix = NAN);
 matrix ff5R(matrix x, matrix = NAN, matrix = NAN);
 void test_ff5T();
 matrix ff6T(matrix, matrix = NAN, matrix = NAN);
+
