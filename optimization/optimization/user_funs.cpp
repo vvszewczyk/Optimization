@@ -801,46 +801,52 @@ matrix ff6T(matrix x, matrix ud2, matrix ud1)
 
 matrix ff6R(matrix x, matrix ud1, matrix ud2)
 {
-    double b1 = x(0, 0); // Zmienna decyzyjna b1
-    double b2 = x(1, 0); // Zmienna decyzyjna b2
+    double b1 = x(0, 0);
+    double b2 = x(1, 0);
 
-    // Symulacja ruchu ciężarków
-    double m1 = 5.0, m2 = 5.0; // Maszyny
-    double k1 = 1.0, k2 = 1.0; // Sprężyny
-    double F = 1.0;           // Siła
+    // Parametry układu:
+    double m1 = 5.0, m2 = 5.0;  // masy
+    double k1 = 1.0, k2 = 1.0;  // współczynniki sprężystości
+    double F = 1.0;             // przyłożona siła
 
-    // Ustawienia czasowe
+    // Ustawienia czasowe:
     double dt = 0.1, T = 100.0;
     int steps = static_cast<int>(T / dt) + 1;
 
-    // Inicjalizacja zmiennych
+    // Inicjalizacja wektorów pozycji
     vector<double> x1(steps, 0.0), x2(steps, 0.0);
+    x1[0] = 0.0; // początkowe położenie pierwszego ciężarka
+    x2[0] = 0.0; // początkowe położenie drugiego ciężarka
+
+    // Prędkości
     vector<double> v1(steps, 0.0), v2(steps, 0.0);
-    x1[0] = 0.0; // Początkowe położenie
-    x2[0] = 0.0; // Początkowe położenie
+
 
     // Symulacja ruchu
-    for (int t = 1; t < steps; ++t)
+    for (int t = 0; t < steps - 1; ++t)
     {
-        double a1 = (-b1 * v1[t - 1] - k1 * x1[t - 1] - k2 * (x1[t - 1] - x2[t - 1])) / m1;
-        double a2 = (F - b2 * v2[t - 1] - k2 * (x2[t - 1] - x1[t - 1])) / m2;
+        // Przyśpieszenia
+        double a1 = (-b1 * v1[t] - b2 * (v1[t] - v2[t]) - k1 * x1[t] - k2 * (x1[t] - x2[t])) / m1;
+        double a2 = (F + b2 * (v1[t] - v2[t]) + k2 * (x1[t] - x2[t])) / m2;
 
-        v1[t] = v1[t - 1] + a1 * dt;
-        v2[t] = v2[t - 1] + a2 * dt;
+        // Aktualizacja prędkości
+        v1[t + 1] = v1[t] + a1 * dt;
+        v2[t + 1] = v2[t] + a2 * dt;
 
-        x1[t] = x1[t - 1] + v1[t] * dt;
-        x2[t] = x2[t - 1] + v2[t] * dt;
+        // Aktualizacja pozycji
+        x1[t + 1] = x1[t] + v1[t] * dt;
+        x2[t + 1] = x2[t] + v2[t] * dt;
     }
 
-    // Obliczanie funkcji celu
-    double error = 0.0;
+    // Obliczenie funkcji celu - suma kwadratów różnic pozycji ciężarków
+    double sum = 0.0;
     for (int t = 0; t < steps; ++t)
     {
-        error += pow(x1[t] - x2[t], 2); // Błąd dopasowania
+        sum += pow(x1[t] - x2[t], 2);
     }
 
     matrix result(1, 1);
-    result(0, 0) = error;
+    result(0, 0) = sum;
     return result;
 }
 

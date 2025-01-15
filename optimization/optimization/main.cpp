@@ -962,15 +962,20 @@ vector<pair<double, double>> simulateMovement(double b1, double b2, double dt, d
     vector<double> x1(steps, 0.0), x2(steps, 0.0);
     vector<double> v1(steps, 0.0), v2(steps, 0.0);
 
-    for (int t = 1; t < steps; ++t) {
-        double a1 = (-b1 * v1[t - 1] - k1 * x1[t - 1] - k2 * (x1[t - 1] - x2[t - 1])) / m1;
-        double a2 = (F - b2 * v2[t - 1] - k2 * (x2[t - 1] - x1[t - 1])) / m2;
+    // Symulacja ruchu
+    for (int t = 0; t < steps - 1; ++t)
+    {
+        // Przyśpieszenia
+        double a1 = (-b1 * v1[t] - b2 * (v1[t] - v2[t]) - k1 * x1[t] - k2 * (x1[t] - x2[t])) / m1;
+        double a2 = (F + b2 * (v1[t] - v2[t]) + k2 * (x1[t] - x2[t])) / m2;
 
-        v1[t] = v1[t - 1] + a1 * dt;
-        v2[t] = v2[t - 1] + a2 * dt;
+        // Aktualizacja prędkości
+        v1[t + 1] = v1[t] + a1 * dt;
+        v2[t + 1] = v2[t] + a2 * dt;
 
-        x1[t] = x1[t - 1] + v1[t] * dt;
-        x2[t] = x2[t - 1] + v2[t] * dt;
+        // Aktualizacja pozycji
+        x1[t + 1] = x1[t] + v1[t] * dt;
+        x2[t + 1] = x2[t] + v2[t] * dt;
     }
 
     vector<pair<double, double>> result;
@@ -1083,8 +1088,7 @@ void lab6()
     // ///////////////////////////////////////////////// //
     // -------------- PROBLEM RZECZYWISTY -------------- //
     // ///////////////////////////////////////////////// //
-  
-
+ 
     N = 2; // Liczba zmiennych decyzyjnych: b1 i b2
     matrix lb_real(N, 1), ub_real(N, 1);
     lb_real(0, 0) = 0.1;  // Dolna granica dla b1
@@ -1093,13 +1097,13 @@ void lab6()
     ub_real(1, 0) = 3.0;  // Górna granica dla b2
 
     // Parametry algorytmu
-    mi = 20;
-    lambda = 40;
+    mi = 10;
+    lambda = 20;
     sigmaValues = { 0.1 };
     eps = 1e-6;
     Nmax = 10000;
 
-    matrix ud1_real, ud2_real; // Dodatkowe dane, jeśli potrzebne (puste w tym przykładzie)
+    matrix ud1_real, ud2_real;
 
     cout << "\nOptymalizacja problemu rzeczywistego:\n";
     cout << "b1*, b2*, J(b*), Liczba wywolan funkcji celu\n";
