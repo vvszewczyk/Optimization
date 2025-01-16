@@ -9,9 +9,9 @@ Data ostatniej modyfikacji: 19.09.2023
 *********************************************/
 
 #include "opt_alg.h"
+#include <iostream>
 #include <random>
 #include <vector>
-#include <iostream>
 
 #ifndef M_PI
 #define M_PI 3.14159265358979323846
@@ -25,7 +25,7 @@ void lab4();
 void lab5();
 void lab6();
 
-bool isGlobalMinimum(const solution& sol, double tol)
+bool isGlobalMinimum(const solution &sol, double tol)
 {
     double x1 = sol.x(0, 0);
     double x2 = sol.x(1, 0);
@@ -35,17 +35,19 @@ bool isGlobalMinimum(const solution& sol, double tol)
     return (yVal <= tol);
 }
 
-void save_to_file_lab_5(std::ofstream& file, double a_val, double w, const matrix& x0, const solution& sol, double f1_val, double f2_val, long f_calls) {
-    file << a_val << ","   // wartość a
-        << w << ","   // waga w
-        << x0(0, 0) << ","   // początkowy x1
-        << x0(1, 0) << ","   // początkowy x2
-        << sol.x(0, 0) << ","   // rozwiązanie x1
-        << sol.x(1, 0) << ","   // rozwiązanie x2
-        << f1_val << ","   // wartość f1
-        << f2_val << ","   // wartość f2
-        << f_calls << ","   // liczba wywołań funkcji celu
-        << sol.flag << "\n";   // flaga statusu
+void save_to_file_lab_5(std::ofstream &file, double a_val, double w, const matrix &x0, const solution &sol,
+                        double f1_val, double f2_val, long f_calls)
+{
+    file << a_val << ","       // wartość a
+         << w << ","           // waga w
+         << x0(0, 0) << ","    // początkowy x1
+         << x0(1, 0) << ","    // początkowy x2
+         << sol.x(0, 0) << "," // rozwiązanie x1
+         << sol.x(1, 0) << "," // rozwiązanie x2
+         << f1_val << ","      // wartość f1
+         << f2_val << ","      // wartość f2
+         << f_calls << ","     // liczba wywołań funkcji celu
+         << sol.flag << "\n";  // flaga statusu
 }
 
 int main()
@@ -790,153 +792,158 @@ void lab5()
     csv.close();
     std::cout << "\nZakonczono iteracje. Wyniki w pliku: wyniki_ff5R.csv\n";
 
+    // Przygotowanie pliku do zapisu wyników
+    std::ofstream results_file_a1("output/lab5/results_powell_test_a1.csv");
+    std::ofstream results_file_a10("output/lab5/results_powell_test_a10.csv");
+    std::ofstream results_file_a100("output/lab5/results_powell_test_a100.csv");
+    results_file_a1 << "a,w,x1_0,x2_0,sol_x1,sol_x2,f1,f2,f_calls,flag\n";
+    results_file_a10 << "a,w,x1_0,x2_0,sol_x1,sol_x2,f1,f2,f_calls,flag\n";
+    results_file_a100 << "a,w,x1_0,x2_0,sol_x1,sol_x2,f1,f2,f_calls,flag\n";
 
-	// Przygotowanie pliku do zapisu wyników
-	std::ofstream results_file_a1("output/lab5/results_powell_test_a1.csv");
-	std::ofstream results_file_a10("output/lab5/results_powell_test_a10.csv");
-	std::ofstream results_file_a100("output/lab5/results_powell_test_a100.csv");
-	results_file_a1 << "a,w,x1_0,x2_0,sol_x1,sol_x2,f1,f2,f_calls,flag\n";
-	results_file_a10 << "a,w,x1_0,x2_0,sol_x1,sol_x2,f1,f2,f_calls,flag\n";
-	results_file_a100 << "a,w,x1_0,x2_0,sol_x1,sol_x2,f1,f2,f_calls,flag\n";
+    // Generator liczb losowych dla punktu startowego
+    // std::random_device rd;
+    // std::mt19937 gen(rd());
+    std::uniform_real_distribution<> dis(-10.0, 10.0);
 
-	// Generator liczb losowych dla punktu startowego
-	//std::random_device rd;
-	//std::mt19937 gen(rd());
-	std::uniform_real_distribution<> dis(-10.0, 10.0);
+    // Parametry
+    epsilon = 1e-8;
+    Nmax = 20000;
+    std::vector<double> a_values = {1.0, 10.0, 100.0};
 
-	// Parametry
-	epsilon = 1e-8;
-	Nmax = 20000;
-	std::vector<double> a_values = { 1.0, 10.0, 100.0 };
+    // Pętla po wagach w
+    for (int i = 0; i <= 100; i++)
+    {
+        // Wagi (w) od 0 do 1 z krokiem 0.01
+        double w = i * 0.01;
 
-	// Pętla po wagach w
-	for (int i = 0; i <= 100; i++)
-	{
-		// Wagi (w) od 0 do 1 z krokiem 0.01
-		double w = i * 0.01;
+        // Losowy punkt startowy x0
+        matrix x0(2, 1);
+        x0(0, 0) = dis(gen);
+        x0(1, 0) = dis(gen);
 
-		// Losowy punkt startowy x0
-		matrix x0(2, 1);
-		x0(0, 0) = dis(gen);
-		x0(1, 0) = dis(gen);
+        // Pętla po wartościach a
+        for (auto a_val : a_values)
+        {
+            // Ud1: tu przechowamy wagę w (ud1(0)) i parametr a (ud1(1))
+            // Zgodnie z założeniami z transkryptu:
+            // ud1(0) = waga, ud1(1) = a
+            matrix ud1(2, 1);
+            ud1(0) = w;
+            ud1(1) = a_val;
 
-		// Pętla po wartościach a
-		for (auto a_val : a_values)
-		{
-			// Ud1: tu przechowamy wagę w (ud1(0)) i parametr a (ud1(1))
-			// Zgodnie z założeniami z transkryptu:
-			// ud1(0) = waga, ud1(1) = a
-			matrix ud1(2, 1);
-			ud1(0) = w;
-			ud1(1) = a_val;
+            // ud2 pusty: ud2 będzie ustawiany w trakcie line search przez algorytm
+            matrix ud2;
 
-			// ud2 pusty: ud2 będzie ustawiany w trakcie line search przez algorytm
-			matrix ud2;
+            // Czyścimy liczniki wywołań funkcji celu itp.
+            solution::clear_calls();
 
-			// Czyścimy liczniki wywołań funkcji celu itp.
-			solution::clear_calls();
+            // Wywołujemy metodę Powella
+            solution sol = Powell(ff5T, x0, epsilon, Nmax, ud1, ud2);
 
-			// Wywołujemy metodę Powella
-			solution sol = Powell(ff5T, x0, epsilon, Nmax, ud1, ud2);
+            // Utwórz macierz 1x1 wypełnioną NaN, aby uzyskać f1 i f2
+            matrix ud2_empty(1, 1, std::numeric_limits<double>::quiet_NaN());
+            matrix y_val = ff5T(sol.x, ud1, ud2_empty);
 
-			// Utwórz macierz 1x1 wypełnioną NaN, aby uzyskać f1 i f2
-			matrix ud2_empty(1, 1, std::numeric_limits<double>::quiet_NaN());
-			matrix y_val = ff5T(sol.x, ud1, ud2_empty);
+            double f1_val = y_val(0, 0);
+            double f2_val = y_val(1, 0);
 
-			double f1_val = y_val(0, 0);
-			double f2_val = y_val(1, 0);
+            if (a_val == 1)
+            {
+                save_to_file_lab_5(results_file_a1, a_val, w, x0, sol, f1_val, f2_val, solution::f_calls);
+            }
+            else if (a_val == 10)
+            {
+                save_to_file_lab_5(results_file_a10, a_val, w, x0, sol, f1_val, f2_val, solution::f_calls);
+            }
+            else if (a_val == 100)
+            {
+                save_to_file_lab_5(results_file_a100, a_val, w, x0, sol, f1_val, f2_val, solution::f_calls);
+            }
+        }
+    }
 
-			if (a_val == 1) {
-				save_to_file_lab_5(results_file_a1, a_val, w, x0, sol, f1_val, f2_val, solution::f_calls);
-			}
-			else if (a_val == 10) {
-				save_to_file_lab_5(results_file_a10, a_val, w, x0, sol, f1_val, f2_val, solution::f_calls);
-			}
-			else if (a_val == 100) {
-				save_to_file_lab_5(results_file_a100, a_val, w, x0, sol, f1_val, f2_val, solution::f_calls);
-			}
-		}
-	}
+    results_file_a1.close();
+    results_file_a10.close();
+    results_file_a100.close();
+    std::cout << "Wyniki zapisane w pliku results_powell_test.csv\n";
 
-	results_file_a1.close();
-	results_file_a10.close();
-	results_file_a100.close();
-	std::cout << "Wyniki zapisane w pliku results_powell_test.csv\n";
+    ////PROBLEM RZECZYWISTY
+    //// Tworzymy generator:
+    // std::random_device rd;
+    // std::mt19937 gen(rd());
+    //// Rozkłady jednostajne (uniform) w określonych przedziałach:
+    ////   - l ~ U(0.2, 1.0)
+    ////   - d ~ U(0.01, 0.05)
+    // std::uniform_real_distribution<double> dist_l(0.2, 1.0);
+    // std::uniform_real_distribution<double> dist_d(0.01, 0.05);
+    //// Otwieramy plik CSV, żeby zapisywać wyniki
+    // std::ofstream csv("wyniki_ff5R.csv");
+    // if (!csv.is_open())
+    //{
+    //	std::cerr << "Nie udalo sie otworzyc pliku wyniki_ff5R.csv\n";
+    // }
+    //// Nagłówek:
+    // csv << "l(0) [mm],d(0) [mm],l* [mm],d* [mm],masa* [kg],ugiecie* [mm],naprężenie* [Pa],Liczba wywolan funkcji
+    // celu\n";
+    //// Parametry metody Powella
+    // double epsilon = 1e-6;
+    // int Nmax = 10000;
+    //// Pętla po w = 0..1 (krok 0.01 => 101 punktów)
+    // for (int i = 0; i <= 100; i++)
+    //{
+    //	double w = i / 100.0;
+    //	// Tworzymy ud1 = [w], 1x1:
+    //	matrix ud1(1, 1);
+    //	ud1(0, 0) = w;
+    //	// Ud2 = [NaN], 1x1, by w ff5R(...) zwracać wektor (masa, ugięcie, naprężenie) przy wywołaniu z NaN
+    //	matrix ud2NaN(1, 1, std::numeric_limits<double>::quiet_NaN());
+    //	// Generujemy punkt startowy x0: (l0, d0)
+    //	double l0 = dist_l(gen);
+    //	double d0 = dist_d(gen);
+    //	matrix x0(2, 1);
+    //	x0(0, 0) = l0;
+    //	x0(1, 0) = d0;
+    //	// Zerujemy licznik wywołań funkcji celu
+    //	solution::f_calls = 0;
+    //	// Wywołujemy metodę Powella
+    //	solution sol = Powell(ff5R, x0, epsilon, Nmax, ud1, ud2NaN);
 
-	////PROBLEM RZECZYWISTY
-	//// Tworzymy generator:
-	//std::random_device rd;
-	//std::mt19937 gen(rd());
-	//// Rozkłady jednostajne (uniform) w określonych przedziałach:
-	////   - l ~ U(0.2, 1.0)
-	////   - d ~ U(0.01, 0.05)
-	//std::uniform_real_distribution<double> dist_l(0.2, 1.0);
-	//std::uniform_real_distribution<double> dist_d(0.01, 0.05);
-	//// Otwieramy plik CSV, żeby zapisywać wyniki
-	//std::ofstream csv("wyniki_ff5R.csv");
-	//if (!csv.is_open())
-	//{
-	//	std::cerr << "Nie udalo sie otworzyc pliku wyniki_ff5R.csv\n";
-	//}
-	//// Nagłówek:
-	//csv << "l(0) [mm],d(0) [mm],l* [mm],d* [mm],masa* [kg],ugiecie* [mm],naprężenie* [Pa],Liczba wywolan funkcji celu\n";
-	//// Parametry metody Powella
-	//double epsilon = 1e-6;
-	//int Nmax = 10000;
-	//// Pętla po w = 0..1 (krok 0.01 => 101 punktów)
-	//for (int i = 0; i <= 100; i++)
-	//{
-	//	double w = i / 100.0;
-	//	// Tworzymy ud1 = [w], 1x1:
-	//	matrix ud1(1, 1);
-	//	ud1(0, 0) = w;
-	//	// Ud2 = [NaN], 1x1, by w ff5R(...) zwracać wektor (masa, ugięcie, naprężenie) przy wywołaniu z NaN
-	//	matrix ud2NaN(1, 1, std::numeric_limits<double>::quiet_NaN());
-	//	// Generujemy punkt startowy x0: (l0, d0)
-	//	double l0 = dist_l(gen);
-	//	double d0 = dist_d(gen);
-	//	matrix x0(2, 1);
-	//	x0(0, 0) = l0;
-	//	x0(1, 0) = d0;
-	//	// Zerujemy licznik wywołań funkcji celu
-	//	solution::f_calls = 0;
-	//	// Wywołujemy metodę Powella
-	//	solution sol = Powell(ff5R, x0, epsilon, Nmax, ud1, ud2NaN);
+    //	std::cout << sol << std::endl;
+    //	// Odczytujemy rozwiązanie
+    //	double l_star = sol.x(0, 0);
+    //	double d_star = sol.x(1, 0);
+    //	double mass = sol.y(0, 0);
+    //	double deflection = sol.y(1, 0);
+    //	double stress = sol.y(2, 0);
+    //	long calls = solution::f_calls;
 
-	//	std::cout << sol << std::endl;
-	//	// Odczytujemy rozwiązanie
-	//	double l_star = sol.x(0, 0);
-	//	double d_star = sol.x(1, 0);
-	//	double mass = sol.y(0, 0);
-	//	double deflection = sol.y(1, 0);
-	//	double stress = sol.y(2, 0);
-	//	long calls = solution::f_calls;
+    //	l0 *=  1000;
+    //	d0 *= 1000;
+    //	l_star *= 1000;
+    //	d_star *= 1000;
+    //	deflection *= 1000;
 
-	//	l0 *=  1000;
-	//	d0 *= 1000;
-	//	l_star *= 1000;
-	//	d_star *= 1000;
-	//	deflection *= 1000;
-
-	//	// Zapis do CSV
-	//	csv << l0 << ","   // l(0)
-	//		<< d0 << ","   // d(0)
-	//		<< l_star << ","
-	//		<< d_star << ","
-	//		<< mass << ","
-	//		<< deflection << ","
-	//		<< stress << ","
-	//		<< calls << "\n";
-	//	// Możesz też coś wypisać na ekran
-	//}
-	//csv.close();
-	//std::cout << "\nZakonczono iteracje. Wyniki w pliku: wyniki_ff5R.csv\n";
+    //	// Zapis do CSV
+    //	csv << l0 << ","   // l(0)
+    //		<< d0 << ","   // d(0)
+    //		<< l_star << ","
+    //		<< d_star << ","
+    //		<< mass << ","
+    //		<< deflection << ","
+    //		<< stress << ","
+    //		<< calls << "\n";
+    //	// Możesz też coś wypisać na ekran
+    //}
+    // csv.close();
+    // std::cout << "\nZakonczono iteracje. Wyniki w pliku: wyniki_ff5R.csv\n";
 }
 
 // Funkcja do wczytania danych z pliku
-matrix loadExperimentalData(const std::string& filename) {
+matrix loadExperimentalData(const std::string &filename)
+{
     std::ifstream file(filename);
-    if (!file.is_open()) {
+    if (!file.is_open())
+    {
         std::cerr << "Nie można otworzyć pliku: " << filename << std::endl;
         return matrix(); // Zwraca pustą macierz
     }
@@ -945,13 +952,15 @@ matrix loadExperimentalData(const std::string& filename) {
     std::vector<double> x2_vals;
     std::string line;
 
-    while (std::getline(file, line)) {
+    while (std::getline(file, line))
+    {
         std::replace(line.begin(), line.end(), ',', '.'); // Zamiana ',' na '.'
         std::replace(line.begin(), line.end(), ';', ' '); // Zamiana ';' na ' '
 
         std::istringstream iss(line);
         double x1, x2;
-        if (iss >> x1 >> x2) {
+        if (iss >> x1 >> x2)
+        {
             x1_vals.push_back(x1);
             x2_vals.push_back(x2);
         }
@@ -963,7 +972,8 @@ matrix loadExperimentalData(const std::string& filename) {
     int rows = x1_vals.size();
     matrix data_matrix(rows, 2); // Tworzymy macierz o wymiarach rows x 2
 
-    for (int i = 0; i < rows; ++i) {
+    for (int i = 0; i < rows; ++i)
+    {
         data_matrix(i, 0) = x1_vals[i]; // Pierwsza kolumna
         data_matrix(i, 1) = x2_vals[i]; // Druga kolumna
     }
@@ -1031,18 +1041,18 @@ void lab6()
     // ///////////////////////////////////////////////// //
     // -------------- PROBLEM RZECZYWISTY -------------- //
     // ///////////////////////////////////////////////// //
- 
+
     N = 2; // Liczba zmiennych decyzyjnych: b1 i b2
     matrix lb_real(N, 1), ub_real(N, 1);
-    lb_real(0, 0) = 0.1;  // Dolna granica dla b1
-    lb_real(1, 0) = 0.1;  // Dolna granica dla b2
-    ub_real(0, 0) = 3.0;  // Górna granica dla b1
-    ub_real(1, 0) = 3.0;  // Górna granica dla b2
+    lb_real(0, 0) = 0.1; // Dolna granica dla b1
+    lb_real(1, 0) = 0.1; // Dolna granica dla b2
+    ub_real(0, 0) = 3.0; // Górna granica dla b1
+    ub_real(1, 0) = 3.0; // Górna granica dla b2
 
     // Parametry algorytmu
     mi = 5;
     lambda = 10;
-    sigmaValues = { 0.1 };
+    sigmaValues = {0.1};
     eps = 1e-1; // 1e-1 fast calculations and ok results, 1e-2 better result but 3 mins calculation
     Nmax = 10000;
 

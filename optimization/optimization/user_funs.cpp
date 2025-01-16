@@ -817,22 +817,20 @@ matrix df6(double t, matrix Y, matrix ud1, matrix ud2)
     double a2 = (F + b2 * (v1 - v2) + k2 * (x1 - x2)) / m2;
 
     matrix dY(4, 1);
-    dY(0, 0) = v1;  // dx1/dt = v1
-    dY(1, 0) = a1;  // dv1/dt = a1
-    dY(2, 0) = v2;  // dx2/dt = v2
-    dY(3, 0) = a2;  // dv2/dt = a2
+    dY(0, 0) = v1; // dx1/dt = v1
+    dY(1, 0) = a1; // dv1/dt = a1
+    dY(2, 0) = v2; // dx2/dt = v2
+    dY(3, 0) = a2; // dv2/dt = a2
 
     return dY;
 }
 
 matrix ff6R(matrix x, matrix ud1, matrix ud2)
 {
-    // Pobranie danych
     double b1 = x(0, 0);
     double b2 = x(1, 0);
     matrix experimentalData = ud2;
 
-    // Kroki czasowe
     double dt = 0.1;
     double T = 100.0;
     double t0 = 0.0;
@@ -844,8 +842,7 @@ matrix ff6R(matrix x, matrix ud1, matrix ud2)
     Y0(2, 0) = 0.0; // pozycja x2
     Y0(3, 0) = 0.0; // prędkość v2
 
-    // Rozwiązanie równania różniczkowego
-    matrix* S = solve_ode(df6, t0, dt, T, Y0, x);
+    matrix *S = solve_ode(df6, t0, dt, T, Y0, x);
 
     // Wyniki równania różniczkowego
     matrix time = S[0];      // Kroki czasowe
@@ -880,7 +877,6 @@ matrix ff6R(matrix x, matrix ud1, matrix ud2)
         best_b2 = b2;
     }
 
-    // Zapisanie najlepszej symulacji do pliku CSV
     std::ofstream file("output/lab6/wyniki_symulacji_p6.csv");
     if (!file.is_open())
     {
@@ -896,12 +892,9 @@ matrix ff6R(matrix x, matrix ud1, matrix ud2)
 
     file.close();
 
-    // Czyszczenie pamięci
     delete[] S;
 
     matrix result(1, 1);
     result(0, 0) = best_error;
     return result;
 }
-
-
