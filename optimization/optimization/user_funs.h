@@ -28,10 +28,10 @@ double computeAccuracy(matrix X, matrix Y, matrix theta);
 void writeResultsToCSV(const string &filename, const vector<vector<double>> &results);
 string trim(const string &value);
 matrix loadDataToMatrix(const string &filename, int rows, int cols);
-
 matrix ff5T(matrix x, matrix = NAN, matrix = NAN);
 matrix ff5R(matrix x, matrix = NAN, matrix = NAN);
 void test_ff5T();
+matrix df6(double t, matrix Y, matrix ud1, matrix = NAN);
 matrix ff6T(matrix, matrix = NAN, matrix = NAN);
 matrix ff6R(matrix, matrix = NAN, matrix = NAN);
 
